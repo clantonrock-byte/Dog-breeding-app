@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Breeder Pro — Public Listings</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2 style="margin:0 0 6px 0">Public Listings</h2>
+      <div class="muted">This page is static. To publish real listings publicly you’ll eventually want a form service or backend.</div>
+      <div class="hr"></div>
+      <p class="muted small">
+        For now: export your <b>public feed</b> from the app and upload it as <code>public-feed.json</code> to this repo to populate listings here.
+      </p>
+      <div class="actions">
+        <a class="btn" href="public-feed.json" target="_blank" rel="noopener">Open public-feed.json</a>
+        <a class="btn ghost" href="index.html">Back to app</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Listings</h3>
+      <div id="listings" class="list"></div>
+    </div>
+
+    <div class="card">
+      <h3>Inquiry</h3>
+      <p class="muted small">No backend yet — this creates an email draft on your device.</p>
+      <form id="inq" class="grid">
+        <label class="span2">Your name<input id="n" class="input" /></label>
+        <label class="span2">Your email<input id="e" class="input" type="email" /></label>
+        <label class="span2">Message<input id="m" class="input" placeholder="What you’re looking for, timing, questions…" /></label>
+        <div class="span2 actions">
+          <button class="btn primary" type="submit">Create email</button>
+        </div>
+      </form>
+      <div id="hint" class="muted small"></div>
+    </div>
+  </div>
+
+<script>
+async function loadFeed(){
+  try{
+    const res = await fetch("./public-feed.json", {cache:"no-store"});
+    if(!res.ok) throw new Error("no feed");
+    const data = await res.json();
+    render(data);
+  }catch(e){
+    document.getElementById("listings").innerHTML = '<div class="muted">No public-feed.json found yet. Upload it and refresh.</div>';
+  }
+}
+function esc(s){ return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+function render(data){
+  const el = document.getElementById("listings");
+  const items = (data.listings||[]);
+  el.innerHTML = items.map(l=>`
+    <div class="item">
+      <div class="item-title">${esc(l.title)}</div>
+      <div class="item-sub">${esc(l.type)} • ${esc(l.breed)} • ${esc(l.status)} ${l.price?`• $${esc(l.price)}`:""}</div>
+      ${l.desc?`<div class="small muted" style="margin-top:8px">${esc(l.desc)}</div>`:""}
+    </div>
+  `).join("") || '<div class="muted">No listings yet.</div>';
+
+  document.getElementById("inq").addEventListener("submit",(ev)=>{
+    ev.preventDefault();
+    const name = document.getElementById("n").value.trim();
+    const email = document.getElementById("e").value.trim();
+    const msg = document.getElementById("m").value.trim();
+    const subject = encodeURIComponent("Puppy/Dog inquiry");
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${msg}`);
+    // You will replace this later with your real business email:
+    const to = "you@example.com";
+    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    document.getElementById("hint").textContent = "If nothing happened, set a default mail app on your phone.";
+  });
+}
+loadFeed();
+</script>
+</body>
+</html>

@@ -3,389 +3,356 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Rocks Corner Breeder</title>
-
-  <!-- Icons currently in repo root -->
-  <link rel="icon" href="icon-192.png" />
-
-  <style>
-    :root{
-      --bg:#0c0c0f; --card:#14141a; --ink:#f2f2f7; --muted:#a7a7b3; --line:#242432;
-      --brand:#7dd3fc; --ok:#86efac; --danger:#ff6b6b;
-      --shadow: 0 10px 30px rgba(0,0,0,.35); --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#09090b 0%,#0c0c0f 40%,#0b0b10 100%);
-      color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .app-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
-      padding:14px 14px 10px;background:rgba(12,12,15,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .brand{display:flex;gap:10px;align-items:center}
-    .logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
-      background: radial-gradient(circle at 30% 30%, var(--brand), #2dd4bf);
-      color:#061014;font-weight:900;box-shadow:var(--shadow)}
-    .title{font-weight:900}
-    .subtitle{color:var(--muted);font-size:.85rem}
-    .tabs{position:sticky;top:72px;z-index:9;display:flex;gap:8px;padding:10px 12px;
-      background:rgba(12,12,15,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);overflow:auto}
-    .tab{border:1px solid var(--line);background:transparent;color:var(--ink);padding:10px 12px;border-radius:999px;font-weight:800;white-space:nowrap}
-    .tab.active{border-color:transparent;background:rgba(125,211,252,.16);box-shadow: inset 0 0 0 1px rgba(125,211,252,.25)}
-    .container{padding:14px;padding-bottom:40px;max-width:980px;margin:0 auto}
-    .view{display:none}.view.active{display:block}
-    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0 12px}
-    .input{border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--ink);padding:12px;border-radius:14px;outline:none;width:100%}
-    .input:focus{border-color:rgba(125,211,252,.55);box-shadow:0 0 0 3px rgba(125,211,252,.14)}
-    .card{background:rgba(20,20,26,.92);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .grid label{display:flex;flex-direction:column;gap:6px;font-weight:700}
-    .span2{grid-column:1/-1}
-    .btn{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.08);color:var(--ink);
-      padding:10px 12px;border-radius:14px;font-weight:900}
-    .btn.primary{background:rgba(125,211,252,.20);border-color:rgba(125,211,252,.35)}
-    .btn.ghost{background:transparent;border-color:var(--line)}
-    .btn.danger{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.35)}
-    .list{display:flex;flex-direction:column;gap:10px}
-    .item{border:1px solid var(--line);background:rgba(0,0,0,.18);border-radius:var(--radius);padding:12px}
-    .item-title{font-size:1.05rem;font-weight:950;margin:0 0 6px}
-    .item-sub{color:var(--muted);font-size:.92rem}
-    .muted{color:var(--muted)} .small{font-size:.86rem}
-    .hr{height:1px;background:var(--line);margin:12px 0}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-    @media (max-width:560px){ .grid{grid-template-columns:1fr} .span2{grid-column:auto} .row{flex-direction:column;align-items:stretch} }
-  </style>
+  <meta name="theme-color" content="#0c0c0f" />
+  <title>Breeder Pro</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <header class="app-header">
     <div class="brand">
-      <div class="logo">RC</div>
-      <div>
-        <div class="title">Rocks Corner</div>
-        <div class="subtitle">Breeder Dashboard (Single-File)</div>
+      <div class="logo" aria-hidden="true">BP</div>
+      <div class="brand-text">
+        <div class="title" id="brandTitle">Breeder Pro</div>
+        <div class="subtitle" id="brandSubtitle">Kennel dashboard</div>
       </div>
     </div>
-    <button id="btnExport" class="btn">Export</button>
+
+    <div class="header-actions">
+      <button id="btnInstall" class="btn ghost" hidden>Install</button>
+      <a class="btn ghost" href="public.html" target="_blank" rel="noopener">Public page</a>
+      <button id="btnExport" class="btn">Export</button>
+      <label class="btn ghost" for="importFile">Import</label>
+      <input id="importFile" type="file" accept="application/json" hidden />
+    </div>
   </header>
 
-  <nav class="tabs">
-    <button class="tab active" data-view="dogsView">Dogs</button>
-    <button class="tab" data-view="littersView">Litters</button>
-    <button class="tab" data-view="waitlistView">Waitlist</button>
-    <button class="tab" data-view="clientsView">Clients</button>
+  <nav class="tabs" aria-label="Primary navigation">
+    <button class="tab active" data-view="dashboardView">Dashboard</button>
+    <button class="tab" data-view="breederView">Breeder</button>
+    <button class="tab" data-view="sellerView">Seller</button>
+    <button class="tab" data-view="buyerView">Buyer</button>
+    <button class="tab" data-view="settingsView">Settings</button>
   </nav>
 
   <main class="container">
-    <!-- Dogs -->
-    <section id="dogsView" class="view active">
-      <div class="row">
-        <h2 style="margin:0">Dogs / Pups</h2>
-        <input id="dogsSearch" class="input" placeholder="Search dogs…" />
+    <!-- DASHBOARD -->
+    <section id="dashboardView" class="view active">
+      <div class="cards-2">
+        <div class="card">
+          <h3>At a glance</h3>
+          <div id="countsBox" class="mono"></div>
+          <div class="muted small" style="margin-top:10px">Tip: Configure hats + kennel brand in Settings.</div>
+        </div>
+        <div class="card">
+          <h3>Breed mix</h3>
+          <div id="breedMixBox" class="mono"></div>
+        </div>
       </div>
 
       <div class="card">
-        <h3 style="margin:.2rem 0 1rem 0">Add Dog</h3>
+        <h3>Next follow-ups</h3>
+        <div class="muted">Contacts with no touch logged in the last 30 days.</div>
+        <div id="followupsBox" class="mono" style="margin-top:10px"></div>
+      </div>
+    </section>
+
+    <!-- BREEDER (dogs + litters + placements pipeline) -->
+    <section id="breederView" class="view">
+      <div class="row">
+        <h2>Breeder</h2>
+        <div class="row-right">
+          <select id="dogsBreedFilter" class="input compact" title="Filter by breed"></select>
+          <input id="dogsSearch" class="input" placeholder="Search dogs… (name, reg #, notes)" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="margin:0 0 10px 0">
+          <h3 style="margin:0">Add Dog</h3>
+          <button class="btn ghost" id="btnDogClear" type="button">Clear</button>
+        </div>
+
         <form id="dogForm" class="grid">
-          <label>Name
-            <input id="dogName" class="input" required placeholder="e.g., Lopaka" />
-          </label>
+          <label>Name<input id="dogName" class="input" required placeholder="e.g., Lopaka" /></label>
+          <label>Breed<select id="dogBreed" class="input" required></select></label>
           <label>Sex
             <select id="dogSex" class="input">
-              <option>Male</option><option>Female</option><option>Unknown</option>
+              <option value="Male">Male</option><option value="Female">Female</option><option value="Unknown">Unknown</option>
             </select>
           </label>
-          <label>DOB
-            <input id="dogDob" class="input" type="date" />
-          </label>
+          <label>DOB<input id="dogDob" class="input" type="date" /></label>
+          <label>AKC Registration #<input id="dogReg" class="input" placeholder="Optional" /></label>
           <label>Status
             <select id="dogStatus" class="input">
-              <option>Breeding Stock</option><option>Retained</option><option>Available</option><option>Placed</option><option>Other</option>
+              <option value="Breeding Stock">Breeding Stock</option>
+              <option value="Retained">Retained</option>
+              <option value="Available">Available</option>
+              <option value="Placed">Placed</option>
+              <option value="Other">Other</option>
             </select>
           </label>
-          <label class="span2">Notes
-            <input id="dogNotes" class="input" placeholder="Temperament, training, health notes…" />
-          </label>
-          <div class="span2 actions">
-            <button class="btn primary" type="submit">Add</button>
-            <button class="btn ghost" type="button" id="dogClear">Clear</button>
-          </div>
+          <label class="span2">Notes<input id="dogNotes" class="input" placeholder="Temperament, training, health notes…" /></label>
+          <div class="span2 actions"><button class="btn primary" type="submit">Add Dog</button></div>
         </form>
       </div>
 
-      <div id="dogsList" class="list"></div>
-    </section>
-
-    <!-- Litters -->
-    <section id="littersView" class="view">
-      <div class="row">
-        <h2 style="margin:0">Litters</h2>
-        <input id="littersSearch" class="input" placeholder="Search litters…" />
-      </div>
-
       <div class="card">
-        <h3 style="margin:.2rem 0 1rem 0">Add Litter</h3>
+        <div class="row" style="margin:0 0 10px 0">
+          <h3 style="margin:0">Add Litter</h3>
+          <button class="btn ghost" id="btnLitterClear" type="button">Clear</button>
+        </div>
+
         <form id="litterForm" class="grid">
-          <label>Birth Date
-            <input id="litterDate" class="input" type="date" required />
+          <label>Breed<select id="litterBreed" class="input" required></select></label>
+          <label>Birth Date<input id="litterDob" class="input" type="date" required /></label>
+
+          <label>Dam (select)
+            <select id="litterDamDog" class="input"></select>
           </label>
-          <label>Dam
-            <input id="litterDam" class="input" placeholder="e.g., Aina" />
+          <label>Sire (select)
+            <select id="litterSireDog" class="input"></select>
           </label>
-          <label>Sire
-            <input id="litterSire" class="input" placeholder="e.g., Malama" />
+
+          <label>Male Count<input id="litterMale" class="input" type="number" min="0" value="0" /></label>
+          <label>Female Count<input id="litterFemale" class="input" type="number" min="0" value="0" /></label>
+
+          <label class="span2">Notes<input id="litterNotes" class="input" placeholder="Highlights, health checks, reservations…" /></label>
+          <div class="span2 actions"><button class="btn primary" type="submit">Add Litter</button></div>
+        </form>
+      </div>
+
+      <div class="cards-2">
+        <div class="card">
+          <h3>Dogs</h3>
+          <div id="dogsList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Litters</h3>
+          <div id="littersList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SELLER (listings + inquiries) -->
+    <section id="sellerView" class="view">
+      <div class="row">
+        <h2>Seller</h2>
+        <input id="sellerSearch" class="input" placeholder="Search listings/inquiries…" />
+      </div>
+
+      <div class="card">
+        <h3>Create listing</h3>
+        <form id="listingForm" class="grid">
+          <label>Type
+            <select id="listingType" class="input">
+              <option value="Dog">Dog</option>
+              <option value="Puppy">Puppy</option>
+              <option value="Litter">Litter</option>
+            </select>
           </label>
-          <label>Male Count
-            <input id="litterMale" class="input" type="number" min="0" value="0" />
+
+          <label>Breed
+            <select id="listingBreed" class="input" required></select>
           </label>
-          <label>Female Count
-            <input id="litterFemale" class="input" type="number" min="0" value="0" />
+
+          <label>Title
+            <input id="listingTitle" class="input" required placeholder="e.g., GSP male available – spring litter" />
           </label>
-          <label class="span2">Notes
-            <input id="litterNotes" class="input" placeholder="Reservations, health checks…" />
+
+          <label>Price (optional)
+            <input id="listingPrice" class="input" type="number" min="0" placeholder="e.g., 2500" />
           </label>
+
+          <label class="span2">Description
+            <input id="listingDesc" class="input" placeholder="Health, temperament, pickup timing, what’s included…" />
+          </label>
+
+          <label>Status
+            <select id="listingStatus" class="input">
+              <option value="Active">Active</option>
+              <option value="Hold">Hold</option>
+              <option value="Sold">Sold</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </label>
+
+          <label>Public?
+            <select id="listingPublic" class="input">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </label>
+
           <div class="span2 actions">
-            <button class="btn primary" type="submit">Add</button>
-            <button class="btn ghost" type="button" id="litterClear">Clear</button>
+            <button class="btn primary" type="submit">Add listing</button>
           </div>
         </form>
       </div>
 
-      <div id="littersList" class="list"></div>
+      <div class="card">
+        <h3>Log inquiry (manual)</h3>
+        <div class="muted small">Until we add a real backend/form service, public inquiries must be logged here or sent via email.</div>
+        <form id="inquiryForm" class="grid" style="margin-top:10px">
+          <label>Listing
+            <select id="inquiryListing" class="input"></select>
+          </label>
+          <label>Buyer name
+            <input id="inquiryName" class="input" placeholder="Name" />
+          </label>
+          <label>Email
+            <input id="inquiryEmail" class="input" type="email" placeholder="name@email.com" />
+          </label>
+          <label>Phone
+            <input id="inquiryPhone" class="input" placeholder="(###) ###-####" />
+          </label>
+          <label class="span2">Message
+            <input id="inquiryMsg" class="input" placeholder="What they want, timing, questions…" />
+          </label>
+          <div class="span2 actions">
+            <button class="btn primary" type="submit">Add inquiry</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="cards-2">
+        <div class="card">
+          <h3>Listings</h3>
+          <div id="listingsList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Inquiries</h3>
+          <div id="inquiriesList" class="list"></div>
+        </div>
+      </div>
     </section>
 
-    <!-- Waitlist -->
-    <section id="waitlistView" class="view">
+    <!-- BUYER (waitlist + purchases + inquiries you sent) -->
+    <section id="buyerView" class="view">
       <div class="row">
-        <h2 style="margin:0">Waitlist</h2>
-        <input id="waitSearch" class="input" placeholder="Search waitlist…" />
+        <h2>Buyer</h2>
+        <input id="buyerSearch" class="input" placeholder="Search buyer records…" />
       </div>
 
       <div class="card">
-        <h3 style="margin:.2rem 0 1rem 0">Add Waitlist Entry</h3>
+        <h3>Add buyer waitlist entry</h3>
         <form id="waitForm" class="grid">
-          <label>Name
-            <input id="waitName" class="input" required placeholder="Client name" />
-          </label>
+          <label>Name<input id="waitName" class="input" required placeholder="Client name" /></label>
+          <label>Desired Breed<select id="waitBreed" class="input" required></select></label>
           <label>Desired Sex
             <select id="waitSex" class="input">
-              <option>Any</option><option>Male</option><option>Female</option>
+              <option value="Any">Any</option><option value="Male">Male</option><option value="Female">Female</option>
             </select>
           </label>
-          <label>Phone
-            <input id="waitPhone" class="input" placeholder="(###) ###-####" />
-          </label>
-          <label>Email
-            <input id="waitEmail" class="input" type="email" placeholder="name@email.com" />
-          </label>
-          <label class="span2">Looking For (traits)
-            <input id="waitTraits" class="input" placeholder="Hunting, family, calm, drive, color…" />
-          </label>
-          <label class="span2">Notes
-            <input id="waitNotes" class="input" placeholder="Follow-up date, preferences…" />
-          </label>
-          <div class="span2 actions">
-            <button class="btn primary" type="submit">Add</button>
-            <button class="btn ghost" type="button" id="waitClear">Clear</button>
-          </div>
+          <label>Timing<input id="waitTiming" class="input" placeholder="e.g., Spring 2026" /></label>
+          <label>Phone<input id="waitPhone" class="input" placeholder="(###) ###-####" /></label>
+          <label>Email<input id="waitEmail" class="input" type="email" placeholder="name@email.com" /></label>
+          <label class="span2">Looking For (traits)<input id="waitTraits" class="input" placeholder="Hunting, family, calm, drive, color…" /></label>
+          <label class="span2">Notes<input id="waitNotes" class="input" placeholder="Follow-up date, preferences…" /></label>
+          <div class="span2 actions"><button class="btn primary" type="submit">Add waitlist</button></div>
         </form>
-      </div>
-
-      <div id="waitList" class="list"></div>
-    </section>
-
-    <!-- Clients -->
-    <section id="clientsView" class="view">
-      <div class="row">
-        <h2 style="margin:0">Clients</h2>
-        <input id="clientSearch" class="input" placeholder="Search clients…" />
       </div>
 
       <div class="card">
-        <h3 style="margin:.2rem 0 1rem 0">Add Client</h3>
-        <form id="clientForm" class="grid">
-          <label>Name
-            <input id="clientName" class="input" required placeholder="Client name" />
+        <h3>Buyer purchases (your own buying)</h3>
+        <form id="buyerPurchaseForm" class="grid">
+          <label>From seller/kennel
+            <input id="bpSeller" class="input" placeholder="Who you bought from" />
           </label>
-          <label>Repeat Client?
-            <select id="clientRepeat" class="input"><option>No</option><option>Yes</option></select>
+          <label>Breed
+            <select id="bpBreed" class="input"></select>
           </label>
-          <label>Phone
-            <input id="clientPhone" class="input" placeholder="(###) ###-####" />
+          <label>Dog/Pup name
+            <input id="bpDog" class="input" placeholder="Name or TBD" />
           </label>
-          <label>Email
-            <input id="clientEmail" class="input" type="email" placeholder="name@email.com" />
+          <label>Date
+            <input id="bpDate" class="input" type="date" />
           </label>
-          <label class="span2">Discount Note
-            <input id="clientDiscount" class="input" placeholder="e.g., $200 off next pup" />
+          <label>Amount
+            <input id="bpAmount" class="input" type="number" min="0" placeholder="e.g., 2500" />
           </label>
           <label class="span2">Notes
-            <input id="clientNotes" class="input" placeholder="Home, goals, experience…" />
+            <input id="bpNotes" class="input" placeholder="Deposit, contract, shipping, etc." />
+          </label>
+          <div class="span2 actions"><button class="btn primary" type="submit">Add purchase</button></div>
+        </form>
+      </div>
+
+      <div class="cards-2">
+        <div class="card">
+          <h3>Waitlist</h3>
+          <div id="waitList" class="list"></div>
+        </div>
+        <div class="card">
+          <h3>Purchases</h3>
+          <div id="buyerPurchasesList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settingsView" class="view">
+      <div class="card">
+        <h3>Hats</h3>
+        <div class="muted small">Enable/disable sections. (All hats can be on.)</div>
+        <div class="hr"></div>
+        <div class="grid">
+          <label>Breeder
+            <select id="hatBreeder" class="input"><option value="On">On</option><option value="Off">Off</option></select>
+          </label>
+          <label>Seller
+            <select id="hatSeller" class="input"><option value="On">On</option><option value="Off">Off</option></select>
+          </label>
+          <label>Buyer
+            <select id="hatBuyer" class="input"><option value="On">On</option><option value="Off">Off</option></select>
           </label>
           <div class="span2 actions">
-            <button class="btn primary" type="submit">Add</button>
-            <button class="btn ghost" type="button" id="clientClear">Clear</button>
+            <button id="btnSaveHats" class="btn primary" type="button">Save hats</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Kennel profile</h3>
+        <form id="kennelForm" class="grid">
+          <label class="span2">Display name<input id="kennelName" class="input" placeholder="e.g., Rocks Corner" /></label>
+          <label>Mode
+            <select id="kennelMode" class="input">
+              <option value="Individual">Individual</option>
+              <option value="Breeder">Breeder</option>
+              <option value="Organization">Organization</option>
+            </select>
+          </label>
+          <label>Brand initials<input id="kennelInitials" class="input" placeholder="e.g., RC" maxlength="4" /></label>
+          <label class="span2">Brand color (hex)<input id="kennelColor" class="input" placeholder="#7dd3fc" /></label>
+          <div class="span2 actions">
+            <button class="btn primary" type="submit">Save profile</button>
+            <button id="btnResetAll" class="btn danger" type="button">Reset all data</button>
           </div>
         </form>
       </div>
 
-      <div id="clientsList" class="list"></div>
+      <div class="card">
+        <h3>Breeds</h3>
+        <p class="muted">Baseline is German Shorthaired Pointer. Add more breeds as needed.</p>
+        <form id="breedForm" class="grid">
+          <label class="span2">Add breed name<input id="breedName" class="input" placeholder="e.g., Labrador Retriever" /></label>
+          <div class="span2 actions"><button class="btn primary" type="submit">Add breed</button></div>
+        </form>
+        <div class="hr"></div>
+        <div id="breedsList" class="list"></div>
+      </div>
+
+      <div class="card">
+        <h3>Data</h3>
+        <div class="muted small">Export/Import works across devices. Save exports in Drive.</div>
+        <div class="hr"></div>
+        <div class="mono" id="metaBox"></div>
+      </div>
     </section>
   </main>
 
-  <script>
-    const KEY="rc_singlefile_v1";
-    const uid=()=>Math.random().toString(16).slice(2)+"-"+Date.now().toString(16);
-    const now=()=>new Date().toISOString();
-    const load=()=>{ try{ return JSON.parse(localStorage.getItem(KEY)) || {dogs:[],litters:[],wait:[],clients:[]}; }catch{ return {dogs:[],litters:[],wait:[],clients:[]}; } };
-    const save=(s)=>localStorage.setItem(KEY, JSON.stringify(s));
-    const esc=(s)=>String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-    const inc=(h,n)=>h.toLowerCase().includes(n.toLowerCase());
-
-    let S=load();
-
-    // Tabs
-    const views=["dogsView","littersView","waitlistView","clientsView"];
-    document.querySelectorAll(".tab").forEach(btn=>{
-      btn.addEventListener("click",()=>{
-        document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        const id=btn.dataset.view;
-        views.forEach(v=>document.getElementById(v).classList.toggle("active", v===id));
-      });
-    });
-
-    // Dogs
-    const dogForm=document.getElementById("dogForm");
-    dogForm.addEventListener("submit",(e)=>{
-      e.preventDefault();
-      S.dogs.unshift({id:uid(),name:dogName.value.trim(),sex:dogSex.value,dob:dogDob.value||"",status:dogStatus.value,notes:dogNotes.value.trim(),t:now()});
-      dogForm.reset(); dogSex.value="Male"; dogStatus.value="Breeding Stock";
-      save(S); render();
-    });
-    dogClear.onclick=()=>dogForm.reset();
-    dogsSearch.oninput=()=>renderDogs();
-
-    function renderDogs(){
-      const q=dogsSearch.value.trim();
-      const list=S.dogs.filter(d=>!q || inc(d.name,q)||inc(d.sex,q)||inc(d.status,q)||inc(d.notes,q));
-      dogsList.innerHTML = list.map(d=>`
-        <div class="item">
-          <div class="item-title">${esc(d.name)}</div>
-          <div class="item-sub">DOB: ${esc(d.dob||"—")} • Sex: ${esc(d.sex)} • Status: ${esc(d.status)}</div>
-          ${d.notes?`<div class="small muted" style="margin-top:8px">${esc(d.notes)}</div>`:""}
-          <div class="hr"></div>
-          <div class="actions">
-            <button class="btn danger" onclick="delDog('${d.id}')">Delete</button>
-          </div>
-        </div>
-      `).join("") || `<div class="muted">No dogs yet.</div>`;
-    }
-    window.delDog=(id)=>{ S.dogs=S.dogs.filter(d=>d.id!==id); save(S); render(); };
-
-    // Litters
-    litterForm.addEventListener("submit",(e)=>{
-      e.preventDefault();
-      S.litters.unshift({id:uid(),date:litterDate.value,dam:litterDam.value.trim(),sire:litterSire.value.trim(),
-        male:+(litterMale.value||0),female:+(litterFemale.value||0),notes:litterNotes.value.trim(),t:now()});
-      litterForm.reset(); litterMale.value=0; litterFemale.value=0;
-      save(S); render();
-    });
-    litterClear.onclick=()=>litterForm.reset();
-    littersSearch.oninput=()=>renderLitters();
-
-    function renderLitters(){
-      const q=littersSearch.value.trim();
-      const list=S.litters.filter(l=>!q || inc(l.date,q)||inc(l.dam,q)||inc(l.sire,q)||inc(l.notes,q));
-      littersList.innerHTML=list.map(l=>`
-        <div class="item">
-          <div class="item-title">${esc(l.date)}</div>
-          <div class="item-sub">Dam: ${esc(l.dam||"—")} • Sire: ${esc(l.sire||"—")} • ♂ ${l.male} / ♀ ${l.female}</div>
-          ${l.notes?`<div class="small muted" style="margin-top:8px">${esc(l.notes)}</div>`:""}
-          <div class="hr"></div>
-          <div class="actions">
-            <button class="btn danger" onclick="delLitter('${l.id}')">Delete</button>
-          </div>
-        </div>
-      `).join("") || `<div class="muted">No litters yet.</div>`;
-    }
-    window.delLitter=(id)=>{ S.litters=S.litters.filter(l=>l.id!==id); save(S); render(); };
-
-    // Waitlist
-    waitForm.addEventListener("submit",(e)=>{
-      e.preventDefault();
-      S.wait.unshift({id:uid(),name:waitName.value.trim(),sex:waitSex.value,phone:waitPhone.value.trim(),email:waitEmail.value.trim(),
-        traits:waitTraits.value.trim(),notes:waitNotes.value.trim(),t:now()});
-      waitForm.reset(); waitSex.value="Any";
-      save(S); render();
-    });
-    waitClear.onclick=()=>waitForm.reset();
-    waitSearch.oninput=()=>renderWait();
-
-    function renderWait(){
-      const q=waitSearch.value.trim();
-      const list=S.wait.filter(w=>!q || inc(w.name,q)||inc(w.phone,q)||inc(w.email,q)||inc(w.traits,q)||inc(w.notes,q));
-      waitList.innerHTML=list.map(w=>`
-        <div class="item">
-          <div class="item-title">${esc(w.name)}</div>
-          <div class="item-sub">${esc(w.phone||"—")} • ${esc(w.email||"—")} • Wants: ${esc(w.sex)}</div>
-          ${w.traits?`<div class="small muted" style="margin-top:8px">Traits: ${esc(w.traits)}</div>`:""}
-          ${w.notes?`<div class="small muted" style="margin-top:4px">Notes: ${esc(w.notes)}</div>`:""}
-          <div class="hr"></div>
-          <div class="actions">
-            <button class="btn" onclick="toClient('${w.id}')">Convert → Client</button>
-            <button class="btn danger" onclick="delWait('${w.id}')">Delete</button>
-          </div>
-        </div>
-      `).join("") || `<div class="muted">No waitlist entries yet.</div>`;
-    }
-    window.delWait=(id)=>{ S.wait=S.wait.filter(w=>w.id!==id); save(S); render(); };
-    window.toClient=(id)=>{
-      const w=S.wait.find(x=>x.id===id); if(!w) return;
-      S.clients.unshift({id:uid(),name:w.name,repeat:"No",phone:w.phone,email:w.email,discount:"",notes:`From waitlist: ${w.sex}. Traits: ${w.traits}. ${w.notes}`.trim(),t:now()});
-      S.wait=S.wait.filter(x=>x.id!==id);
-      save(S); render();
-      alert("Converted to Client ✅");
-    };
-
-    // Clients
-    clientForm.addEventListener("submit",(e)=>{
-      e.preventDefault();
-      S.clients.unshift({id:uid(),name:clientName.value.trim(),repeat:clientRepeat.value,phone:clientPhone.value.trim(),email:clientEmail.value.trim(),
-        discount:clientDiscount.value.trim(),notes:clientNotes.value.trim(),t:now()});
-      clientForm.reset(); clientRepeat.value="No";
-      save(S); render();
-    });
-    clientClear.onclick=()=>clientForm.reset();
-    clientSearch.oninput=()=>renderClients();
-
-    function renderClients(){
-      const q=clientSearch.value.trim();
-      const list=S.clients.filter(c=>!q || inc(c.name,q)||inc(c.phone,q)||inc(c.email,q)||inc(c.notes,q)||inc(c.discount,q));
-      clientsList.innerHTML=list.map(c=>`
-        <div class="item">
-          <div class="item-title">${esc(c.name)}</div>
-          <div class="item-sub">${esc(c.phone||"—")} • ${esc(c.email||"—")} • ${c.repeat==="Yes"?"Repeat":"New"}</div>
-          ${c.discount?`<div class="small muted" style="margin-top:8px">Discount: ${esc(c.discount)}</div>`:""}
-          ${c.notes?`<div class="small muted" style="margin-top:4px">${esc(c.notes)}</div>`:""}
-          <div class="hr"></div>
-          <div class="actions">
-            <button class="btn danger" onclick="delClient('${c.id}')">Delete</button>
-          </div>
-        </div>
-      `).join("") || `<div class="muted">No clients yet.</div>`;
-    }
-    window.delClient=(id)=>{ S.clients=S.clients.filter(c=>c.id!==id); save(S); render(); };
-
-    // Export
-    btnExport.onclick=()=>{
-      const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a");
-      a.href=url; a.download=`rocks-corner-backup-${new Date().toISOString().slice(0,10)}.json`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-    };
-
-    function render(){ renderDogs(); renderLitters(); renderWait(); renderClients(); }
-    render();
-  </script>
+  <script src="app.js"></script>
 </body>
-  </html>
+</html>
