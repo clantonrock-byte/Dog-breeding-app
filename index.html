@@ -245,6 +245,36 @@
     </dialog>
   </main>
 
+<script>
+    // Visible "health" bar + error catcher (temporary)
+    (function () {
+      const bar = document.createElement("div");
+      bar.id = "jsHealth";
+      bar.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:999999;" +
+        "background:#111;color:#fff;padding:8px 10px;font:12px system-ui;" +
+        "border-top:1px solid rgba(255,255,255,.15)";
+      bar.textContent = "JS: page loaded (waiting for app.js)";
+      document.body.appendChild(bar);
+
+      window.addEventListener("error", function (e) {
+        bar.textContent = "JS ERROR: " + (e.message || "unknown error");
+      });
+
+      window.addEventListener("unhandledrejection", function (e) {
+        bar.textContent = "JS PROMISE ERROR: " + (e.reason?.message || e.reason || "unknown");
+      });
+    })();
+  </script>
+
   <script src="app.js"></script>
+
+  <script>
+    // If you see this text change, app.js loaded successfully.
+    const bar = document.getElementById("jsHealth");
+    if (bar) bar.textContent = "JS: app.js loaded (if buttons still dead, app.js crashed after load)";
+  </script>
+</body>
+</html>
 </body>
 </html>
