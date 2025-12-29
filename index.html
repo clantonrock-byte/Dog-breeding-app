@@ -6,7 +6,6 @@
   <title>Breeder Pro (MSV)</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <header class="topbar">
     <div class="brand">
@@ -21,14 +20,11 @@
   </header>
 
   <main class="shell">
-
-    <!-- GOAL -->
     <section class="card">
       <div class="card-h">
         <h2>Goal here</h2>
         <button class="icon-btn" data-help="goal">ⓘ</button>
       </div>
-
       <div id="goalHelp" class="help hide"></div>
 
       <div class="goal-grid">
@@ -39,7 +35,6 @@
       </div>
     </section>
 
-    <!-- TABS -->
     <section class="tabs">
       <button class="tab active" data-view="dogs">Dogs</button>
       <button class="tab" data-view="care">Care</button>
@@ -47,27 +42,26 @@
       <button class="tab" data-view="records">Records</button>
     </section>
 
-    <!-- DOGS VIEW -->
+    <!-- DOGS -->
     <section id="viewDogs" class="card">
       <div class="card-h">
         <h2>Dogs & Pups</h2>
-        <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
+        <button class="btn" id="btnAddDog">+ Add Dog/Pup</button>
       </div>
 
       <div class="grid two">
         <div>
           <label class="label">Select</label>
           <select id="selAnimal"></select>
+          <div class="muted small">Tip: pups are just animals with type “Pup”.</div>
         </div>
 
-        <div id="animalSummary" class="animal-summary"></div>
+        <div class="animal-summary" id="animalSummary"></div>
       </div>
 
       <hr class="sep"/>
 
       <div class="grid two">
-
-        <!-- FEEDING -->
         <div class="card sub">
           <div class="card-h">
             <h3>Feeding</h3>
@@ -75,19 +69,22 @@
           </div>
           <div id="feedHelp" class="help hide"></div>
 
-          <label class="label">Current Feed</label>
-          <input id="inpCurrentFeed" placeholder="e.g., Purina Pro Plan Puppy" />
-
-          <label class="label">Notes</label>
-          <input id="inpFeedNotes" placeholder="e.g., tolerating well" />
-
+          <div class="row">
+            <div class="col">
+              <label class="label">Current feed</label>
+              <input id="inpCurrentFeed" placeholder="e.g., Purina Pro Plan Puppy" />
+            </div>
+            <div class="col">
+              <label class="label">Notes (optional)</label>
+              <input id="inpFeedNotes" placeholder="e.g., tolerating well / transition week 2" />
+            </div>
+          </div>
           <div class="row">
             <button class="btn primary" id="btnSaveCurrentFeed">Save current feed</button>
             <button class="btn" id="btnLogFeeding">Log feeding</button>
           </div>
         </div>
 
-        <!-- MEDS -->
         <div class="card sub">
           <div class="card-h">
             <h3>Medications</h3>
@@ -95,68 +92,72 @@
           </div>
           <div id="medHelp" class="help hide"></div>
 
-          <label class="label">Medication name</label>
-          <input id="inpMedName" placeholder="e.g., Metronidazole" />
-
-          <label class="label">Dose</label>
-          <input id="inpMedDose" placeholder="e.g., 1/2 tab with food" />
-
+          <div class="row">
+            <div class="col">
+              <label class="label">Medication name</label>
+              <input id="inpMedName" placeholder="e.g., Metronidazole" />
+            </div>
+            <div class="col">
+              <label class="label">Dose (free text)</label>
+              <input id="inpMedDose" placeholder="e.g., 1/2 tab, with food" />
+            </div>
+          </div>
           <div class="row">
             <button class="btn primary" id="btnAddMed">Add medication</button>
             <button class="btn" id="btnLogMed">Log medication event</button>
           </div>
-        </div>
 
+          <div class="muted small">Note: If you skip a dose, the app will require a reason (for the vet timeline).</div>
+        </div>
       </div>
 
       <hr class="sep"/>
 
-      <!-- PREPAREDNESS -->
       <div class="card sub">
         <div class="card-h">
-          <h3>Preparedness</h3>
+          <h3>Microchip, Vet, Insurance (quick fields)</h3>
           <button class="icon-btn" data-help="prep">ⓘ</button>
         </div>
         <div id="prepHelp" class="help hide"></div>
 
         <div class="grid three">
           <div>
-            <label class="label">Primary Vet Phone</label>
-            <input id="inpVetPhone" />
+            <label class="label">Primary Vet phone</label>
+            <input id="inpVetPhone" placeholder="e.g., 555-555-5555" />
           </div>
           <div>
-            <label class="label">Emergency Vet Phone</label>
-            <input id="inpVetEmergPhone" />
+            <label class="label">Emergency Vet phone</label>
+            <input id="inpVetEmergPhone" placeholder="e.g., 555-555-5555" />
           </div>
           <div>
-            <label class="label">Backup Vet Phone</label>
-            <input id="inpVetBackupPhone" />
+            <label class="label">Backup Vet phone</label>
+            <input id="inpVetBackupPhone" placeholder="e.g., 555-555-5555" />
           </div>
         </div>
 
         <div class="grid three">
           <div>
             <label class="label">Microchip #</label>
-            <input id="inpChip" />
+            <input id="inpChip" placeholder="e.g., 9851210..." />
           </div>
           <div>
-            <label class="label">Microchip Registry</label>
-            <input id="inpChipRegistry" />
+            <label class="label">Microchip registry</label>
+            <input id="inpChipRegistry" placeholder="e.g., HomeAgain / AKC Reunite" />
           </div>
           <div>
-            <label class="label">Rabies Date</label>
-            <input id="inpRabies" />
+            <label class="label">Rabies date (optional)</label>
+            <input id="inpRabies" placeholder="e.g., 2026-03-01" />
           </div>
         </div>
 
         <div class="grid two">
           <div>
-            <label class="label">Insurance Provider</label>
-            <input id="inpInsProvider" />
+            <label class="label">Insurance provider (optional)</label>
+            <input id="inpInsProvider" placeholder="e.g., Trupanion" />
           </div>
           <div>
-            <label class="label">Policy #</label>
-            <input id="inpInsPolicy" />
+            <label class="label">Policy # (optional)</label>
+            <input id="inpInsPolicy" placeholder="e.g., ABC-123" />
           </div>
         </div>
 
@@ -166,26 +167,29 @@
       </div>
     </section>
 
-    <!-- CARE VIEW -->
+    <!-- CARE -->
     <section id="viewCare" class="card hide">
       <div class="card-h">
         <h2>Care Timeline</h2>
-        <button class="btn primary" id="btnAddCareEntry">+ Add Entry</button>
+        <button class="btn primary" id="btnAddCareEntry">+ Add entry</button>
+      </div>
+      <div class="muted small">
+        Nursing-notes style: record what you did + what you observed. Auto timestamp. No judgment.
       </div>
       <div id="timeline"></div>
     </section>
 
-    <!-- HELPERS VIEW -->
+    <!-- HELPERS -->
     <section id="viewHelpers" class="card hide">
       <div class="card-h">
         <h2>Helpers</h2>
-        <button class="btn" id="btnAddHelper">+ Add Helper</button>
+        <button class="btn" id="btnAddHelper">+ Add helper</button>
       </div>
 
       <div class="grid two">
         <div class="card sub">
           <div class="card-h">
-            <h3>Helper Pins</h3>
+            <h3>Helper pins (tool, not surveillance)</h3>
             <button class="icon-btn" data-help="pins">ⓘ</button>
           </div>
           <div id="pinHelp" class="help hide"></div>
@@ -194,7 +198,7 @@
 
         <div class="card sub">
           <div class="card-h">
-            <h3>Request Help</h3>
+            <h3>Request help</h3>
             <button class="icon-btn" data-help="helpreq">ⓘ</button>
           </div>
           <div id="helpReqHelp" class="help hide"></div>
@@ -208,23 +212,39 @@
       </div>
     </section>
 
-    <!-- RECORDS VIEW -->
+    <!-- RECORDS -->
     <section id="viewRecords" class="card hide">
       <div class="card-h">
         <h2>Export / Records</h2>
-        <button class="btn primary" id="btnExport">Export timeline</button>
+        <button class="btn primary" id="btnExport">Export timeline (JSON)</button>
       </div>
+      <div class="muted small">You can export your records at any time.</div>
       <pre id="exportOut" class="pre"></pre>
     </section>
 
-    <!-- MODALS -->
-    <dialog id="dlg"></dialog>
-    <dialog id="dlgEmergency"></dialog>
+    <!-- MODALS (these IDs are required by app.js) -->
+    <dialog id="dlg">
+      <form method="dialog" class="modal">
+        <div class="modal-h">
+          <h3 id="dlgTitle">Title</h3>
+          <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
+        </div>
+        <div id="dlgBody"></div>
+        <div class="modal-f" id="dlgFooter"></div>
+      </form>
+    </dialog>
 
+    <dialog id="dlgEmergency">
+      <form method="dialog" class="modal">
+        <div class="modal-h">
+          <h3>Emergency Quick Card</h3>
+          <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
+        </div>
+        <div id="emergencyBody"></div>
+      </form>
+    </dialog>
   </main>
 
-  <!-- THIS IS THE CRITICAL LINE -->
   <script src="app.js"></script>
-
 </body>
 </html>
