@@ -1,76 +1,66 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><meta name="theme-color" content="#0c0c0f"/><title>Breeder Pro</title><link rel="manifest" href="manifest.json"/><link rel="icon" href="icons/icon-192.png"/><style>:root{--bg:#0c0c0f;--card:#14141a;--ink:#f2f2f7;--muted:#a7a7b3;--line:#242432;--brand:#7dd3fc;--danger:#ff6b6b;--ok:#86efac;--shadow:0 10px 30px rgba(0,0,0,.35);--radius:18px}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:linear-gradient(180deg,#09090b 0%,#0c0c0f 40%,#0b0b10 100%);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-h2{margin:0}h3{margin:.2rem 0 1rem 0}p{margin:.5rem 0}a{color:inherit;text-decoration:none}
-.app-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;background:rgba(12,12,15,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.brand{display:flex;gap:10px;align-items:center}
-.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%,var(--brand),#2dd4bf);color:#061014;font-weight:900;box-shadow:var(--shadow)}
-.brand-text .title{font-weight:900;letter-spacing:.2px}.brand-text .subtitle{color:var(--muted);font-size:.85rem}
-.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.tabs{position:sticky;top:72px;z-index:9;display:flex;gap:8px;padding:10px 12px;background:rgba(12,12,15,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);overflow:auto}
-.tab{border:1px solid var(--line);background:transparent;color:var(--ink);padding:10px 12px;border-radius:999px;font-weight:800;white-space:nowrap}
-.tab.active{border-color:transparent;background:rgba(125,211,252,.16);box-shadow:inset 0 0 0 1px rgba(125,211,252,.25)}
-.container{padding:14px;padding-bottom:40px;max-width:1100px;margin:0 auto}
-.view{display:none}.view.active{display:block}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0 12px}
-.card{background:rgba(20,20,26,.92);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid label{display:flex;flex-direction:column;gap:6px;font-weight:700}
-.span2{grid-column:1/-1}
-@media (max-width:560px){.grid{grid-template-columns:1fr}.span2{grid-column:auto}}
-.input{border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--ink);padding:12px;border-radius:14px;outline:none}
-.btn{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.08);color:var(--ink);padding:10px 12px;border-radius:14px;font-weight:900}
-.btn.primary{background:rgba(125,211,252,.20);border-color:rgba(125,211,252,.35)}
-.btn.ghost{background:transparent;border-color:var(--line)}
-.btn.danger{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.35)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
-.list{display:flex;flex-direction:column;gap:10px}
-.item{border:1px solid var(--line);background:rgba(0,0,0,.18);border-radius:var(--radius);padding:12px}
-.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.item-title{font-size:1.05rem;font-weight:950;margin:0 0 6px}.item-sub{color:var(--muted);font-size:.92rem}
-.small{font-size:.86rem}.muted{color:var(--muted)}.mono{font-family:ui-monospace,Menlo,Monaco,Consolas,monospace;white-space:pre-wrap}
-.hr{height:1px;background:var(--line);margin:12px 0}
-</style></head><body>
-<header class="app-header"><div class="brand"><div class="logo">BP</div><div class="brand-text"><div class="title">Breeder Pro</div><div class="subtitle">Single-file fallback</div></div></div><div class="header-actions"><a class="btn ghost" href="public.html" target="_blank" rel="noopener">Public page</a></div></header>
-<nav class="tabs"><button class="tab active" data-view="dashboardView">Dashboard</button><button class="tab" data-view="breederView">Breeder</button><button class="tab" data-view="sellerView">Seller</button><button class="tab" data-view="buyerView">Buyer</button><button class="tab" data-view="settingsView">Settings</button></nav>
-<main class="container">
-<section id="dashboardView" class="view active"><div class="card"><h3>At a glance</h3><div id="countsBox" class="mono"></div><div class="muted small" style="margin-top:10px">If tabs work here, your phone is good. We can switch back to multi-file later.</div></div></section>
-<section id="breederView" class="view"><div class="card"><div class="row" style="margin:0 0 10px 0"><h3 style="margin:0">Add Dog</h3><button class="btn ghost" id="btnDogClear" type="button">Clear</button></div>
-<form id="dogForm" class="grid">
-<label>Name<input id="dogName" class="input" required/></label>
-<label>Breed<select id="dogBreed" class="input"></select></label>
-<label>Sex<select id="dogSex" class="input"><option>Male</option><option>Female</option><option>Unknown</option></select></label>
-<label>DOB<input id="dogDob" class="input" type="date"/></label>
-<label>AKC Registration #<input id="dogReg" class="input"/></label>
-<label>Status<select id="dogStatus" class="input"><option>Breeding Stock</option><option>Retained</option><option>Available</option><option>Placed</option><option>Other</option></select></label>
-<label class="span2">Notes<input id="dogNotes" class="input"/></label>
-<div class="span2 actions"><button class="btn primary" type="submit">Add Dog</button></div>
-</form></div>
-<div id="dogsList" class="list"></div></section>
-<section id="sellerView" class="view"><div class="card"><h3>Seller</h3><div class="muted">Placeholder in fallback build.</div></div></section>
-<section id="buyerView" class="view"><div class="card"><h3>Buyer</h3><div class="muted">Placeholder in fallback build.</div></div></section>
-<section id="settingsView" class="view"><div class="card"><h3>Settings</h3><div class="mono" id="metaBox"></div></div></section>
-</main>
-<script>const KEY="breeder_pro_single_v2_1";
-const uid=()=>Math.random().toString(16).slice(2)+"-"+Date.now().toString(16);
-const now=()=>new Date().toISOString();
-const esc=(s)=>String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Breeder Pro (MSV)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title">Breeder Pro</div>
+      <div class="brand-sub">MSV Phase 1</div>
+    </div>
 
-function defaultState(){return{meta:{version:"2.1-single",createdAt:now(),updatedAt:now()},breeds:[{id:"gsp",name:"German Shorthaired Pointer"}],dogs:[]};}
-function load(){try{return JSON.parse(localStorage.getItem(KEY))||defaultState();}catch{return defaultState();}}
-function save(){S.meta.updatedAt=now();localStorage.setItem(KEY,JSON.stringify(S));render();}
-let S=load();
+    <div class="top-actions">
+      <button id="btnEmergency" class="btn danger">Emergency</button>
+      <button id="btnTalk" class="btn">🎙️ Talk</button>
+    </div>
+  </header>
 
-const views=["dashboardView","breederView","sellerView","buyerView","settingsView"];
-document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));btn.classList.add("active");const id=btn.dataset.view;views.forEach(v=>document.getElementById(v).classList.toggle("active",v===id));}));
+  <main class="shell">
+    <section class="card">
+      <div class="card-h">
+        <h2>Goal here</h2>
+        <button class="icon-btn" data-help="goal">ⓘ</button>
+      </div>
+      <div id="goalHelp" class="help hide"></div>
 
-function fillBreeds(){document.getElementById("dogBreed").innerHTML=S.breeds.map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join("");}
-document.getElementById("dogForm").addEventListener("submit",(e)=>{e.preventDefault();const item={id:uid(),name:document.getElementById("dogName").value.trim(),breedId:document.getElementById("dogBreed").value,sex:document.getElementById("dogSex").value,dob:document.getElementById("dogDob").value||"",akcReg:document.getElementById("dogReg").value.trim(),status:document.getElementById("dogStatus").value,notes:document.getElementById("dogNotes").value.trim(),createdAt:now(),updatedAt:now()};if(!item.name)return;S.dogs.unshift(item);e.target.reset();document.getElementById("dogSex").value="Male";document.getElementById("dogStatus").value="Breeding Stock";save();});
-document.getElementById("btnDogClear").addEventListener("click",()=>document.getElementById("dogForm").reset());
+      <div class="goal-grid">
+        <button class="btn primary" data-nav="dogs">Dogs & Pups</button>
+        <button class="btn primary" data-nav="care">Log Care Notes</button>
+        <button class="btn primary" data-nav="helpers">Helpers</button>
+        <button class="btn primary" data-nav="records">Export / Records</button>
+      </div>
+    </section>
 
-function breedName(id){return(S.breeds.find(b=>b.id===id)||{}).name||id||"—";}
-function renderDogs(){const list=document.getElementById("dogsList");list.innerHTML=S.dogs.map(d=>`<div class="item"><div class="item-head"><div><div class="item-title">${esc(d.name)}</div><div class="item-sub">${esc(breedName(d.breedId))} • ${esc(d.sex)} • DOB: ${esc(d.dob||"—")} • ${esc(d.status)}</div>${d.akcReg?`<div class="small muted" style="margin-top:6px">AKC Reg: ${esc(d.akcReg)}</div>`:""}</div></div>${d.notes?`<div class="small muted" style="margin-top:8px;">${esc(d.notes)}</div>`:""}<div class="hr"></div><div class="actions"><button class="btn danger" type="button" data-del="${d.id}">Delete</button></div></div>`).join("")||`<div class="muted">No dogs yet.</div>`;list.querySelectorAll("[data-del]").forEach(btn=>btn.addEventListener("click",()=>{const id=btn.getAttribute("data-del");S.dogs=S.dogs.filter(x=>x.id!==id);save();}));}
-function renderDashboard(){document.getElementById("countsBox").textContent=`Dogs: ${S.dogs.length}\nUpdated: ${new Date(S.meta.updatedAt).toLocaleString()}`;}
-function render(){fillBreeds();renderDogs();renderDashboard();document.getElementById("metaBox").textContent=`Storage key: ${KEY}\nVersion: ${S.meta.version}`;}
-render();
-</script></body></html>
+    <section class="tabs">
+      <button class="tab active" data-view="dogs">Dogs</button>
+      <button class="tab" data-view="care">Care</button>
+      <button class="tab" data-view="helpers">Helpers</button>
+      <button class="tab" data-view="records">Records</button>
+    </section>
+
+    <!-- DOGS -->
+    <section id="viewDogs" class="card">
+      <div class="card-h">
+        <h2>Dogs & Pups</h2>
+        <button class="btn" id="btnAddDog">+ Add Dog/Pup</button>
+      </div>
+
+      <div class="grid two">
+        <div>
+          <label class="label">Select</label>
+          <select id="selAnimal"></select>
+          <div class="muted small">Tip: pups are just animals with type “Pup”.</div>
+        </div>
+
+        <div class="animal-summary" id="animalSummary"></div>
+      </div>
+
+      <hr class="sep"/>
+
+      <div class="grid two">
+        <div class="card sub">
+          <div class
