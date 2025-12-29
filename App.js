@@ -1,3 +1,4 @@
+alert("app.js is running ✅");
 // Breeder Pro MSV (Phase 1) — minimal app.js that matches the minimal index.html
 // - Tabs work (Dogs/Care/Helpers/Records)
 // - Add dog/pup works
