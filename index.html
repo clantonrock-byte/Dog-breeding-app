@@ -1,18 +1,18 @@
-9u<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro (MSV)</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <header class="topbar">
     <div class="brand">
       <div class="brand-title">Breeder Pro</div>
       <div class="brand-sub">MSV Phase 1</div>
     </div>
-
     <div class="top-actions">
       <button id="btnEmergency" class="btn danger">Emergency</button>
       <button id="btnTalk" class="btn">🎙️ Talk</button>
@@ -20,18 +20,14 @@
   </header>
 
   <main class="shell">
-    <section class="card">
-      <div class="card-h">
-        <h2>Goal here</h2>
-        <button class="icon-btn" data-help="goal">ⓘ</button>
-      </div>
-      <div id="goalHelp" class="help hide"></div>
 
+    <section class="card">
+      <h2>Goal here</h2>
       <div class="goal-grid">
-        <button class="btn primary" data-nav="dogs">Dogs & Pups</button>
-        <button class="btn primary" data-nav="care">Log Care Notes</button>
+        <button class="btn primary" data-nav="dogs">Dogs</button>
+        <button class="btn primary" data-nav="care">Care</button>
         <button class="btn primary" data-nav="helpers">Helpers</button>
-        <button class="btn primary" data-nav="records">Export / Records</button>
+        <button class="btn primary" data-nav="records">Records</button>
       </div>
     </section>
 
@@ -44,238 +40,41 @@
 
     <!-- DOGS -->
     <section id="viewDogs" class="card">
-      <div class="card-h">
-        <h2>Dogs & Pups</h2>
-        <button class="btn" id="btnAddDog">+ Add Dog/Pup</button>
-      </div>
-
-      <div class="grid two">
-        <div>
-          <label class="label">Select</label>
-          <select id="selAnimal"></select>
-          <div class="muted small">Tip: pups are just animals with type “Pup”.</div>
-        </div>
-
-        <div class="animal-summary" id="animalSummary"></div>
-      </div>
-
-      <hr class="sep"/>
-
-      <div class="grid two">
-        <div class="card sub">
-          <div class="card-h">
-            <h3>Feeding</h3>
-            <button class="icon-btn" data-help="feeding">ⓘ</button>
-          </div>
-          <div id="feedHelp" class="help hide"></div>
-
-          <div class="row">
-            <div class="col">
-              <label class="label">Current feed</label>
-              <input id="inpCurrentFeed" placeholder="e.g., Purina Pro Plan Puppy" />
-            </div>
-            <div class="col">
-              <label class="label">Notes (optional)</label>
-              <input id="inpFeedNotes" placeholder="e.g., tolerating well / transition week 2" />
-            </div>
-          </div>
-          <div class="row">
-            <button class="btn primary" id="btnSaveCurrentFeed">Save current feed</button>
-            <button class="btn" id="btnLogFeeding">Log feeding</button>
-          </div>
-        </div>
-
-        <div class="card sub">
-          <div class="card-h">
-            <h3>Medications</h3>
-            <button class="icon-btn" data-help="meds">ⓘ</button>
-          </div>
-          <div id="medHelp" class="help hide"></div>
-
-          <div class="row">
-            <div class="col">
-              <label class="label">Medication name</label>
-              <input id="inpMedName" placeholder="e.g., Metronidazole" />
-            </div>
-            <div class="col">
-              <label class="label">Dose (free text)</label>
-              <input id="inpMedDose" placeholder="e.g., 1/2 tab, with food" />
-            </div>
-          </div>
-          <div class="row">
-            <button class="btn primary" id="btnAddMed">Add medication</button>
-            <button class="btn" id="btnLogMed">Log medication event</button>
-          </div>
-
-          <div class="muted small">Note: If you skip a dose, the app will require a reason (for the vet timeline).</div>
-        </div>
-      </div>
-
-      <hr class="sep"/>
-
-      <div class="card sub">
-        <div class="card-h">
-          <h3>Microchip, Vet, Insurance (quick fields)</h3>
-          <button class="icon-btn" data-help="prep">ⓘ</button>
-        </div>
-        <div id="prepHelp" class="help hide"></div>
-
-        <div class="grid three">
-          <div>
-            <label class="label">Primary Vet phone</label>
-            <input id="inpVetPhone" placeholder="e.g., 555-555-5555" />
-          </div>
-          <div>
-            <label class="label">Emergency Vet phone</label>
-            <input id="inpVetEmergPhone" placeholder="e.g., 555-555-5555" />
-          </div>
-          <div>
-            <label class="label">Backup Vet phone</label>
-            <input id="inpVetBackupPhone" placeholder="e.g., 555-555-5555" />
-          </div>
-        </div>
-
-        <div class="grid three">
-          <div>
-            <label class="label">Microchip #</label>
-            <input id="inpChip" placeholder="e.g., 9851210..." />
-          </div>
-          <div>
-            <label class="label">Microchip registry</label>
-            <input id="inpChipRegistry" placeholder="e.g., HomeAgain / AKC Reunite" />
-          </div>
-          <div>
-            <label class="label">Rabies date (optional)</label>
-            <input id="inpRabies" placeholder="e.g., 2026-03-01" />
-          </div>
-        </div>
-
-        <div class="grid two">
-          <div>
-            <label class="label">Insurance provider (optional)</label>
-            <input id="inpInsProvider" placeholder="e.g., Trupanion" />
-          </div>
-          <div>
-            <label class="label">Policy # (optional)</label>
-            <input id="inpInsPolicy" placeholder="e.g., ABC-123" />
-          </div>
-        </div>
-
-        <div class="row">
-          <button class="btn primary" id="btnSavePreparedness">Save preparedness</button>
-        </div>
-      </div>
+      <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
+      <select id="selAnimal"></select>
+      <div id="animalSummary" class="animal-summary"></div>
     </section>
 
     <!-- CARE -->
     <section id="viewCare" class="card hide">
-      <div class="card-h">
-        <h2>Care Timeline</h2>
-        <button class="btn primary" id="btnAddCareEntry">+ Add entry</button>
-      </div>
-      <div class="muted small">
-        Nursing-notes style: record what you did + what you observed. Auto timestamp. No judgment.
-      </div>
+      <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
       <div id="timeline"></div>
     </section>
 
     <!-- HELPERS -->
     <section id="viewHelpers" class="card hide">
-      <div class="card-h">
-        <h2>Helpers</h2>
-        <button class="btn" id="btnAddHelper">+ Add helper</button>
-      </div>
-
-      <div class="grid two">
-        <div class="card sub">
-          <div class="card-h">
-            <h3>Helper pins (tool, not surveillance)</h3>
-            <button class="icon-btn" data-help="pins">ⓘ</button>
-          </div>
-          <div id="pinHelp" class="help hide"></div>
-          <div id="pins"></div>
-        </div>
-
-        <div class="card sub">
-          <div class="card-h">
-            <h3>Request help</h3>
-            <button class="icon-btn" data-help="helpreq">ⓘ</button>
-          </div>
-          <div id="helpReqHelp" class="help hide"></div>
-
-          <div class="goal-grid">
-            <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
-            <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
-            <button class="btn danger" id="btnHelpNow">Send someone now</button>
-          </div>
-        </div>
+      <button class="btn" id="btnAddHelper">+ Add Helper</button>
+      <div id="pins"></div>
+      <div class="goal-grid">
+        <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
+        <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
+        <button class="btn danger" id="btnHelpNow">Send someone now</button>
       </div>
     </section>
 
     <!-- RECORDS -->
     <section id="viewRecords" class="card hide">
-      <div class="card-h">
-        <h2>Export / Records</h2>
-        <button class="btn primary" id="btnExport">Export timeline (JSON)</button>
-      </div>
-      <div class="muted small">You can export your records at any time.</div>
+      <button class="btn primary" id="btnExport">Export timeline</button>
       <pre id="exportOut" class="pre"></pre>
     </section>
 
-    <!-- MODALS (these IDs are required by app.js) -->
-    <dialog id="dlg">
-      <form method="dialog" class="modal">
-        <div class="modal-h">
-          <h3 id="dlgTitle">Title</h3>
-          <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
-        </div>
-        <div id="dlgBody"></div>
-        <div class="modal-f" id="dlgFooter"></div>
-      </form>
-    </dialog>
+    <!-- MODAL ROOTS (required by app.js) -->
+    <dialog id="dlg"></dialog>
+    <dialog id="dlgEmergency"></dialog>
 
-    <dialog id="dlgEmergency">
-      <form method="dialog" class="modal">
-        <div class="modal-h">
-          <h3>Emergency Quick Card</h3>
-          <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
-        </div>
-        <div id="emergencyBody"></div>
-      </form>
-    </dialog>
-  
+  </main>
 
-<script>
-    // Visible "health" bar + error catcher (temporary)
-    (function () {
-      const bar = document.createElement("div");
-      bar.id = "jsHealth";
-      bar.style.cssText =
-        "position:fixed;left:0;right:0;bottom:0;z-index:999999;" +
-        "background:#111;color:#fff;padding:8px 10px;font:12px system-ui;" +
-        "border-top:1px solid rgba(255,255,255,.15)";
-      bar.textContent = "JS: page loaded (waiting for app.js)";
-      document.body.appendChild(bar);
-
-      window.addEventListener("error", function (e) {
-        bar.textContent = "JS ERROR: " + (e.message || "unknown error");
-      });
-
-      window.addEventListener("unhandledrejection", function (e) {
-        bar.textContent = "JS PROMISE ERROR: " + (e.reason?.message || e.reason || "unknown");
-      });
-    })();
-  </script>
-
+  <!-- LOAD APP LOGIC -->
   <script src="app.js"></script>
-
-  <script>
-    // If you see this text change, app.js loaded successfully.
-    const bar = document.getElementById("jsHealth");
-    if (bar) bar.textContent = "JS: app.js loaded (if buttons still dead, app.js crashed after load)";
-  </script>
 </body>
 </html>
-</body>
-</html>
-</main>
