@@ -13,6 +13,7 @@
       <div class="brand-title">Breeder Pro</div>
       <div class="brand-sub">MSV Phase 1</div>
     </div>
+
     <div class="top-actions">
       <button id="btnEmergency" class="btn danger">Emergency</button>
       <button id="btnTalk" class="btn">🎙️ Talk</button>
@@ -21,6 +22,7 @@
 
   <main class="shell">
 
+    <!-- GOAL NAVIGATION (single source of truth) -->
     <section class="card">
       <h2>Goal here</h2>
       <div class="goal-grid">
@@ -31,25 +33,37 @@
       </div>
     </section>
 
-
-
     <!-- DOGS -->
     <section id="viewDogs" class="card">
-      <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
+      <div class="card-h">
+        <h2>Dogs & Pups</h2>
+        <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
+      </div>
+
+      <label class="label">Select</label>
       <select id="selAnimal"></select>
+
       <div id="animalSummary" class="animal-summary"></div>
     </section>
 
     <!-- CARE -->
     <section id="viewCare" class="card hide">
-      <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
+      <div class="card-h">
+        <h2>Care Timeline</h2>
+        <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
+      </div>
       <div id="timeline"></div>
     </section>
 
     <!-- HELPERS -->
     <section id="viewHelpers" class="card hide">
-      <button class="btn" id="btnAddHelper">+ Add Helper</button>
+      <div class="card-h">
+        <h2>Helpers</h2>
+        <button class="btn" id="btnAddHelper">+ Add Helper</button>
+      </div>
+
       <div id="pins"></div>
+
       <div class="goal-grid">
         <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
         <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
@@ -59,11 +73,14 @@
 
     <!-- RECORDS -->
     <section id="viewRecords" class="card hide">
-      <button class="btn primary" id="btnExport">Export timeline</button>
+      <div class="card-h">
+        <h2>Export / Records</h2>
+        <button class="btn primary" id="btnExport">Export timeline</button>
+      </div>
       <pre id="exportOut" class="pre"></pre>
     </section>
 
-    <!-- MODAL ROOTS (required by app.js) -->
+    <!-- REQUIRED DIALOG ROOTS -->
     <dialog id="dlg"></dialog>
     <dialog id="dlgEmergency"></dialog>
 
