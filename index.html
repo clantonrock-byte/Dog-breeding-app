@@ -87,6 +87,12 @@
   </main>
 
   <!-- LOAD APP LOGIC -->
-  <script src="app.js?v=21"></script>
+<div id="jsHealth" class="muted small">JS status: loading…</div>
+
+<script src="app.js?v=21"></script>
+
+<script>
+  document.getElementById("jsHealth").textContent = "JS status: app.js loaded";
+</script>
 </body>
 </html>
