@@ -3,88 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro (MSV)</title>
+  <title>Breeder Pro – JS Test</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+
+<!-- INLINE JS PROOF BANNER -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var banner = document.createElement("div");
+    banner.textContent = "INLINE JS: RUNNING ✅";
+    banner.style.cssText =
+      "position:fixed;top:0;left:0;right:0;" +
+      "z-index:999999;background:#28c16f;color:#000;" +
+      "padding:10px;font:16px system-ui;font-weight:800;text-align:center;";
+    document.body.appendChild(banner);
+  });
+</script>
 
 <header class="topbar">
   <div class="brand">
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">MSV Phase 1</div>
-  </div>
-  <div class="top-actions">
-    <button id="btnEmergency" class="btn danger">Emergency</button>
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
+    <div class="brand-sub">JavaScript Test Mode</div>
   </div>
 </header>
 
 <main class="shell">
-
   <section class="card">
-    <h2>Goal here</h2>
-    <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs</button>
-      <button class="btn primary" data-nav="care">Care</button>
-      <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records</button>
-    </div>
-    <div class="muted small" style="margin-top:10px;">
-      Use what helps. Skip what doesn’t. You can export at any time.
-    </div>
+    <h2>JS Test Page</h2>
+    <p>If you see a green bar at the top that says <strong>INLINE JS: RUNNING</strong>, JavaScript is executing.</p>
+
+    <button id="btnTest" class="btn primary">Click me</button>
   </section>
-
-  <!-- DOGS -->
-  <section id="viewDogs" class="card">
-    <div class="card-h">
-      <h2>Dogs & Pups</h2>
-      <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
-    </div>
-
-    <label class="label">Select</label>
-    <select id="selAnimal"></select>
-
-    <div id="animalSummary" class="animal-summary"></div>
-  </section>
-
-  <!-- CARE -->
-  <section id="viewCare" class="card hide">
-    <div class="card-h">
-      <h2>Care Timeline</h2>
-      <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
-    </div>
-    <div id="timeline"></div>
-  </section>
-
-  <!-- HELPERS -->
-  <section id="viewHelpers" class="card hide">
-    <div class="card-h">
-      <h2>Helpers</h2>
-      <button class="btn" id="btnAddHelper">+ Add Helper</button>
-    </div>
-
-    <div id="pins"></div>
-
-    <div class="goal-grid" style="margin-top:10px;">
-      <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
-      <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
-      <button class="btn danger" id="btnHelpNow">Send someone now</button>
-    </div>
-  </section>
-
-  <!-- RECORDS -->
-  <section id="viewRecords" class="card hide">
-    <div class="card-h">
-      <h2>Export / Records</h2>
-      <button class="btn primary" id="btnExport">Export timeline</button>
-    </div>
-    <pre id="exportOut" class="pre"></pre>
-  </section>
-
 </main>
 
-<!-- Load logic next (we'll restore app.js in the next step) -->
-<script src="app.js"></script>
+<script>
+  document.getElementById("btnTest").addEventListener("click", function () {
+    alert("Button click detected ✅");
+  });
+</script>
 
 </body>
 </html>
