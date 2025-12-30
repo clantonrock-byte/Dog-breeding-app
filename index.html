@@ -21,6 +21,13 @@
 
 <main class="shell">
 
+  <!-- JS STATUS (VISIBLE) -->
+  <section class="card">
+    <div class="muted small" id="jsStatus">
+      JS status: page loaded… (waiting for app.js)
+    </div>
+  </section>
+
   <section class="card">
     <h2>Goal here</h2>
     <div class="goal-grid">
@@ -34,6 +41,7 @@
     </div>
   </section>
 
+  <!-- DOGS -->
   <section id="viewDogs" class="card">
     <div class="card-h">
       <h2>Dogs & Pups</h2>
@@ -46,6 +54,7 @@
     <div id="animalSummary" class="animal-summary"></div>
   </section>
 
+  <!-- CARE -->
   <section id="viewCare" class="card hide">
     <div class="card-h">
       <h2>Care Timeline</h2>
@@ -54,6 +63,7 @@
     <div id="timeline"></div>
   </section>
 
+  <!-- HELPERS -->
   <section id="viewHelpers" class="card hide">
     <div class="card-h">
       <h2>Helpers</h2>
@@ -69,6 +79,7 @@
     </div>
   </section>
 
+  <!-- RECORDS -->
   <section id="viewRecords" class="card hide">
     <div class="card-h">
       <h2>Export / Records</h2>
@@ -79,7 +90,8 @@
 
 </main>
 
-<!-- cache-bust JS so phone can't cling to old app.js -->
-<script src="app.js?v=1001"></script>
+<!-- CACHE-BUST the JS so we never fight old builds -->
+<script src="app.js?v=2001"></script>
+
 </body>
-  </html>
+</html>
