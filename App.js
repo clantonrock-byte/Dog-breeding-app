@@ -1,10 +1,17 @@
-const STORE_KEY = "breederPro_msv_v1001";
+// app.js v2001 — proves load + binds Goal buttons
+
+const STORE_KEY = "breederPro_msv_v2001";
 const $ = (s)=>document.querySelector(s);
 
 function nowISO(){ return new Date().toISOString(); }
 function fmt(ts){ return new Date(ts).toLocaleString(); }
 function uid(p="id"){ return `${p}_${Math.random().toString(16).slice(2)}_${Date.now()}`; }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function setStatus(msg){
+  const el = document.getElementById("jsStatus");
+  if (el) el.textContent = msg;
+}
 
 function seed(){
   const s = {
@@ -53,8 +60,14 @@ function renderSelect(){
   sel.onchange = ()=>{ state.selected = sel.value; save(); renderAll(); };
 }
 
+function esc(s){
+  return String(s||"")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
 function renderSummary(){
-  const a = getAnimal();
+  const a=getAnimal();
   $("#animalSummary").innerHTML = `<div><strong>${esc(a.name)}</strong> · ${esc(a.breed||"")}</div><div class="muted small">${esc(a.type)}</div>`;
 }
 
@@ -90,7 +103,11 @@ function renderPins(){
 
 function exportJSON(){
   const a=getAnimal();
-  $("#exportOut").textContent = JSON.stringify({exportedAt:nowISO(), animal:a, timeline: state.timeline.filter(e=>e.animalId===a.id)}, null, 2);
+  $("#exportOut").textContent = JSON.stringify({
+    exportedAt: nowISO(),
+    animal: a,
+    timeline: state.timeline.filter(e=>e.animalId===a.id)
+  }, null, 2);
 }
 
 function addDog(){
@@ -120,27 +137,24 @@ function addHelper(){
   renderPins();
 }
 
-function emergencyCard(){
-  alert("Emergency Quick Card (Phase 1):\nVet-first UI is next in the build. This confirms wiring works.");
-}
-
 function bind(){
-  document.querySelectorAll("[data-nav]").forEach(b=> b.onclick = ()=> show(b.dataset.nav));
+  // PROOF we found the buttons
+  const navButtons = document.querySelectorAll("[data-nav]");
+  setStatus(`JS status: app.js loaded ✅ (nav buttons found: ${navButtons.length})`);
+
+  navButtons.forEach(b=> b.onclick = ()=> show(b.dataset.nav));
+
   $("#btnAddDog").onclick = addDog;
   $("#btnAddCareEntry").onclick = addCare;
   $("#btnAddHelper").onclick = addHelper;
   $("#btnExport").onclick = exportJSON;
 
-  $("#btnEmergency").onclick = emergencyCard;
+  $("#btnEmergency").onclick = ()=> alert("Emergency Quick Card placeholder (Phase 1 wiring confirmed).");
   $("#btnTalk").onclick = ()=> alert("Voice comes next.");
 
   $("#btnHelpAnotherPerson").onclick = ()=> addEntry("incident","Helper requested another person","", "helper");
   $("#btnHelpUnsafe").onclick = ()=> addEntry("incident","Helper flagged: feels unsafe","", "helper");
   $("#btnHelpNow").onclick = ()=> addEntry("incident","HELP NOW requested","Immediate assistance requested.","helper");
-}
-
-function esc(s){
-  return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
 function renderAll(){
@@ -150,6 +164,10 @@ function renderAll(){
   renderPins();
 }
 
-bind();
-show("dogs");
-renderAll();
+(function boot(){
+  if(!state.selected && state.animals[0]) state.selected = state.animals[0].id;
+  save();
+  bind();
+  show("dogs");
+  renderAll();
+})();
