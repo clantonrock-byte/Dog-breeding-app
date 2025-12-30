@@ -3,34 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro (MSV)</title>
+  <title>Breeder Pro</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
 <header class="topbar">
   <div class="brand">
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">MSV Phase 1</div>
+    <div class="brand-sub">Phase 1</div>
   </div>
   <div class="top-actions">
     <button id="btnEmergency" class="btn danger">Emergency</button>
     <button id="btnTalk" class="btn">🎙️ Talk</button>
   </div>
-  <div class="muted small">
-  JS file check: <a href="app.js?v=2001" target="_blank" style="color:#2d7ff9;">Open app.js</a>
-  </div>
 </header>
 
 <main class="shell">
 
-  <!-- JS STATUS (VISIBLE) -->
-  <section class="card">
-    <div class="muted small" id="jsStatus">
-      JS status: page loaded… (waiting for app.js)
-    </div>
-  </section>
-
+  <!-- GOAL NAVIGATION -->
   <section class="card">
     <h2>Goal here</h2>
     <div class="goal-grid">
@@ -78,23 +70,3 @@
     <div class="goal-grid" style="margin-top:10px;">
       <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
       <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
-      <button class="btn danger" id="btnHelpNow">Send someone now</button>
-    </div>
-  </section>
-
-  <!-- RECORDS -->
-  <section id="viewRecords" class="card hide">
-    <div class="card-h">
-      <h2>Export / Records</h2>
-      <button class="btn primary" id="btnExport">Export timeline</button>
-    </div>
-    <pre id="exportOut" class="pre"></pre>
-  </section>
-
-</main>
-
-<!-- CACHE-BUST the JS so we never fight old builds -->
-<script src="app.js?v=2001"></script>
-
-</body>
-</html>
