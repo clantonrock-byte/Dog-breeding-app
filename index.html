@@ -68,7 +68,7 @@
     </div>
   </section>
 
-  <!-- FEEDING (placeholder; inventory work first) -->
+  <!-- FEEDING (placeholder) -->
   <section id="viewFeeding" class="card hide">
     <h2>Feeding</h2>
     <div class="muted small">Records feeding-related information and notes.</div>
@@ -94,13 +94,31 @@
       </div>
     </div>
 
+    <!-- Last update + Undo (quiet, non-blocking) -->
+    <div class="inv-banner">
+      <div id="invLastUpdate" class="muted small">Last update: none</div>
+      <button id="btnInvUndo" class="inv-undo hide">Undo</button>
+    </div>
+
     <div class="row">
       <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
+      <button class="btn" id="btnReviewInventory">Review list</button>
       <button class="btn" id="btnToggleArchived">Show Archived</button>
     </div>
 
+    <!-- Normal view -->
     <div id="inventoryList"></div>
     <div id="inventoryArchived" class="hide"></div>
+
+    <!-- Review view -->
+    <div id="inventoryReview" class="hide">
+      <div class="inv-review-h">
+        <h3>Inventory review</h3>
+        <button class="btn" id="btnBackToInventory">Back</button>
+      </div>
+      <div class="muted small" id="invReviewContext"></div>
+      <div id="inventoryReviewList"></div>
+    </div>
   </section>
 
   <!-- HELPERS -->
@@ -127,124 +145,6 @@
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<!-- Inventory add/edit modal -->
-<dialog id="dlgInv" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Inventory item</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <label class="label">Item name / label</label>
-      <input id="invName" />
-
-      <div class="grid2">
-        <div>
-          <label class="label">Category</label>
-          <select id="invCategory">
-            <option>Food</option>
-            <option>Treat</option>
-            <option>Topper</option>
-            <option>Supplement</option>
-            <option>Toy</option>
-            <option>Blanket</option>
-            <option>Coat</option>
-            <option>Equipment</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Source</label>
-          <select id="invSource">
-            <option>Purchased</option>
-            <option>Donated</option>
-            <option>Other</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label class="label">Identifier type</label>
-          <select id="invIdType">
-            <option>None</option>
-            <option>Barcode</option>
-            <option>QR</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Identifier value</label>
-          <input id="invIdValue" placeholder="(scan or type)" />
-        </div>
-      </div>
-
-      <div class="row">
-        <button type="button" class="btn" id="btnScanId">Scan with camera</button>
-        <button type="button" class="btn" id="btnClearId">Clear identifier</button>
-      </div>
-
-      <div class="grid3">
-        <div>
-          <label class="label">Unit</label>
-          <select id="invUnit">
-            <option>count</option>
-            <option>weight</option>
-            <option>volume</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Quantity on hand</label>
-          <input id="invQty" inputmode="decimal" />
-        </div>
-        <div>
-          <label class="label">Low threshold (optional)</label>
-          <input id="invThresh" inputmode="decimal" />
-        </div>
-      </div>
-
-      <label class="label">Notes (optional)</label>
-      <input id="invNotes" />
-    </div>
-
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- Scan modal -->
-<dialog id="dlgScan" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Scan</h3>
-      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <div class="muted small">
-        Camera access is requested by the browser when scanning starts.
-      </div>
-
-      <video id="scanVideo" playsinline></video>
-
-      <div id="scanResultBox" class="scan-result hide">
-        <div class="muted small">Scanned value</div>
-        <div id="scanValue" class="scan-value"></div>
-      </div>
-
-      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="dlg-f">
-      <button type="button" class="btn" id="btnRescan">Rescan</button>
-      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
-      <button class="btn" value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-
-<script src="app.js?v=6001"></script>
+<script src="app.js?v=7001"></script>
 </body>
 </html>
