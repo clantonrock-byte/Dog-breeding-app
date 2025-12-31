@@ -111,7 +111,10 @@ function renderPins(){
   if(!wrap) return;
   wrap.innerHTML = state.helpers.map(h=>`
     <div class="timeline-item">
-      <div class="muted small"><strong>${esc(h.name)}</strong> <span style="color:${h.color};font-weight:900;">●</span></div>
+      <div class="muted small">
+        <strong>${esc(h.name)}</strong>
+        <span style="color:${h.color};font-weight:900;">●</span>
+      </div>
       <div class="muted small">Zone: ${esc(h.zone||"Not set")}</div>
     </div>
   `).join("");
@@ -143,8 +146,8 @@ function addDog(){
 }
 
 function addCare(){
-  const action = prompt("Action (what you did):","") || "";
-  const obs = prompt("Observed (what you saw):","") || "";
+  const action = prompt("Action (what occurred):","") || "";
+  const obs = prompt("Observation (what was noted):","") || "";
   if(!action && !obs) return;
   addEntry("care",action,obs,"owner");
   show("care");
@@ -161,29 +164,37 @@ function addHelper(){
   renderPins();
 }
 
-/* ✅ 2-second hold behavior for Emergency */
+/* ⓘ Info toggles */
+function bindInfoButtons(){
+  document.querySelectorAll(".info-btn").forEach(btn=>{
+    btn.onclick = ()=>{
+      const key = btn.getAttribute("data-info");
+      const panel = document.getElementById(`info-${key}`);
+      if(panel) panel.classList.toggle("hide");
+    };
+  });
+}
+
+/* 2-second hold for Emergency */
 function bindEmergencyHold(){
   const btn = $("#btnEmergency");
   if(!btn) return;
 
   let timer = null;
   let holding = false;
+  const originalText = btn.textContent;
 
   const startHold = (e) => {
     e.preventDefault();
     if (holding) return;
     holding = true;
-
-    // Visual cue on the button text
-    const original = btn.textContent;
     btn.textContent = "Hold 2 seconds…";
 
     timer = setTimeout(() => {
-      btn.textContent = original;
       holding = false;
       timer = null;
-      // Trigger emergency action
-      alert("Emergency Quick Card placeholder.\n\n(Next: wire stored vet/microchip/insurance.)");
+      btn.textContent = originalText;
+      alert("Emergency Quick Card placeholder.\n\nNext: wire stored vet/microchip/insurance.");
     }, 2000);
   };
 
@@ -191,10 +202,9 @@ function bindEmergencyHold(){
     if (timer) clearTimeout(timer);
     timer = null;
     holding = false;
-    btn.textContent = "Emergency";
+    btn.textContent = originalText;
   };
 
-  // Touch + mouse support
   btn.addEventListener("touchstart", startHold, { passive:false });
   btn.addEventListener("touchend", cancelHold);
   btn.addEventListener("touchcancel", cancelHold);
@@ -210,19 +220,28 @@ function bind(){
     b.onclick = ()=> show(b.dataset.nav);
   });
 
-  $("#btnAddDog").onclick = addDog;
-  $("#btnAddCareEntry").onclick = addCare;
-  $("#btnAddHelper").onclick = addHelper;
-  $("#btnExport").onclick = exportJSON;
+  // Info buttons
+  bindInfoButtons();
 
-  // Talk stays normal click
+  // Core actions
+  const btnAddDog = $("#btnAddDog");
+  const btnAddCare = $("#btnAddCareEntry");
+  const btnAddHelper = $("#btnAddHelper");
+  const btnExport = $("#btnExport");
+
+  if(btnAddDog) btnAddDog.onclick = addDog;
+  if(btnAddCare) btnAddCare.onclick = addCare;
+  if(btnAddHelper) btnAddHelper.onclick = addHelper;
+  if(btnExport) btnExport.onclick = exportJSON;
+
+  // Talk button (placeholder)
   const talk = $("#btnTalk");
   if (talk) talk.onclick = ()=> alert("Voice comes next.");
 
-  // Emergency is press-and-hold
+  // Emergency hold
   bindEmergencyHold();
 
-  // Helper request buttons (Phase 1 record only)
+  // Helper request buttons
   const b1=$("#btnHelpAnotherPerson");
   const b2=$("#btnHelpUnsafe");
 
@@ -243,4 +262,4 @@ function renderAll(){
   bind();
   show("dogs");
   renderAll();
-})();    
+})();
