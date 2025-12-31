@@ -1,149 +1,208 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+:root{
+  --bg:#0b0c10;
+  --card:#111318;
+  --ink:#e8edf2;
+  --muted:#a5afbc;
+  --line:#212633;
+  --primary:#2d7ff9;
+  --dangerSolid:#b00020;
+  --soft:#0c0e14;
+  --warn:#f2c94c;
 
-<body>
+  --radius:18px;
+  --radius-sm:14px;
+  --shadow: 0 10px 28px rgba(0,0,0,.4);
+}
 
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1</div>
-  </div>
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
 
-  <div class="top-actions">
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
-  </div>
-</header>
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  border-bottom:1px solid var(--line);
+  background:#090a0d;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.brand-title{font-weight:900;font-size:16px}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.top-actions{display:flex;gap:12px;align-items:center}
 
-<main class="shell">
+.shell{
+  padding:16px;
+  max-width:980px;
+  margin:0 auto;
+  padding-bottom:140px;
+}
 
-  <!-- GOAL NAVIGATION -->
-  <section class="card">
-    <div class="card-h">
-      <h2>What is our goal today?</h2>
-      <button class="info-btn" data-info="goal">ⓘ</button>
-    </div>
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.card-h{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  margin-bottom:14px;
+}
+h2{margin:0;font-size:18px}
+.label{
+  display:block;
+  font-size:13px;
+  color:var(--muted);
+  margin:10px 0 8px;
+}
+.muted{color:var(--muted)}
+.small{font-size:12px}
 
-    <div id="info-goal" class="info-text hide">
-      <div class="info-summary">
-        One focus at a time keeps everything else from competing.
-      </div>
-      <button class="info-more-btn" data-more="goal">More</button>
-      <div class="info-more hide" id="info-goal-more">
-        Records remain available for review or export. Voice may be used at any time.
-      </div>
-      <button class="info-full-btn" data-full="goal">Full</button>
-      <div class="info-full hide" id="info-goal-full">
-        Sections are skimmable by default. Deeper detail appears only when requested.
-      </div>
-    </div>
+.btn{
+  display:block;
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--soft);
+  color:var(--ink);
+  padding:16px 18px;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  font-weight:800;
+  font-size:15px;
+  min-height:56px;
+  margin-bottom:14px;
+}
+.btn.primary{
+  background:rgba(45,127,249,.18);
+  border-color:rgba(45,127,249,.55);
+}
+.btn.danger{
+  background:rgba(242,75,75,.18);
+  border-color:rgba(242,75,75,.6);
+}
 
-    <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-nav="care">Care Timeline</button>
-      <button class="btn primary" data-nav="feeding">Feeding</button>
-      <button class="btn primary" data-nav="inventory">Inventory</button>
-      <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records &amp; Export</button>
-    </div>
-  </section>
+.goal-grid{
+  display:grid;
+  gap:18px;
+  grid-template-columns:1fr;
+}
+@media(min-width:600px){
+  .goal-grid{grid-template-columns:1fr 1fr}
+}
 
-  <!-- DOGS -->
-  <section id="viewDogs" class="card">
-    <h2>Dogs &amp; Pups</h2>
-    <div class="muted small">A central record for each dog or pup.</div>
-    <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
-    <label class="label">Select</label>
-    <select id="selAnimal"></select>
-    <div id="animalSummary" class="animal-summary"></div>
-    <div class="muted small" style="margin-top:12px;">
-      This records what occurred. Information remains available for review or export.
-    </div>
-  </section>
+.hide{display:none !important}
 
-  <!-- CARE -->
-  <section id="viewCare" class="card hide">
-    <h2>Care Timeline</h2>
-    <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
-    <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
-    <div id="timeline"></div>
-    <div class="muted small" style="margin-top:12px;">
-      This records what occurred. Information remains available for review or export.
-    </div>
-  </section>
+select, input, textarea{
+  width:100%;
+  padding:14px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--line);
+  background:var(--soft);
+  color:var(--ink);
+  min-height:52px;
+  font-size:15px;
+}
 
-  <!-- FEEDING (placeholder section; inventory comes first) -->
-  <section id="viewFeeding" class="card hide">
-    <h2>Feeding</h2>
-    <div class="muted small">Records feeding-related information and notes.</div>
-    <button class="btn primary" id="btnAddFeeding">+ Add Feeding Entry</button>
-    <div class="muted small" style="margin-top:12px;">
-      Feeding entries appear in the Care Timeline.
-    </div>
-  </section>
+.animal-summary,
+.timeline-item,
+.pre{
+  border:1px solid var(--line);
+  background:var(--soft);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-top:14px;
+}
 
-  <!-- INVENTORY -->
-  <section id="viewInventory" class="card hide">
-    <div class="card-h">
-      <h2>Inventory</h2>
-      <button class="info-btn" data-info="inventory">ⓘ</button>
-    </div>
+.info-btn, .info-more-btn, .info-full-btn{
+  border:1px solid var(--line);
+  background:var(--soft);
+  color:var(--ink);
+  border-radius:12px;
+  padding:8px 10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.info-text{
+  border:1px dashed rgba(165,175,188,.35);
+  background:rgba(165,175,188,.06);
+  padding:12px;
+  border-radius:14px;
+  margin:12px 0;
+}
+.info-more, .info-full{margin-top:10px}
 
-    <div id="info-inventory" class="info-text hide">
-      <div class="info-summary">
-        Inventory records what is on hand and how it changes.
-      </div>
+/* Inventory rows */
+.row{display:flex; gap:12px; flex-wrap:wrap}
+.row .btn{flex:1; min-width:220px; margin-bottom:0}
 
-      <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">
-        Inventory adjusts only when a real event is recorded: added, used, discarded, retired, or transferred.
-      </div>
+.inv-item{
+  border:1px solid var(--line);
+  background:var(--soft);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-top:14px;
+}
+.inv-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.inv-name{
+  font-weight:900;
+}
+.inv-name.low{
+  color:var(--warn);
+}
+.inv-meta{
+  color:var(--muted);
+  font-size:12px;
+}
+.inv-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.inv-actions .btn{
+  width:auto;
+  min-height:44px;
+  padding:10px 12px;
+  margin-bottom:0;
+}
 
-      <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">
-        Any item with a barcode or QR code may be tracked. Thresholds are optional. Low items display in yellow.
-        This records what occurred. Interpretation and decisions occur elsewhere.
-      </div>
-    </div>
-
-    <div class="row">
-      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
-      <button class="btn" id="btnToggleArchived">Show Archived</button>
-    </div>
-
-    <div id="inventoryList"></div>
-    <div id="inventoryArchived" class="hide"></div>
-  </section>
-
-  <!-- HELPERS -->
-  <section id="viewHelpers" class="card hide">
-    <h2>Helpers</h2>
-    <div class="muted small">A shared view for coordination and support.</div>
-    <button class="btn" id="btnAddHelper">+ Add Helper</button>
-    <div id="pins"></div>
-    <div class="goal-grid" style="margin-top:14px;">
-      <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
-      <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
-    </div>
-  </section>
-
-  <!-- RECORDS -->
-  <section id="viewRecords" class="card hide">
-    <h2>Records &amp; Export</h2>
-    <div class="muted small">Information recorded across the app, available for review or export.</div>
-    <button class="btn primary" id="btnExport">Export timeline</button>
-    <pre id="exportOut" class="pre"></pre>
-  </section>
-
-</main>
-
-<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
-
-<script src="app.js?v=5001"></script>
-</body>
-</html>
+/* Emergency dock */
+.emergency-fixed{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  z-index:50;
+  background: var(--dangerSolid) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  color: #fff !important;
+  box-shadow: 0 12px 34px rgba(0,0,0,.6);
+}
+.emergency-fixed::before{
+  content:"";
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:108px;
+  background:#090a0d;
+  border-top:1px solid rgba(255,255,255,.10);
+  z-index:-1;
+}
