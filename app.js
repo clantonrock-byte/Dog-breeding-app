@@ -1,18 +1,10 @@
-// app.js — Phase 1 wiring + status line update
-// This file is intentionally lowercase: app.js (GitHub Pages is case-sensitive)
-
-const STORE_KEY = "breederPro_msv_v2001";
+const STORE_KEY = "breederPro_msv_v1";
 const $ = (s)=>document.querySelector(s);
 
 function nowISO(){ return new Date().toISOString(); }
 function fmt(ts){ return new Date(ts).toLocaleString(); }
 function uid(p="id"){ return `${p}_${Math.random().toString(16).slice(2)}_${Date.now()}`; }
 function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-
-function setStatus(msg){
-  const el = document.getElementById("jsStatus");
-  if (el) el.textContent = msg;
-}
 
 function seed(){
   const s = {
@@ -34,9 +26,7 @@ function load(){
     if(!s?.animals?.length) return seed();
     if(!s.selected) s.selected = s.animals[0].id;
     return s;
-  }catch{
-    return seed();
-  }
+  }catch{ return seed(); }
 }
 
 let state = load();
@@ -87,10 +77,7 @@ function addEntry(kind, action, obs, actor){
   state.timeline.push({
     id: uid("t"),
     animalId: state.selected,
-    kind,
-    action,
-    obs,
-    actor,
+    kind, action, obs, actor,
     ts: nowISO()
   });
   save();
@@ -174,37 +161,73 @@ function addHelper(){
   renderPins();
 }
 
-function emergencyCard(){
-  alert("Emergency Quick Card placeholder.\n\nNext: wire saved vet/microchip/insurance.");
+/* ✅ 2-second hold behavior for Emergency */
+function bindEmergencyHold(){
+  const btn = $("#btnEmergency");
+  if(!btn) return;
+
+  let timer = null;
+  let holding = false;
+
+  const startHold = (e) => {
+    e.preventDefault();
+    if (holding) return;
+    holding = true;
+
+    // Visual cue on the button text
+    const original = btn.textContent;
+    btn.textContent = "Hold 2 seconds…";
+
+    timer = setTimeout(() => {
+      btn.textContent = original;
+      holding = false;
+      timer = null;
+      // Trigger emergency action
+      alert("Emergency Quick Card placeholder.\n\n(Next: wire stored vet/microchip/insurance.)");
+    }, 2000);
+  };
+
+  const cancelHold = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    holding = false;
+    btn.textContent = "Emergency";
+  };
+
+  // Touch + mouse support
+  btn.addEventListener("touchstart", startHold, { passive:false });
+  btn.addEventListener("touchend", cancelHold);
+  btn.addEventListener("touchcancel", cancelHold);
+
+  btn.addEventListener("mousedown", startHold);
+  btn.addEventListener("mouseup", cancelHold);
+  btn.addEventListener("mouseleave", cancelHold);
 }
 
 function bind(){
-  const navButtons = document.querySelectorAll("[data-nav]");
-  setStatus(`JS status: app.js loaded ✅ (nav buttons found: ${navButtons.length})`);
+  // Goal navigation
+  document.querySelectorAll("[data-nav]").forEach(b=>{
+    b.onclick = ()=> show(b.dataset.nav);
+  });
 
-  navButtons.forEach(b=> b.onclick = ()=> show(b.dataset.nav));
+  $("#btnAddDog").onclick = addDog;
+  $("#btnAddCareEntry").onclick = addCare;
+  $("#btnAddHelper").onclick = addHelper;
+  $("#btnExport").onclick = exportJSON;
 
-  const btnAddDog = $("#btnAddDog");
-  const btnAddCare = $("#btnAddCareEntry");
-  const btnAddHelper = $("#btnAddHelper");
-  const btnExport = $("#btnExport");
-  const btnEmergency = $("#btnEmergency");
-  const btnTalk = $("#btnTalk");
+  // Talk stays normal click
+  const talk = $("#btnTalk");
+  if (talk) talk.onclick = ()=> alert("Voice comes next.");
 
-  if(btnAddDog) btnAddDog.onclick = addDog;
-  if(btnAddCare) btnAddCare.onclick = addCare;
-  if(btnAddHelper) btnAddHelper.onclick = addHelper;
-  if(btnExport) btnExport.onclick = exportJSON;
-  if(btnEmergency) btnEmergency.onclick = emergencyCard;
-  if(btnTalk) btnTalk.onclick = ()=> alert("Voice comes next.");
+  // Emergency is press-and-hold
+  bindEmergencyHold();
 
-  const btnH1=$("#btnHelpAnotherPerson");
-  const btnH2=$("#btnHelpUnsafe");
-  const btnH3=$("#btnHelpNow");
+  // Helper request buttons (Phase 1 record only)
+  const b1=$("#btnHelpAnotherPerson");
+  const b2=$("#btnHelpUnsafe");
 
-  if(btnH1) btnH1.onclick = ()=> addEntry("incident","Helper requested another person","", "helper");
-  if(btnH2) btnH2.onclick = ()=> addEntry("incident","Helper flagged: feels unsafe","", "helper");
-  if(btnH3) btnH3.onclick = ()=> addEntry("incident","HELP NOW requested","Immediate assistance requested.","helper");
+  if(b1) b1.onclick = ()=> addEntry("incident","Helper requested another person","", "helper");
+  if(b2) b2.onclick = ()=> addEntry("incident","Helper flagged: feels unsafe","", "helper");
 }
 
 function renderAll(){
@@ -220,4 +243,4 @@ function renderAll(){
   bind();
   show("dogs");
   renderAll();
-})();
+})();    
