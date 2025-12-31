@@ -15,7 +15,6 @@
     <div class="brand-sub">Phase 1</div>
   </div>
 
-  <!-- Voice stays available, but not “dangerous” -->
   <div class="top-actions">
     <button id="btnTalk" class="btn">🎙️ Talk</button>
   </div>
@@ -27,10 +26,10 @@
   <section class="card">
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs</button>
-      <button class="btn primary" data-nav="care">Care</button>
+      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
+      <button class="btn primary" data-nav="care">Care Timeline</button>
       <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records</button>
+      <button class="btn primary" data-nav="records">Records &amp; Export</button>
     </div>
     <div class="muted small" style="margin-top:12px;">
       Choose what matters today. Everything else can wait.
@@ -40,31 +39,51 @@
   <!-- DOGS -->
   <section id="viewDogs" class="card">
     <div class="card-h">
-      <h2>Dogs & Pups</h2>
-      <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
+      <h2>Dogs &amp; Pups</h2>
     </div>
+    <div class="muted small">
+      A central record for each dog or pup.
+    </div>
+
+    <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
 
     <label class="label">Select</label>
     <select id="selAnimal"></select>
 
     <div id="animalSummary" class="animal-summary"></div>
+
+    <div class="muted small" style="margin-top:12px;">
+      This records what occurred. Information remains available for review or export.
+    </div>
   </section>
 
   <!-- CARE -->
   <section id="viewCare" class="card hide">
     <div class="card-h">
       <h2>Care Timeline</h2>
-      <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
     </div>
+    <div class="muted small">
+      A time-stamped record of actions taken and observations noted.
+    </div>
+
+    <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
     <div id="timeline"></div>
+
+    <div class="muted small" style="margin-top:12px;">
+      This records what occurred. Information remains available for review or export.
+    </div>
   </section>
 
   <!-- HELPERS -->
   <section id="viewHelpers" class="card hide">
     <div class="card-h">
       <h2>Helpers</h2>
-      <button class="btn" id="btnAddHelper">+ Add Helper</button>
     </div>
+    <div class="muted small">
+      A shared view for coordination and support.
+    </div>
+
+    <button class="btn" id="btnAddHelper">+ Add Helper</button>
 
     <div id="pins"></div>
 
@@ -72,26 +91,36 @@
       <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
       <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
     </div>
+
+    <div class="muted small" style="margin-top:12px;">
+      This records what occurred. Information remains available for review or export.
+    </div>
   </section>
 
   <!-- RECORDS -->
   <section id="viewRecords" class="card hide">
     <div class="card-h">
-      <h2>Export / Records</h2>
-      <button class="btn primary" id="btnExport">Export timeline</button>
+      <h2>Records &amp; Export</h2>
     </div>
+    <div class="muted small">
+      Information recorded across the app, available for review or export.
+    </div>
+
+    <button class="btn primary" id="btnExport">Export timeline</button>
     <pre id="exportOut" class="pre"></pre>
+
+    <div class="muted small" style="margin-top:12px;">
+      Information is exportable at any time for veterinary review, coordination, reference, or recordkeeping needs.
+    </div>
   </section>
 
 </main>
 
-<!-- EMERGENCY BUTTON – FIXED & SAFE -->
+<!-- EMERGENCY -->
 <button id="btnEmergency" class="btn danger emergency-fixed">
   Emergency
 </button>
 
-<!-- LOAD APPLICATION LOGIC -->
 <script src="app.js"></script>
-
 </body>
 </html>
