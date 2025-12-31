@@ -14,25 +14,21 @@
     <div class="brand-title">Breeder Pro</div>
     <div class="brand-sub">Phase 1</div>
   </div>
-  <div class="top-actions">
-    <button id="btnEmergency" class="btn danger">Emergency</button>
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
-  </div>
 </header>
 
 <main class="shell">
 
   <!-- GOAL NAVIGATION -->
   <section class="card">
-    <h2>Goal here</h2>
+    <h2>What is our goal today?</h2>
     <div class="goal-grid">
       <button class="btn primary" data-nav="dogs">Dogs</button>
       <button class="btn primary" data-nav="care">Care</button>
       <button class="btn primary" data-nav="helpers">Helpers</button>
       <button class="btn primary" data-nav="records">Records</button>
     </div>
-    <div class="muted small" style="margin-top:10px;">
-      Use what helps. Skip what doesn’t. You can export at any time.
+    <div class="muted small" style="margin-top:12px;">
+      Choose what matters right now. Everything else can wait.
     </div>
   </section>
 
@@ -67,6 +63,30 @@
 
     <div id="pins"></div>
 
-    <div class="goal-grid" style="margin-top:10px;">
+    <div class="goal-grid" style="margin-top:14px;">
       <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
       <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
+    </div>
+  </section>
+
+  <!-- RECORDS -->
+  <section id="viewRecords" class="card hide">
+    <div class="card-h">
+      <h2>Export / Records</h2>
+      <button class="btn primary" id="btnExport">Export timeline</button>
+    </div>
+    <pre id="exportOut" class="pre"></pre>
+  </section>
+
+</main>
+
+<!-- EMERGENCY BUTTON – FIXED & SAFE -->
+<button id="btnEmergency" class="btn danger emergency-fixed">
+  Emergency
+</button>
+
+<!-- LOAD APPLICATION LOGIC -->
+<script src="app.js"></script>
+
+</body>
+</html>
