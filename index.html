@@ -26,70 +26,41 @@
   <section class="card">
     <div class="card-h">
       <h2>What is our goal today?</h2>
-      <button class="info-btn" data-info="goal" aria-label="Info">ⓘ</button>
+      <button class="info-btn" data-info="goal">ⓘ</button>
     </div>
 
-    <!-- Tiered Info -->
     <div id="info-goal" class="info-text hide">
       <div class="info-summary">
-        This app remains quiet until more context is needed. One focus at a time.
+        One focus at a time keeps everything else from competing.
       </div>
-
       <button class="info-more-btn" data-more="goal">More</button>
       <div class="info-more hide" id="info-goal-more">
-        Short notes, coordination, and emergency support remain available without noise.
+        Records remain available for review or export. Voice may be used at any time.
       </div>
-
       <button class="info-full-btn" data-full="goal">Full</button>
       <div class="info-full hide" id="info-goal-full">
-        Sections are designed to stay skimmable. Deeper detail appears only when requested.
-        Records remain exportable for review and coordination.
+        Sections are skimmable by default. Deeper detail appears only when requested.
       </div>
     </div>
 
     <div class="goal-grid">
       <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
       <button class="btn primary" data-nav="care">Care Timeline</button>
+      <button class="btn primary" data-nav="feeding">Feeding</button>
+      <button class="btn primary" data-nav="inventory">Inventory</button>
       <button class="btn primary" data-nav="helpers">Helpers</button>
       <button class="btn primary" data-nav="records">Records &amp; Export</button>
-    </div>
-
-    <div class="muted small" style="margin-top:12px;">
-      Choose what matters today. Everything else can wait.
     </div>
   </section>
 
   <!-- DOGS -->
   <section id="viewDogs" class="card">
-    <div class="card-h">
-      <h2>Dogs &amp; Pups</h2>
-      <button class="info-btn" data-info="dogs" aria-label="Info">ⓘ</button>
-    </div>
-
-    <div id="info-dogs" class="info-text hide">
-      <div class="info-summary">
-        A central record for each dog or pup.
-      </div>
-
-      <button class="info-more-btn" data-more="dogs">More</button>
-      <div class="info-more hide" id="info-dogs-more">
-        Identity and history collected here connect to other sections automatically.
-      </div>
-
-      <button class="info-full-btn" data-full="dogs">Full</button>
-      <div class="info-full hide" id="info-dogs-full">
-        Records remain usable even when incomplete. Entries can be added by typing or by voice at any time.
-        Information remains available for review or export.
-      </div>
-    </div>
-
+    <h2>Dogs &amp; Pups</h2>
+    <div class="muted small">A central record for each dog or pup.</div>
     <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
-
     <label class="label">Select</label>
     <select id="selAnimal"></select>
-
     <div id="animalSummary" class="animal-summary"></div>
-
     <div class="muted small" style="margin-top:12px;">
       This records what occurred. Information remains available for review or export.
     </div>
@@ -97,108 +68,82 @@
 
   <!-- CARE -->
   <section id="viewCare" class="card hide">
-    <div class="card-h">
-      <h2>Care Timeline</h2>
-      <button class="info-btn" data-info="care" aria-label="Info">ⓘ</button>
-    </div>
-
-    <div id="info-care" class="info-text hide">
-      <div class="info-summary">
-        A time-stamped record of actions taken and observations noted.
-      </div>
-
-      <button class="info-more-btn" data-more="care">More</button>
-      <div class="info-more hide" id="info-care-more">
-        This functions like nursing notes. Interpretation comes later.
-      </div>
-
-      <button class="info-full-btn" data-full="care">Full</button>
-      <div class="info-full hide" id="info-care-full">
-        Voice may be used at any time. Records are exportable for veterinary review, coordination, reference, or recordkeeping needs.
-        This records facts, not conclusions.
-      </div>
-    </div>
-
+    <h2>Care Timeline</h2>
+    <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
     <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
     <div id="timeline"></div>
-
     <div class="muted small" style="margin-top:12px;">
       This records what occurred. Information remains available for review or export.
     </div>
   </section>
 
+  <!-- FEEDING (placeholder section; inventory comes first) -->
+  <section id="viewFeeding" class="card hide">
+    <h2>Feeding</h2>
+    <div class="muted small">Records feeding-related information and notes.</div>
+    <button class="btn primary" id="btnAddFeeding">+ Add Feeding Entry</button>
+    <div class="muted small" style="margin-top:12px;">
+      Feeding entries appear in the Care Timeline.
+    </div>
+  </section>
+
+  <!-- INVENTORY -->
+  <section id="viewInventory" class="card hide">
+    <div class="card-h">
+      <h2>Inventory</h2>
+      <button class="info-btn" data-info="inventory">ⓘ</button>
+    </div>
+
+    <div id="info-inventory" class="info-text hide">
+      <div class="info-summary">
+        Inventory records what is on hand and how it changes.
+      </div>
+
+      <button class="info-more-btn" data-more="inventory">More</button>
+      <div class="info-more hide" id="info-inventory-more">
+        Inventory adjusts only when a real event is recorded: added, used, discarded, retired, or transferred.
+      </div>
+
+      <button class="info-full-btn" data-full="inventory">Full</button>
+      <div class="info-full hide" id="info-inventory-full">
+        Any item with a barcode or QR code may be tracked. Thresholds are optional. Low items display in yellow.
+        This records what occurred. Interpretation and decisions occur elsewhere.
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
+      <button class="btn" id="btnToggleArchived">Show Archived</button>
+    </div>
+
+    <div id="inventoryList"></div>
+    <div id="inventoryArchived" class="hide"></div>
+  </section>
+
   <!-- HELPERS -->
   <section id="viewHelpers" class="card hide">
-    <div class="card-h">
-      <h2>Helpers</h2>
-      <button class="info-btn" data-info="helpers" aria-label="Info">ⓘ</button>
-    </div>
-
-    <div id="info-helpers" class="info-text hide">
-      <div class="info-summary">
-        A shared view for coordination and support.
-      </div>
-
-      <button class="info-more-btn" data-more="helpers">More</button>
-      <div class="info-more hide" id="info-helpers-more">
-        Requests for assistance can be recorded without interruption.
-      </div>
-
-      <button class="info-full-btn" data-full="helpers">Full</button>
-      <div class="info-full hide" id="info-helpers-full">
-        This section is not used for monitoring or evaluation. Records remain exportable when needed.
-        Voice may be used at any time.
-      </div>
-    </div>
-
+    <h2>Helpers</h2>
+    <div class="muted small">A shared view for coordination and support.</div>
     <button class="btn" id="btnAddHelper">+ Add Helper</button>
-
     <div id="pins"></div>
-
     <div class="goal-grid" style="margin-top:14px;">
       <button class="btn primary" id="btnHelpAnotherPerson">I need another person</button>
       <button class="btn primary" id="btnHelpUnsafe">This feels unsafe</button>
-    </div>
-
-    <div class="muted small" style="margin-top:12px;">
-      This records what occurred. Information remains available for review or export.
     </div>
   </section>
 
   <!-- RECORDS -->
   <section id="viewRecords" class="card hide">
-    <div class="card-h">
-      <h2>Records &amp; Export</h2>
-      <button class="info-btn" data-info="records" aria-label="Info">ⓘ</button>
-    </div>
-
-    <div id="info-records" class="info-text hide">
-      <div class="info-summary">
-        Information recorded across the app, available for review or export.
-      </div>
-
-      <button class="info-more-btn" data-more="records">More</button>
-      <div class="info-more hide" id="info-records-more">
-        Exports are commonly shared for veterinary review, coordination, reference, or recordkeeping needs.
-      </div>
-
-      <button class="info-full-btn" data-full="records">Full</button>
-      <div class="info-full hide" id="info-records-full">
-        Records reflect what was recorded at the time. Interpretation and decisions occur elsewhere.
-        Voice may be used at any time.
-      </div>
-    </div>
-
+    <h2>Records &amp; Export</h2>
+    <div class="muted small">Information recorded across the app, available for review or export.</div>
     <button class="btn primary" id="btnExport">Export timeline</button>
     <pre id="exportOut" class="pre"></pre>
   </section>
 
 </main>
 
-<button id="btnEmergency" class="btn danger emergency-fixed">
-  Emergency
-</button>
+<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<script src="app.js?v=4001"></script>
+<script src="app.js?v=5001"></script>
 </body>
 </html>
