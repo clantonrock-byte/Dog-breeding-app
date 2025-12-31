@@ -164,13 +164,32 @@ function addHelper(){
   renderPins();
 }
 
-/* ⓘ Info toggles */
+/* Tiered info system */
 function bindInfoButtons(){
+  // ⓘ toggles the whole panel
   document.querySelectorAll(".info-btn").forEach(btn=>{
     btn.onclick = ()=>{
       const key = btn.getAttribute("data-info");
       const panel = document.getElementById(`info-${key}`);
       if(panel) panel.classList.toggle("hide");
+    };
+  });
+
+  // More reveals "more" block
+  document.querySelectorAll(".info-more-btn").forEach(btn=>{
+    btn.onclick = ()=>{
+      const key = btn.getAttribute("data-more");
+      const more = document.getElementById(`info-${key}-more`);
+      if(more) more.classList.toggle("hide");
+    };
+  });
+
+  // Full reveals "full" block
+  document.querySelectorAll(".info-full-btn").forEach(btn=>{
+    btn.onclick = ()=>{
+      const key = btn.getAttribute("data-full");
+      const full = document.getElementById(`info-${key}-full`);
+      if(full) full.classList.toggle("hide");
     };
   });
 }
@@ -215,36 +234,29 @@ function bindEmergencyHold(){
 }
 
 function bind(){
-  // Goal navigation
   document.querySelectorAll("[data-nav]").forEach(b=>{
     b.onclick = ()=> show(b.dataset.nav);
   });
 
-  // Info buttons
   bindInfoButtons();
 
-  // Core actions
   const btnAddDog = $("#btnAddDog");
   const btnAddCare = $("#btnAddCareEntry");
-  const btnAddHelper = $("#btnAddHelper");
+  const btnAddHelperBtn = $("#btnAddHelper");
   const btnExport = $("#btnExport");
 
   if(btnAddDog) btnAddDog.onclick = addDog;
   if(btnAddCare) btnAddCare.onclick = addCare;
-  if(btnAddHelper) btnAddHelper.onclick = addHelper;
+  if(btnAddHelperBtn) btnAddHelperBtn.onclick = addHelper;
   if(btnExport) btnExport.onclick = exportJSON;
 
-  // Talk button (placeholder)
   const talk = $("#btnTalk");
   if (talk) talk.onclick = ()=> alert("Voice comes next.");
 
-  // Emergency hold
   bindEmergencyHold();
 
-  // Helper request buttons
   const b1=$("#btnHelpAnotherPerson");
   const b2=$("#btnHelpUnsafe");
-
   if(b1) b1.onclick = ()=> addEntry("incident","Helper requested another person","", "helper");
   if(b2) b2.onclick = ()=> addEntry("incident","Helper flagged: feels unsafe","", "helper");
 }
@@ -256,10 +268,10 @@ function renderAll(){
   renderPins();
 }
 
-(function boot(){
+document.addEventListener("DOMContentLoaded", ()=>{
   if(!state.selected && state.animals[0]) state.selected = state.animals[0].id;
   save();
   bind();
   show("dogs");
   renderAll();
-})();
+});
