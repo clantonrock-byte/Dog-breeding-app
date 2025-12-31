@@ -5,7 +5,7 @@
   --muted:#a5afbc;
   --line:#212633;
   --primary:#2d7ff9;
-  --danger:#f24b4b;
+  --dangerSolid:#b00020;   /* solid red */
   --soft:#0c0e14;
 
   --radius:18px;
@@ -36,16 +36,14 @@ body{
 }
 .brand-title{font-weight:900;font-size:16px}
 .brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
-
-.top-actions{display:flex; gap:12px; align-items:center}
+.top-actions{display:flex;gap:12px;align-items:center}
 
 /* Main layout */
-/* IMPORTANT: bottom padding makes room so content never sits behind the emergency dock */
 .shell{
   padding:16px;
   max-width:980px;
   margin:0 auto;
-  padding-bottom:120px; /* room for dock + button */
+  padding-bottom:140px; /* room for dock + button */
 }
 
 /* Cards */
@@ -95,6 +93,8 @@ h2{margin:0;font-size:18px}
   background:rgba(45,127,249,.18);
   border-color:rgba(45,127,249,.55);
 }
+
+/* We keep danger style generally, but emergency-fixed overrides it below */
 .btn.danger{
   background:rgba(242,75,75,.18);
   border-color:rgba(242,75,75,.6);
@@ -135,8 +135,7 @@ select, input, textarea{
   margin-top:14px;
 }
 
-/* ✅ Emergency dock + pinned button */
-/* Dock provides an opaque “base” so nothing shows through behind the button */
+/* ✅ Emergency dock (opaque) */
 .emergency-fixed{
   position:fixed;
   left:12px;
@@ -144,23 +143,23 @@ select, input, textarea{
   bottom:12px;
   z-index:50;
 
-  /* Make it truly opaque */
-  background: #2a0d10;            /* deep, opaque red base */
-  border-color: rgba(242,75,75,.8);
+  /* Hard override translucency */
+  background: var(--dangerSolid) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  color: #fff !important;
 
-  /* Visual separation */
-  box-shadow: 0 10px 30px rgba(0,0,0,.55);
+  box-shadow: 0 12px 34px rgba(0,0,0,.6);
 }
 
-/* Create a “dock” bar behind it to prevent content from visually competing */
+/* Opaque bar behind the button so content never shows through */
 .emergency-fixed::before{
   content:"";
   position:fixed;
   left:0;
   right:0;
   bottom:0;
-  height:92px;
-  background: rgba(9,10,13,0.98); /* opaque dock */
-  border-top: 1px solid rgba(255,255,255,.10);
+  height:108px;
+  background:#090a0d;          /* fully opaque */
+  border-top:1px solid rgba(255,255,255,.10);
   z-index:-1;
 }
