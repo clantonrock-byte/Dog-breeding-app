@@ -22,11 +22,11 @@ body{
   color:var(--ink);
 }
 
+/* Top bar */
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:14px;
   padding:16px;
   border-bottom:1px solid var(--line);
   background:#090a0d;
@@ -34,24 +34,13 @@ body{
   top:0;
   z-index:10;
 }
-.brand-title{
-  font-weight:900;
-  font-size:16px;
-}
-.brand-sub{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:2px;
-}
-.top-actions{
-  display:flex;
-  gap:14px;
-}
+.brand-title{font-weight:900;font-size:16px}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:2px}
 
 .shell{
   padding:16px;
   max-width:980px;
-  margin:0 auto;
+  margin:0 auto 96px; /* room for emergency button */
 }
 
 /* Cards */
@@ -71,23 +60,17 @@ body{
   margin-bottom:14px;
 }
 
-h1,h2,h3{
-  margin:0;
-  line-height:1.2;
-}
-h2{font-size:18px}
-
+h2{margin:0;font-size:18px}
 .label{
   display:block;
   font-size:13px;
   color:var(--muted);
   margin:10px 0 8px;
 }
-
 .muted{color:var(--muted)}
 .small{font-size:12px}
 
-/* Buttons — BIG & SAFE */
+/* Buttons – large & deliberate */
 .btn{
   display:block;
   width:100%;
@@ -99,9 +82,8 @@ h2{font-size:18px}
   cursor:pointer;
   font-weight:800;
   font-size:15px;
-  min-height:56px;          /* big tap target */
-  letter-spacing:.2px;
-  margin-bottom:14px;       /* spacing prevents mis-taps */
+  min-height:56px;
+  margin-bottom:14px;
 }
 
 .btn.primary{
@@ -113,19 +95,16 @@ h2{font-size:18px}
   border-color:rgba(242,75,75,.6);
 }
 
-/* Goal navigation spacing */
+/* Goal grid */
 .goal-grid{
   display:grid;
-  gap:18px;                 /* deliberate separation */
+  gap:18px;
   grid-template-columns:1fr;
 }
 @media(min-width:600px){
-  .goal-grid{
-    grid-template-columns:1fr 1fr;
-  }
+  .goal-grid{grid-template-columns:1fr 1fr}
 }
 
-/* Hide utility */
 .hide{display:none !important}
 
 /* Inputs */
@@ -140,47 +119,23 @@ select, input, textarea{
   font-size:15px;
 }
 
-/* Summary & lists */
-.animal-summary{
-  border:1px solid var(--line);
-  background:var(--soft);
-  border-radius:var(--radius-sm);
-  padding:14px;
-  margin-top:14px;
-}
-
-.timeline-item{
-  border:1px solid var(--line);
-  background:var(--soft);
-  border-radius:var(--radius);
-  padding:14px;
-  margin-top:14px;
-}
-
-.pre{
-  white-space:pre-wrap;
-  word-break:break-word;
-  background:var(--soft);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:14px;
-  margin-top:14px;
-  font-size:12px;
-}
-
-/* Helper pins */
+/* Lists */
+.animal-summary,
+.timeline-item,
+.pre,
 .pin-row{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:14px;
-  border-radius:var(--radius);
   border:1px solid var(--line);
   background:var(--soft);
+  border-radius:var(--radius);
+  padding:14px;
   margin-top:14px;
 }
-.pin-dot{
-  width:14px;
-  height:14px;
-  border-radius:50%;
+
+/* Emergency button pinned at bottom */
+.emergency-fixed{
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  z-index:50;
 }
