@@ -26,12 +26,25 @@
   <section class="card">
     <div class="card-h">
       <h2>What is our goal today?</h2>
-      <button class="info-btn" data-info="goal">ⓘ</button>
+      <button class="info-btn" data-info="goal" aria-label="Info">ⓘ</button>
     </div>
 
-    <div id="info-goal" class="muted small hide">
-      This app remains quiet until more context is needed.  
-      One focus at a time keeps everything else from competing.
+    <!-- Tiered Info -->
+    <div id="info-goal" class="info-text hide">
+      <div class="info-summary">
+        This app remains quiet until more context is needed. One focus at a time.
+      </div>
+
+      <button class="info-more-btn" data-more="goal">More</button>
+      <div class="info-more hide" id="info-goal-more">
+        Short notes, coordination, and emergency support remain available without noise.
+      </div>
+
+      <button class="info-full-btn" data-full="goal">Full</button>
+      <div class="info-full hide" id="info-goal-full">
+        Sections are designed to stay skimmable. Deeper detail appears only when requested.
+        Records remain exportable for review and coordination.
+      </div>
     </div>
 
     <div class="goal-grid">
@@ -50,12 +63,24 @@
   <section id="viewDogs" class="card">
     <div class="card-h">
       <h2>Dogs &amp; Pups</h2>
-      <button class="info-btn" data-info="dogs">ⓘ</button>
+      <button class="info-btn" data-info="dogs" aria-label="Info">ⓘ</button>
     </div>
 
-    <div id="info-dogs" class="muted small hide">
-      This section holds identifying information and history for each individual.  
-      Information recorded here connects to other sections automatically.
+    <div id="info-dogs" class="info-text hide">
+      <div class="info-summary">
+        A central record for each dog or pup.
+      </div>
+
+      <button class="info-more-btn" data-more="dogs">More</button>
+      <div class="info-more hide" id="info-dogs-more">
+        Identity and history collected here connect to other sections automatically.
+      </div>
+
+      <button class="info-full-btn" data-full="dogs">Full</button>
+      <div class="info-full hide" id="info-dogs-full">
+        Records remain usable even when incomplete. Entries can be added by typing or by voice at any time.
+        Information remains available for review or export.
+      </div>
     </div>
 
     <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
@@ -74,12 +99,24 @@
   <section id="viewCare" class="card hide">
     <div class="card-h">
       <h2>Care Timeline</h2>
-      <button class="info-btn" data-info="care">ⓘ</button>
+      <button class="info-btn" data-info="care" aria-label="Info">ⓘ</button>
     </div>
 
-    <div id="info-care" class="muted small hide">
-      This functions like nursing notes.  
-      Actions and observations are recorded; interpretation comes later.
+    <div id="info-care" class="info-text hide">
+      <div class="info-summary">
+        A time-stamped record of actions taken and observations noted.
+      </div>
+
+      <button class="info-more-btn" data-more="care">More</button>
+      <div class="info-more hide" id="info-care-more">
+        This functions like nursing notes. Interpretation comes later.
+      </div>
+
+      <button class="info-full-btn" data-full="care">Full</button>
+      <div class="info-full hide" id="info-care-full">
+        Voice may be used at any time. Records are exportable for veterinary review, coordination, reference, or recordkeeping needs.
+        This records facts, not conclusions.
+      </div>
     </div>
 
     <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
@@ -94,12 +131,24 @@
   <section id="viewHelpers" class="card hide">
     <div class="card-h">
       <h2>Helpers</h2>
-      <button class="info-btn" data-info="helpers">ⓘ</button>
+      <button class="info-btn" data-info="helpers" aria-label="Info">ⓘ</button>
     </div>
 
-    <div id="info-helpers" class="muted small hide">
-      This section supports coordination without interruption or oversight.  
-      It is not used for monitoring or evaluation.
+    <div id="info-helpers" class="info-text hide">
+      <div class="info-summary">
+        A shared view for coordination and support.
+      </div>
+
+      <button class="info-more-btn" data-more="helpers">More</button>
+      <div class="info-more hide" id="info-helpers-more">
+        Requests for assistance can be recorded without interruption.
+      </div>
+
+      <button class="info-full-btn" data-full="helpers">Full</button>
+      <div class="info-full hide" id="info-helpers-full">
+        This section is not used for monitoring or evaluation. Records remain exportable when needed.
+        Voice may be used at any time.
+      </div>
     </div>
 
     <button class="btn" id="btnAddHelper">+ Add Helper</button>
@@ -120,29 +169,36 @@
   <section id="viewRecords" class="card hide">
     <div class="card-h">
       <h2>Records &amp; Export</h2>
-      <button class="info-btn" data-info="records">ⓘ</button>
+      <button class="info-btn" data-info="records" aria-label="Info">ⓘ</button>
     </div>
 
-    <div id="info-records" class="muted small hide">
-      Information recorded across the app is collected here.  
-      Records may be shared when needed.
+    <div id="info-records" class="info-text hide">
+      <div class="info-summary">
+        Information recorded across the app, available for review or export.
+      </div>
+
+      <button class="info-more-btn" data-more="records">More</button>
+      <div class="info-more hide" id="info-records-more">
+        Exports are commonly shared for veterinary review, coordination, reference, or recordkeeping needs.
+      </div>
+
+      <button class="info-full-btn" data-full="records">Full</button>
+      <div class="info-full hide" id="info-records-full">
+        Records reflect what was recorded at the time. Interpretation and decisions occur elsewhere.
+        Voice may be used at any time.
+      </div>
     </div>
 
     <button class="btn primary" id="btnExport">Export timeline</button>
     <pre id="exportOut" class="pre"></pre>
-
-    <div class="muted small" style="margin-top:12px;">
-      Information is exportable at any time for veterinary review, coordination, reference, or recordkeeping needs.
-    </div>
   </section>
 
 </main>
 
-<!-- EMERGENCY -->
 <button id="btnEmergency" class="btn danger emergency-fixed">
   Emergency
 </button>
 
-<script src="app.js"></script>
+<script src="app.js?v=4001"></script>
 </body>
 </html>
