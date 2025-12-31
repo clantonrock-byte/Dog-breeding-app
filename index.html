@@ -24,13 +24,23 @@
 
   <!-- GOAL NAVIGATION -->
   <section class="card">
-    <h2>What is our goal today?</h2>
+    <div class="card-h">
+      <h2>What is our goal today?</h2>
+      <button class="info-btn" data-info="goal">ⓘ</button>
+    </div>
+
+    <div id="info-goal" class="muted small hide">
+      This app remains quiet until more context is needed.  
+      One focus at a time keeps everything else from competing.
+    </div>
+
     <div class="goal-grid">
       <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
       <button class="btn primary" data-nav="care">Care Timeline</button>
       <button class="btn primary" data-nav="helpers">Helpers</button>
       <button class="btn primary" data-nav="records">Records &amp; Export</button>
     </div>
+
     <div class="muted small" style="margin-top:12px;">
       Choose what matters today. Everything else can wait.
     </div>
@@ -40,9 +50,12 @@
   <section id="viewDogs" class="card">
     <div class="card-h">
       <h2>Dogs &amp; Pups</h2>
+      <button class="info-btn" data-info="dogs">ⓘ</button>
     </div>
-    <div class="muted small">
-      A central record for each dog or pup.
+
+    <div id="info-dogs" class="muted small hide">
+      This section holds identifying information and history for each individual.  
+      Information recorded here connects to other sections automatically.
     </div>
 
     <button class="btn" id="btnAddDog">+ Add Dog / Pup</button>
@@ -61,9 +74,12 @@
   <section id="viewCare" class="card hide">
     <div class="card-h">
       <h2>Care Timeline</h2>
+      <button class="info-btn" data-info="care">ⓘ</button>
     </div>
-    <div class="muted small">
-      A time-stamped record of actions taken and observations noted.
+
+    <div id="info-care" class="muted small hide">
+      This functions like nursing notes.  
+      Actions and observations are recorded; interpretation comes later.
     </div>
 
     <button class="btn primary" id="btnAddCareEntry">+ Add Care Entry</button>
@@ -78,9 +94,12 @@
   <section id="viewHelpers" class="card hide">
     <div class="card-h">
       <h2>Helpers</h2>
+      <button class="info-btn" data-info="helpers">ⓘ</button>
     </div>
-    <div class="muted small">
-      A shared view for coordination and support.
+
+    <div id="info-helpers" class="muted small hide">
+      This section supports coordination without interruption or oversight.  
+      It is not used for monitoring or evaluation.
     </div>
 
     <button class="btn" id="btnAddHelper">+ Add Helper</button>
@@ -101,9 +120,12 @@
   <section id="viewRecords" class="card hide">
     <div class="card-h">
       <h2>Records &amp; Export</h2>
+      <button class="info-btn" data-info="records">ⓘ</button>
     </div>
-    <div class="muted small">
-      Information recorded across the app, available for review or export.
+
+    <div id="info-records" class="muted small hide">
+      Information recorded across the app is collected here.  
+      Records may be shared when needed.
     </div>
 
     <button class="btn primary" id="btnExport">Export timeline</button>
