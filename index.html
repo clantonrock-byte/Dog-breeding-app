@@ -4,24 +4,262 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=restore1" />
 </head>
+
 <body>
-  <main class="shell">
-    <section class="card">
-      <h2>Breeder Pro</h2>
-      <div class="goal-grid">
-        <button class="btn primary" data-nav="inventory">Inventory</button>
-      </div>
-    </section>
 
-    <section id="viewInventory" class="card hide">
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-title">Breeder Pro</div>
+    <div class="brand-sub">Phase 1</div>
+  </div>
+  <div class="top-actions">
+    <button id="btnTalk" class="btn">🎙️ Talk</button>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- GOAL NAVIGATION -->
+  <section class="card">
+    <div class="card-h">
+      <h2>What is our goal today?</h2>
+      <button class="info-btn" data-info="goal">ⓘ</button>
+    </div>
+
+    <div id="info-goal" class="info-text hide">
+      <div class="info-summary">One focus at a time keeps everything else from competing.</div>
+      <button class="info-more-btn" data-more="goal">More</button>
+      <div class="info-more hide" id="info-goal-more">Voice may be used at any time. Records remain available for review or export.</div>
+      <button class="info-full-btn" data-full="goal">Full</button>
+      <div class="info-full hide" id="info-goal-full">Deeper detail appears only when requested. This records what occurred.</div>
+    </div>
+
+    <div class="goal-grid">
+      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
+      <button class="btn primary" data-nav="care">Care Timeline</button>
+      <button class="btn primary" data-nav="feeding">Feeding</button>
+      <button class="btn primary" data-nav="inventory">Inventory</button>
+      <button class="btn primary" data-nav="helpers">Helpers</button>
+      <button class="btn primary" data-nav="records">Records &amp; Export</button>
+    </div>
+  </section>
+
+  <!-- DOGS -->
+  <section id="viewDogs" class="card">
+    <h2>Dogs &amp; Pups</h2>
+    <div class="muted small">A central record for each dog or pup.</div>
+  </section>
+
+  <!-- CARE -->
+  <section id="viewCare" class="card hide">
+    <h2>Care Timeline</h2>
+    <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
+  </section>
+
+  <!-- FEEDING -->
+  <section id="viewFeeding" class="card hide">
+    <h2>Feeding</h2>
+    <div class="muted small">Records feeding-related information and notes.</div>
+  </section>
+
+  <!-- INVENTORY -->
+  <section id="viewInventory" class="card hide">
+    <div class="card-h">
       <h2>Inventory</h2>
-      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
-      <div id="inventoryList"></div>
-    </section>
-  </main>
+      <button class="info-btn" data-info="inventory">ⓘ</button>
+    </div>
 
-  <script src="app.js?v=12348"></script>
+    <div id="info-inventory" class="info-text hide">
+      <div class="info-summary">Inventory records what is on hand and how it changes.</div>
+      <button class="info-more-btn" data-more="inventory">More</button>
+      <div class="info-more hide" id="info-inventory-more">Adjustments are recorded as events. Items are archived, not deleted.</div>
+      <button class="info-full-btn" data-full="inventory">Full</button>
+      <div class="info-full hide" id="info-inventory-full">Exact identifier match = same item. Thresholds are optional; low items appear yellow.</div>
+    </div>
+
+    <div class="inv-banner">
+      <div id="invLastUpdate" class="muted small">Last update: none</div>
+      <button id="btnInvUndo" class="inv-undo hide">Undo</button>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
+      <button class="btn" id="btnReviewInventory">Review list</button>
+      <button class="btn" id="btnToggleArchived">Show Archived</button>
+    </div>
+
+    <div id="inventoryList"></div>
+    <div id="inventoryArchived" class="hide"></div>
+
+    <div id="inventoryReview" class="hide">
+      <div class="inv-review-h">
+        <h3>Inventory review</h3>
+        <button class="btn" id="btnBackToInventory">Back</button>
+      </div>
+      <div class="muted small" id="invReviewContext"></div>
+      <div id="inventoryReviewList"></div>
+    </div>
+  </section>
+
+  <!-- HELPERS -->
+  <section id="viewHelpers" class="card hide">
+    <h2>Helpers</h2>
+    <div class="muted small">A shared view for coordination and support.</div>
+  </section>
+
+  <!-- RECORDS -->
+  <section id="viewRecords" class="card hide">
+    <h2>Records &amp; Export</h2>
+    <div class="muted small">Information recorded across the app, available for review or export.</div>
+    <button class="btn primary" id="btnExport">Export</button>
+    <pre id="exportOut" class="pre"></pre>
+  </section>
+
+</main>
+
+<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
+
+<!-- Add/Edit Inventory Dialog -->
+<dialog id="dlgInv" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Inventory item</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <label class="label">Item name / label</label>
+      <input id="invName" />
+
+      <div class="grid2">
+        <div>
+          <label class="label">Category</label>
+          <select id="invCategory">
+            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
+            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Source</label>
+          <select id="invSource">
+            <option>Purchased</option><option>Donated</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label class="label">Identifier type</label>
+          <select id="invIdType">
+            <option>None</option><option>Barcode</option><option>QR</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Identifier value</label>
+          <input id="invIdValue" placeholder="(scan or type)" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button type="button" class="btn" id="btnScanId">Scan with camera</button>
+        <button type="button" class="btn" id="btnClearId">Clear identifier</button>
+      </div>
+
+      <div class="grid3">
+        <div>
+          <label class="label">Unit</label>
+          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
+        </div>
+        <div>
+          <label class="label">Weight per unit (optional)</label>
+          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
+        </div>
+        <div>
+          <label class="label">Low threshold (optional)</label>
+          <input id="invThresh" inputmode="decimal" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label class="label">Quantity on hand</label>
+          <input id="invQty" inputmode="decimal" />
+        </div>
+        <div>
+          <label class="label">Notes (optional)</label>
+          <input id="invNotes" />
+        </div>
+      </div>
+    </div>
+
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Cancel</button>
+      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Update Inventory Dialog -->
+<dialog id="dlgInvUpdate" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Inventory update</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <div class="muted small" id="invUpdateItemName"></div>
+
+      <label class="label">Action</label>
+      <select id="invUpdateAction">
+        <option>Added</option><option>Used</option><option>Discarded</option><option>Retired</option><option>Transferred</option>
+      </select>
+
+      <div id="invUpdateQtyWrap">
+        <label class="label">Quantity change</label>
+        <input id="invUpdateQty" inputmode="decimal" placeholder="e.g., 1" />
+      </div>
+
+      <label class="label">Note (optional)</label>
+      <input id="invUpdateNote" />
+    </div>
+
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Cancel</button>
+      <button class="btn primary" id="btnInvUpdateSave" value="ok">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Scan Dialog -->
+<dialog id="dlgScan" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Scan</h3>
+      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <video id="scanVideo" playsinline></video>
+
+      <div id="scanResultBox" class="scan-result hide">
+        <div class="muted small">Identifier captured</div>
+        <div id="scanValue" class="scan-value"></div>
+      </div>
+
+      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="dlg-f">
+      <button type="button" class="btn" id="btnRescan">Rescan</button>
+      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
+      <button class="btn" value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js?v=restore1"></script>
 </body>
 </html>
