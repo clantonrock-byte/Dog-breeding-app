@@ -1,4 +1,4 @@
-const STORE_KEY = "breederPro_bulk1";
+const STORE_KEY = "breederPro_sepA1";
 const $ = (s)=>document.querySelector(s);
 
 function nowISO(){ return new Date().toISOString(); }
@@ -29,6 +29,9 @@ function load(){
       if(it.identifierType===undefined) it.identifierType="None";
       if(it.identifierValue===undefined) it.identifierValue="";
       if(it.history===undefined) it.history=[];
+      if(it.archived===undefined) it.archived=false;
+      if(it.qty===undefined) it.qty=0;
+      if(it.thresholdLow===undefined) it.thresholdLow=null;
     });
     return s;
   }catch{ return seed(); }
@@ -149,12 +152,13 @@ function renderInventory(){
   list.innerHTML = active.length ? active.map(i=>{
     const low=inventoryLow(i);
     const w=i.weightPerUnit?` • W/unit: ${esc(i.weightPerUnit)}`:"";
+    const stock = `Qty: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
     return `
       <div class="inv-item">
         <div class="inv-top">
           <div>
             <div class="inv-name ${low?"low":""}">${esc(i.name)}</div>
-            <div class="inv-meta">${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}${i.thresholdLow!==null&&i.thresholdLow!==""?` • Low: ${esc(i.thresholdLow)}`:""}${w}</div>
+            <div class="inv-meta">${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • ${stock}${w}</div>
             <div class="inv-meta">${i.identifierType!=="None"?`${esc(i.identifierType)}: ${esc(i.identifierValue||"")}`:"Identifier: none"}</div>
           </div>
         </div>
@@ -168,12 +172,13 @@ function renderInventory(){
 
   arch.innerHTML = archived.length ? archived.map(i=>{
     const w=i.weightPerUnit?` • W/unit: ${esc(i.weightPerUnit)}`:"";
+    const stock = `Qty: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
     return `
       <div class="inv-item">
         <div class="inv-top">
           <div>
             <div class="inv-name">${esc(i.name)}</div>
-            <div class="inv-meta">Archived • ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}${w}</div>
+            <div class="inv-meta">Archived • ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • ${stock}${w}</div>
             <div class="inv-meta">${i.identifierType!=="None"?`${esc(i.identifierType)}: ${esc(i.identifierValue||"")}`:"Identifier: none"}</div>
           </div>
         </div>
@@ -242,8 +247,9 @@ function renderReview(){
   }).join("") : `<div class="muted small">No active inventory items recorded.</div>`;
 }
 
-/* Add/Edit modal */
+/* Definition-only Add/Edit modal */
 let editingItemId=null;
+
 function openInvDialog(item){
   $("#invName").value=item?.name||"";
   $("#invCategory").value=item?.category||"Food";
@@ -251,8 +257,6 @@ function openInvDialog(item){
   $("#invIdType").value=item?.identifierType||"None";
   $("#invIdValue").value=item?.identifierValue||"";
   $("#invUnit").value=item?.unit||"count";
-  $("#invQty").value=(item?.qty??"");
-  $("#invThresh").value=(item?.thresholdLow??"");
   $("#invNotes").value=item?.notes||"";
   $("#invWeightPerUnit").value=item?.weightPerUnit||"";
   $("#dlgInv")?.showModal();
@@ -266,9 +270,6 @@ function saveInvFromDialog(){
   const idType=$("#invIdType").value;
   const idValue=($("#invIdValue").value||"").trim();
   const unit=$("#invUnit").value;
-  const qty=Number($("#invQty").value||"0")||0;
-  const threshRaw=($("#invThresh").value||"").trim();
-  const thresholdLow=threshRaw===""?null:(Number(threshRaw)||null);
   const notes=($("#invNotes").value||"").trim();
   const weightPerUnit=($("#invWeightPerUnit").value||"").trim();
 
@@ -276,55 +277,75 @@ function saveInvFromDialog(){
     const it=state.inventory.find(x=>x.itemId===editingItemId);
     if(!it) return;
     const beforeItem=JSON.parse(JSON.stringify(it));
+
     it.name=name; it.category=category; it.source=source;
     it.identifierType=idType; it.identifierValue=(idType==="None"?"":idValue);
-    it.unit=unit; it.qty=qty; it.thresholdLow=thresholdLow;
-    it.notes=notes; it.weightPerUnit=weightPerUnit;
-    it.history=it.history||[];
-    it.history.push({ts:nowISO(),action:"Edited",qtyDelta:0,note:"Record updated"});
+    it.unit=unit; it.notes=notes; it.weightPerUnit=weightPerUnit;
+
+    it.history.push({ts:nowISO(),action:"Edited",qtyDelta:0,note:"Definition updated"});
+
     undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: Edited ${it.name}`};
     showUndo(`Undo: Edited ${it.name}`);
     setLastUpdate(`Last update: Edited · ${it.name} · ${fmt(nowISO())}`);
   } else {
     const itemId=uid("inv");
     state.inventory.push({
-      itemId,name,category,source,
-      identifierType:idType,identifierValue:(idType==="None"?"":idValue),
-      unit,qty,thresholdLow,notes,weightPerUnit,
+      itemId,
+      name,category,source,
+      identifierType:idType,
+      identifierValue:(idType==="None"?"":idValue),
+      unit,
+      // Stock lives elsewhere:
+      qty: 0,
+      thresholdLow: null,
+      notes,
+      weightPerUnit,
       archived:false,
-      history:[{ts:nowISO(),action:"Added",qtyDelta:qty,note:"Initial record"}]
+      history:[{ts:nowISO(),action:"Created",qtyDelta:0,note:"Definition recorded"}]
     });
-    undoPayload={kind:"add",addedItemId:itemId,label:`Undo: Added ${name}`};
-    showUndo(`Undo: Added ${name}`);
-    setLastUpdate(`Last update: Added · ${name} · ${fmt(nowISO())}`);
+
+    undoPayload={kind:"add",addedItemId:itemId,label:`Undo: Created ${name}`};
+    showUndo(`Undo: Created ${name}`);
+    setLastUpdate(`Last update: Created · ${name} · ${fmt(nowISO())}`);
   }
+
   save(); renderInventory(); renderReview();
   $("#dlgInv")?.close(); editingItemId=null;
 }
 
-/* Update modal */
+/* Update modal: stock + threshold live here */
 let currentUpdateId=null;
+
 function openUpdateDialog(itemId){
   const it=state.inventory.find(x=>x.itemId===itemId);
   if(!it) return;
+
   currentUpdateId=itemId;
   $("#invUpdateItemName").textContent=`Item: ${it.name}`;
+  $("#invUpdateCurrentQty").textContent=`Current on hand: ${it.qty} ${it.unit}`;
   $("#invUpdateAction").value="Used";
   $("#invUpdateQty").value="1";
   $("#invUpdateNote").value="";
+  $("#invUpdateThreshold").value = (it.thresholdLow ?? "");
   $("#invUpdateQtyWrap").classList.remove("hide");
   $("#dlgInvUpdate")?.showModal();
 }
+
 function saveUpdateFromDialog(){
   const it=state.inventory.find(x=>x.itemId===currentUpdateId);
   if(!it) return;
+
   const beforeItem=JSON.parse(JSON.stringify(it));
   const action=$("#invUpdateAction").value;
   const note=($("#invUpdateNote").value||"").trim();
+  const threshRaw=($("#invUpdateThreshold").value||"").trim();
+  const newThreshold = threshRaw==="" ? null : (Number(threshRaw) || null);
+
+  // Apply threshold change regardless of action (if entered)
+  it.thresholdLow = newThreshold;
 
   if(action==="Retired"||action==="Transferred"){
     it.archived=true;
-    it.history=it.history||[];
     it.history.push({ts:nowISO(),action,qtyDelta:0,note});
     undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: ${action} ${it.name}`};
     showUndo(`Undo: ${action} ${it.name}`);
@@ -337,11 +358,12 @@ function saveUpdateFromDialog(){
   const deltaRaw=Number($("#invUpdateQty").value||"0")||0;
   const signed=(action==="Added")?Math.abs(deltaRaw):-Math.abs(deltaRaw);
   it.qty=Math.max(0,(Number(it.qty)||0)+signed);
-  it.history=it.history||[];
   it.history.push({ts:nowISO(),action,qtyDelta:signed,note});
+
   undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: ${action} ${it.name}`};
   showUndo(`Undo: ${action} ${it.name}`);
   setLastUpdate(`Last update: ${action} · ${it.name} · ${fmt(nowISO())}`);
+
   save(); renderInventory(); renderReview();
   $("#dlgInvUpdate")?.close(); currentUpdateId=null;
 }
@@ -349,7 +371,8 @@ function saveUpdateFromDialog(){
 /* Scanner + match logic */
 let scanStream=null;
 let lastScanValue="";
-let assumeSessionIdKey=""; // if set, auto-add +1 for same id (this session only)
+let assumeSessionIdKey="";
+let pendingMatchedItem=null;
 
 function findItemByIdentifier(type,value){
   const t=String(type||"").trim();
@@ -409,64 +432,6 @@ function stopScanStream(){
 function openScanDialog(){ $("#dlgScan")?.showModal(); startScan(); }
 function closeScanDialog(){ stopScanStream(); $("#dlgScan")?.close(); }
 
-let pendingMatchedItem=null;
-
-function confirmScan(){
-  if(!lastScanValue) return;
-
-  // Assume barcode unless user set QR manually
-  const scannedType = ($("#invIdType").value && $("#invIdType").value !== "None") ? $("#invIdType").value : "Barcode";
-  const idKey = normalizeId(scannedType, lastScanValue);
-
-  // If session-assume is active and matches, auto-add +1 with a quiet update and keep dialog closed
-  if(assumeSessionIdKey && assumeSessionIdKey === idKey){
-    const it = findItemByIdentifier(scannedType, lastScanValue);
-    if(it){
-      const beforeItem = JSON.parse(JSON.stringify(it));
-      it.qty = (Number(it.qty)||0) + 1;
-      it.history.push({ ts: nowISO(), action:"Added", qtyDelta:1, note:"Scan add (session)" });
-      undoPayload = { kind:"update", itemId: it.itemId, beforeItem, label:`Undo: Added 1 unit to ${it.name}` };
-      showUndo(`Undo: Added 1 unit to ${it.name}`);
-      setLastUpdate(`Last update: Added · ${it.name} · ${fmt(nowISO())}`);
-      save(); renderInventory(); renderReview();
-    }
-    closeScanDialog();
-    return;
-  }
-
-  // Normal: look for exact match
-  const match = findItemByIdentifier(scannedType, lastScanValue);
-  if(match){
-    pendingMatchedItem = match;
-
-    // Auto-populate the form fields from the match (so the user sees it’s the same item)
-    $("#invName").value = match.name || "";
-    $("#invCategory").value = match.category || "Food";
-    $("#invSource").value = match.source || "Other";
-    $("#invUnit").value = match.unit || "count";
-    $("#invQty").value = match.qty ?? "";
-    $("#invThresh").value = match.thresholdLow ?? "";
-    $("#invNotes").value = match.notes || "";
-    $("#invWeightPerUnit").value = match.weightPerUnit || "";
-    $("#invIdType").value = match.identifierType || scannedType;
-    $("#invIdValue").value = match.identifierValue || lastScanValue;
-
-    // Show match dialog
-    $("#scanMatchName").textContent = `This matches: ${match.name}`;
-    $("#scanMatchMulti").value = "";
-    $("#scanMatchAssumeSession").checked = false;
-    closeScanDialog();
-    $("#dlgScanMatch")?.showModal();
-    return;
-  }
-
-  // No match: populate identifier fields for new entry
-  $("#invIdType").value = scannedType;
-  $("#invIdValue").value = lastScanValue;
-  closeScanDialog();
-}
-
-/* Match dialog actions */
 function addUnitsToMatched(count){
   if(!pendingMatchedItem) return;
   const it = state.inventory.find(x=>x.itemId===pendingMatchedItem.itemId);
@@ -486,13 +451,69 @@ function addUnitsToMatched(count){
   save(); renderInventory(); renderReview();
 }
 
-/* Bind */
+function confirmScan(){
+  if(!lastScanValue) return;
+
+  const scannedType = ($("#invIdType").value && $("#invIdType").value !== "None") ? $("#invIdType").value : "Barcode";
+  const idKey = normalizeId(scannedType, lastScanValue);
+
+  if(assumeSessionIdKey && assumeSessionIdKey === idKey){
+    const it = findItemByIdentifier(scannedType, lastScanValue);
+    if(it){
+      const beforeItem = JSON.parse(JSON.stringify(it));
+      it.qty = (Number(it.qty)||0) + 1;
+      it.history.push({ ts: nowISO(), action:"Added", qtyDelta:1, note:"Scan add (session)" });
+      undoPayload = { kind:"update", itemId: it.itemId, beforeItem, label:`Undo: Added 1 unit to ${it.name}` };
+      showUndo(`Undo: Added 1 unit to ${it.name}`);
+      setLastUpdate(`Last update: Added · ${it.name} · ${fmt(nowISO())}`);
+      save(); renderInventory(); renderReview();
+    }
+    closeScanDialog();
+    return;
+  }
+
+  const match = findItemByIdentifier(scannedType, lastScanValue);
+  if(match){
+    pendingMatchedItem = match;
+
+    // Auto-populate definition fields (no stock fields here)
+    $("#invName").value = match.name || "";
+    $("#invCategory").value = match.category || "Food";
+    $("#invSource").value = match.source || "Other";
+    $("#invUnit").value = match.unit || "count";
+    $("#invNotes").value = match.notes || "";
+    $("#invWeightPerUnit").value = match.weightPerUnit || "";
+    $("#invIdType").value = match.identifierType || scannedType;
+    $("#invIdValue").value = match.identifierValue || lastScanValue;
+
+    $("#scanMatchName").textContent = `This matches: ${match.name}`;
+    $("#scanMatchMulti").value = "";
+    $("#scanMatchAssumeSession").checked = false;
+
+    closeScanDialog();
+    $("#dlgScanMatch")?.showModal();
+    return;
+  }
+
+  $("#invIdType").value = scannedType;
+  $("#invIdValue").value = lastScanValue;
+  closeScanDialog();
+}
+
+/* Bind + hooks */
+window.__invEdit = (id)=>{
+  const it=state.inventory.find(x=>x.itemId===id);
+  if(!it) return;
+  editingItemId=id;
+  openInvDialog(it);
+};
+window.__invUpdate = (id)=> openUpdateDialog(id);
+
 function bind(){
   document.querySelectorAll("[data-nav]").forEach(b=> b.onclick=()=> show(b.dataset.nav));
   bindInfoButtons();
   bindEmergencyHold();
 
-  // Inventory dialogs
   $("#btnAddInventory")?.addEventListener("click", ()=>{ editingItemId=null; openInvDialog(null); });
   $("#btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveInvFromDialog(); });
 
@@ -511,7 +532,6 @@ function bind(){
   });
   $("#btnToggleArchived")?.addEventListener("click", ()=> $("#inventoryArchived")?.classList.toggle("hide"));
 
-  // Update dialog
   $("#invUpdateAction")?.addEventListener("change", ()=>{
     const a=$("#invUpdateAction").value;
     if(a==="Retired"||a==="Transferred") $("#invUpdateQtyWrap").classList.add("hide");
@@ -519,7 +539,6 @@ function bind(){
   });
   $("#btnInvUpdateSave")?.addEventListener("click", (e)=>{ e.preventDefault(); saveUpdateFromDialog(); });
 
-  // Scanner
   $("#btnScanId")?.addEventListener("click", ()=> openScanDialog());
   $("#btnClearId")?.addEventListener("click", ()=>{ $("#invIdValue").value=""; });
   $("#btnRescan")?.addEventListener("click", ()=> startScan());
@@ -527,7 +546,7 @@ function bind(){
   $("#btnCloseScan")?.addEventListener("click", ()=> closeScanDialog());
   $("#dlgScan")?.addEventListener("close", ()=> stopScanStream());
 
-  // Match dialog buttons
+  // Match dialog actions
   $("#btnScanAddOne")?.addEventListener("click", ()=>{
     const assume = $("#scanMatchAssumeSession").checked;
     addUnitsToMatched(1);
@@ -560,14 +579,6 @@ function bind(){
 
   $("#btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 }
-
-window.__invEdit = (id)=>{
-  const it=state.inventory.find(x=>x.itemId===id);
-  if(!it) return;
-  editingItemId=id;
-  openInvDialog(it);
-};
-window.__invUpdate = (id)=> openUpdateDialog(id);
 
 document.addEventListener("DOMContentLoaded", ()=>{
   bind();
