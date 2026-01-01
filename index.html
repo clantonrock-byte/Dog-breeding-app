@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
 <header class="topbar">
   <div class="brand">
     <div class="brand-title">Breeder Pro</div>
@@ -21,12 +20,9 @@
 
 <main class="shell">
 
-  <!-- VIEW: HOME -->
+  <!-- HOME -->
   <section id="viewHome" class="card">
-    <div class="card-h">
-      <h2>What is our goal today?</h2>
-    </div>
-
+    <h2>What is our goal today?</h2>
     <div class="goal-grid">
       <button class="btn primary" data-go="dogs">Dogs &amp; Pups</button>
       <button class="btn primary" data-go="care">Care Timeline</button>
@@ -37,11 +33,9 @@
     </div>
   </section>
 
-  <!-- VIEW: INVENTORY MENU -->
+  <!-- INVENTORY MENU (2nd level) -->
   <section id="viewInventoryMenu" class="card hide">
-    <div class="card-h">
-      <h2>Inventory</h2>
-    </div>
+    <h2>Inventory</h2>
 
     <div class="row">
       <button class="btn" data-back="home">Back</button>
@@ -54,299 +48,59 @@
       <button class="btn primary" data-inv="transfer">Transfer</button>
     </div>
 
-    <div class="row" style="margin-top:12px;">
+    <div class="goal-grid" style="margin-top:12px;">
       <button class="btn" data-inv="review">Review list</button>
-      <button class="btn" id="btnToggleArchivedMenu">Show Archived</button>
     </div>
-
-    <div id="inventoryArchivedMenu" class="hide"></div>
   </section>
 
-  <!-- VIEW: INVENTORY CURRENT -->
+  <!-- INVENTORY ACTION PAGES (3rd level) -->
   <section id="viewInventoryCurrent" class="card hide">
-    <div class="card-h">
-      <h2>Current inventory</h2>
-    </div>
-
+    <h2>Current inventory</h2>
     <div class="row">
       <button class="btn" data-back="inventoryMenu">Back</button>
       <button class="btn" data-home="home">Home</button>
     </div>
-
-    <div id="inventoryList"></div>
-    <div class="row" style="margin-top:12px;">
-      <button class="btn" id="btnToggleArchivedCurrent">Show Archived</button>
-    </div>
-    <div id="inventoryArchived" class="hide"></div>
+    <div class="muted small">Inventory list will appear here once we reattach inventory logic.</div>
   </section>
 
-  <!-- VIEW: INVENTORY ADD -->
   <section id="viewInventoryAdd" class="card hide">
-    <div class="card-h">
-      <h2>Add inventory</h2>
-    </div>
-
+    <h2>Add inventory</h2>
     <div class="row">
       <button class="btn" data-back="inventoryMenu">Back</button>
       <button class="btn" data-home="home">Home</button>
     </div>
-
-    <div class="muted small" style="margin:10px 0;">
-      Item definition is recorded here. Stock changes are recorded in Update.
-    </div>
-
-    <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
-
-    <div class="muted small" style="margin-top:12px;">
-      After saving, use “Current inventory” → Update to add on-hand quantity.
-    </div>
+    <div class="muted small">Add item definition UI will appear here once we reattach inventory logic.</div>
   </section>
 
-  <!-- VIEW: INVENTORY TRANSFER -->
   <section id="viewInventoryTransfer" class="card hide">
-    <div class="card-h">
-      <h2>Transfer</h2>
-    </div>
-
+    <h2>Transfer</h2>
     <div class="row">
       <button class="btn" data-back="inventoryMenu">Back</button>
       <button class="btn" data-home="home">Home</button>
     </div>
-
-    <div class="muted small" style="margin:10px 0;">
-      Scan an identifier to transfer stock. Exact match routes to the item’s Transfer update.
-    </div>
-
-    <button class="btn primary" id="btnTransferScan">Scan item to transfer</button>
+    <div class="muted small">Transfer flow will appear here once we reattach inventory logic.</div>
   </section>
 
-  <!-- VIEW: INVENTORY REVIEW -->
   <section id="viewInventoryReview" class="card hide">
-    <div class="card-h">
-      <h2>Inventory review</h2>
-    </div>
-
+    <h2>Inventory review</h2>
     <div class="row">
       <button class="btn" data-back="inventoryMenu">Back</button>
       <button class="btn" data-home="home">Home</button>
     </div>
-
-    <div class="muted small" id="invReviewContext"></div>
-    <div id="inventoryReviewList"></div>
+    <div class="muted small">Review list will appear here once we reattach inventory logic.</div>
   </section>
 
-  <!-- PLACEHOLDER VIEWS FOR OTHER MODULES -->
+  <!-- OTHER MODULE PLACEHOLDERS -->
   <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2></section>
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2></section>
   <section id="viewHelpers" class="card hide"><h2>Helpers</h2></section>
-  <section id="viewRecords" class="card hide">
-    <h2>Records &amp; Export</h2>
-    <button class="btn primary" id="btnExport">Export</button>
-    <pre id="exportOut" class="pre"></pre>
-  </section>
+  <section id="viewRecords" class="card hide"><h2>Records &amp; Export</h2></section>
 
 </main>
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<!-- Add/Edit Inventory Dialog (definition only) -->
-<dialog id="dlgInv" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Inventory item</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <label class="label">Item name / label</label>
-      <input id="invName" />
-
-      <div class="grid2">
-        <div>
-          <label class="label">Category</label>
-          <select id="invCategory">
-            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
-            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Source</label>
-          <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label class="label">Identifier type</label>
-          <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
-        </div>
-        <div>
-          <label class="label">Identifier value</label>
-          <input id="invIdValue" placeholder="(scan or type)" />
-        </div>
-      </div>
-
-      <div class="row">
-        <button type="button" class="btn" id="btnScanId">Scan with camera</button>
-        <button type="button" class="btn" id="btnClearId">Clear identifier</button>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label class="label">Unit</label>
-          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
-        </div>
-        <div>
-          <label class="label">Weight per unit (optional)</label>
-          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
-        </div>
-      </div>
-
-      <label class="label">Notes (optional)</label>
-      <input id="invNotes" />
-    </div>
-
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- Update Inventory (stock + threshold + transfer destination) -->
-<dialog id="dlgInvUpdate" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Inventory update</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <div class="muted small" id="invUpdateItemName"></div>
-      <div class="muted small" id="invUpdateCurrentQty"></div>
-
-      <label class="label">Action</label>
-      <select id="invUpdateAction">
-        <option>Added</option>
-        <option>Used</option>
-        <option>Discarded</option>
-        <option>Transferred</option>
-        <option>Retired</option>
-      </select>
-
-      <div id="invUpdateQtyWrap">
-        <label class="label">Quantity change</label>
-        <input id="invUpdateQty" inputmode="decimal" placeholder="e.g., 1" />
-      </div>
-
-      <label class="label">Low threshold (optional)</label>
-      <input id="invUpdateThreshold" inputmode="decimal" placeholder="e.g., 2" />
-
-      <div id="transferWrap" class="hide">
-        <label class="label">Transfer destination</label>
-        <select id="transferType">
-          <option>With a dog</option>
-          <option>To adopter</option>
-          <option>To foster</option>
-          <option>To another organization</option>
-          <option>Returned to donor</option>
-          <option>Moved to storage</option>
-          <option>Other</option>
-        </select>
-
-        <div class="grid2">
-          <div>
-            <label class="label">Destination details (optional)</label>
-            <input id="transferDetail" placeholder="e.g., Dog name / org name / storage location" />
-          </div>
-          <div>
-            <label class="label">Contact person (optional)</label>
-            <input id="transferContactPerson" placeholder="e.g., Jordan Smith" />
-          </div>
-        </div>
-
-        <div class="grid2">
-          <div>
-            <label class="label">Contact method (optional)</label>
-            <select id="transferContactMethod">
-              <option>None</option><option>Phone</option><option>Email</option><option>Both</option><option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="label">Contact details (optional)</label>
-            <input id="transferContactDetails" placeholder="e.g., 555-555-5555 / name@email.com" />
-          </div>
-        </div>
-      </div>
-
-      <label class="label">Note (optional)</label>
-      <input id="invUpdateNote" />
-    </div>
-
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnInvUpdateSave" value="ok">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- Scan Dialog -->
-<dialog id="dlgScan" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Scan</h3>
-      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <video id="scanVideo" playsinline></video>
-      <div id="scanResultBox" class="scan-result hide">
-        <div class="muted small">Identifier captured</div>
-        <div id="scanValue" class="scan-value"></div>
-      </div>
-      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="dlg-f">
-      <button type="button" class="btn" id="btnRescan">Rescan</button>
-      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
-      <button class="btn" value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- Same identifier found dialog -->
-<dialog id="dlgScanMatch" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Same identifier found</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <div class="muted small" id="scanMatchName"></div>
-      <div class="muted small" style="margin-top:8px;">There may be more bags with the same identifier.</div>
-
-      <label class="label" style="margin-top:12px;">Add multiple (optional)</label>
-      <input id="scanMatchMulti" inputmode="decimal" placeholder="e.g., 40" />
-
-      <div class="muted small" style="margin-top:10px;">
-        <label style="display:flex; gap:10px; align-items:center;">
-          <input type="checkbox" id="scanMatchAssumeSession" />
-          Assume the next scan is the same item (this session)
-        </label>
-      </div>
-    </div>
-
-    <div class="dlg-f">
-      <button type="button" class="btn" id="btnScanAddOne">Add one unit</button>
-      <button type="button" class="btn primary" id="btnScanAddMulti">Add multiple</button>
-      <button class="btn" value="cancel" id="btnScanNotNow">Not now</button>
-    </div>
-  </form>
-</dialog>
-
-<script src="app.js?v=menu1"></script>
+<script src="app.js?v=navfix1"></script>
 </body>
-        </html>
+</html>
