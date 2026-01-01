@@ -1,135 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1</div>
-  </div>
-
-  <div class="top-actions">
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
-  </div>
-</header>
-
-<main class="shell">
-
-  <!-- GOAL NAVIGATION -->
-  <section class="card">
-    <div class="card-h">
-      <h2>What is our goal today?</h2>
-      <button class="info-btn" data-info="goal">ⓘ</button>
-    </div>
-
-    <div id="info-goal" class="info-text hide">
-      <div class="info-summary">One focus at a time keeps everything else from competing.</div>
-      <button class="info-more-btn" data-more="goal">More</button>
-      <div class="info-more hide" id="info-goal-more">Records remain available for review or export. Voice may be used at any time.</div>
-      <button class="info-full-btn" data-full="goal">Full</button>
-      <div class="info-full hide" id="info-goal-full">Sections are skimmable by default. Deeper detail appears only when requested.</div>
-    </div>
-
-    <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-nav="care">Care Timeline</button>
-      <button class="btn primary" data-nav="feeding">Feeding</button>
-      <button class="btn primary" data-nav="inventory">Inventory</button>
-      <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records &amp; Export</button>
-    </div>
-  </section>
-
-  <!-- DOGS -->
-  <section id="viewDogs" class="card">
-    <h2>Dogs &amp; Pups</h2>
-    <div class="muted small">A central record for each dog or pup.</div>
-    <div class="muted small" style="margin-top:12px;">(Dog profiles wiring continues later.)</div>
-  </section>
-
-  <!-- CARE -->
-  <section id="viewCare" class="card hide">
-    <h2>Care Timeline</h2>
-    <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
-    <div class="muted small" style="margin-top:12px;">(Care timeline wiring continues later.)</div>
-  </section>
-
-  <!-- FEEDING -->
-  <section id="viewFeeding" class="card hide">
-    <h2>Feeding</h2>
-    <div class="muted small">Records feeding-related information and notes.</div>
-    <div class="muted small" style="margin-top:12px;">(Feeding wiring continues next.)</div>
-  </section>
-
-  <!-- INVENTORY -->
-  <section id="viewInventory" class="card hide">
-    <div class="card-h">
-      <h2>Inventory</h2>
-      <button class="info-btn" data-info="inventory">ⓘ</button>
-    </div>
-
-    <div id="info-inventory" class="info-text hide">
-      <div class="info-summary">Inventory records what is on hand and how it changes.</div>
-      <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">
-        Inventory adjusts only when a real event is recorded: added, used, discarded, retired, or transferred.
-      </div>
-      <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">
-        Any item with a barcode or QR code may be tracked. Thresholds are optional. Low items display in yellow.
-      </div>
-    </div>
-
-    <!-- Last update + Undo -->
-    <div class="inv-banner">
-      <div id="invLastUpdate" class="muted small">Last update: none</div>
-      <button id="btnInvUndo" class="inv-undo hide">Undo</button>
-    </div>
-
-    <div class="row">
-      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
-      <button class="btn" id="btnReviewInventory">Review list</button>
-      <button class="btn" id="btnToggleArchived">Show Archived</button>
-    </div>
-
-    <div id="inventoryList"></div>
-    <div id="inventoryArchived" class="hide"></div>
-
-    <div id="inventoryReview" class="hide">
-      <div class="inv-review-h">
-        <h3>Inventory review</h3>
-        <button class="btn" id="btnBackToInventory">Back</button>
-      </div>
-      <div class="muted small" id="invReviewContext"></div>
-      <div id="inventoryReviewList"></div>
-    </div>
-  </section>
-
-  <!-- HELPERS -->
-  <section id="viewHelpers" class="card hide">
-    <h2>Helpers</h2>
-    <div class="muted small">A shared view for coordination and support.</div>
-    <div class="muted small" style="margin-top:12px;">(Helpers wiring continues later.)</div>
-  </section>
-
-  <!-- RECORDS -->
-  <section id="viewRecords" class="card hide">
-    <h2>Records &amp; Export</h2>
-    <div class="muted small">Information recorded across the app, available for review or export.</div>
-    <div class="muted small" style="margin-top:12px;">(Export wiring continues later.)</div>
-  </section>
-
-</main>
-
-<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
-
 <!-- ✅ Add/Edit Inventory Item Dialog -->
 <dialog id="dlgInv" class="dlg">
   <form method="dialog" class="dlg-card">
@@ -146,8 +14,9 @@
         <div>
           <label class="label">Category</label>
           <select id="invCategory">
-            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
-            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
+            <option>Food</option><option>Treat</option><option>Topper</option>
+            <option>Supplement</option><option>Toy</option><option>Blanket</option>
+            <option>Coat</option><option>Equipment</option><option>Other</option>
           </select>
         </div>
         <div>
@@ -179,12 +48,17 @@
       <div class="grid3">
         <div>
           <label class="label">Unit</label>
-          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
+          <select id="invUnit">
+            <option>count</option><option>weight</option><option>volume</option>
+          </select>
         </div>
+
+        <!-- ✅ NEW FIELD -->
         <div>
-          <label class="label">Quantity on hand</label>
-          <input id="invQty" inputmode="decimal" />
+          <label class="label">Weight per unit (optional)</label>
+          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
         </div>
+
         <div>
           <label class="label">Low threshold (optional)</label>
           <input id="invThresh" inputmode="decimal" />
@@ -201,66 +75,3 @@
     </div>
   </form>
 </dialog>
-
-<!-- ✅ Inventory Update Dialog -->
-<dialog id="dlgInvUpdate" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Inventory update</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <div class="muted small" id="invUpdateItemName"></div>
-
-      <label class="label">Action</label>
-      <select id="invUpdateAction">
-        <option>Added</option><option>Used</option><option>Discarded</option><option>Retired</option><option>Transferred</option>
-      </select>
-
-      <div id="invUpdateQtyWrap">
-        <label class="label">Quantity change</label>
-        <input id="invUpdateQty" inputmode="decimal" placeholder="e.g., 1" />
-      </div>
-
-      <label class="label">Note (optional)</label>
-      <input id="invUpdateNote" />
-    </div>
-
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnInvUpdateSave" value="ok">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- ✅ Scan Dialog (trust-first copy can be added later safely) -->
-<dialog id="dlgScan" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Scan</h3>
-      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <video id="scanVideo" playsinline></video>
-
-      <div id="scanResultBox" class="scan-result hide">
-        <div class="muted small">Identifier captured</div>
-        <div id="scanValue" class="scan-value"></div>
-      </div>
-
-      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="dlg-f">
-      <button type="button" class="btn" id="btnRescan">Rescan</button>
-      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
-      <button class="btn" value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-
-<script src="app.js?v=9993"></script>
-</body>
-  </html>
