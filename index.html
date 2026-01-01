@@ -33,7 +33,7 @@
     </div>
   </section>
 
-  <!-- INVENTORY MENU (2nd level) -->
+  <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
 
@@ -47,13 +47,9 @@
       <button class="btn primary" data-go="InventoryAdd">Add to inventory</button>
       <button class="btn primary" data-go="InventoryTransfer">Transfer inventory</button>
     </div>
-
-    <div class="muted small" style="margin-top:12px;">
-      This section is designed to stay calm and skimmable.
-    </div>
   </section>
 
-  <!-- INVENTORY: AVAILABLE (3rd level) -->
+  <!-- INVENTORY: AVAILABLE -->
   <section id="viewInventoryAvailable" class="card hide">
     <h2>Inventory available</h2>
 
@@ -68,7 +64,6 @@
     </div>
 
     <div id="invAvailableMeta" class="muted small" style="margin-top:10px;"></div>
-
     <div id="invAvailableList"></div>
     <div id="invAvailableArchived" class="hide"></div>
   </section>
@@ -82,12 +77,18 @@
       <button class="btn" data-home="Home">Home</button>
     </div>
 
-    <div class="muted small" style="margin-top:10px;">
-      Next step: wire this page to open the item-definition form (dropdowns + scan).
+    <div class="muted small" style="margin:10px 0;">
+      This records item definition (what it is). Stock changes are handled later through Update.
+    </div>
+
+    <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
+
+    <div class="muted small" style="margin-top:12px;">
+      After saving, the item will appear under “Inventory available”.
     </div>
   </section>
 
-  <!-- INVENTORY: TRANSFER -->
+  <!-- INVENTORY: TRANSFER (next step) -->
   <section id="viewInventoryTransfer" class="card hide">
     <h2>Transfer inventory</h2>
 
@@ -112,6 +113,67 @@
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
+<!-- ✅ Definition-only Add/Edit dialog -->
+<dialog id="dlgInv" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Inventory item</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <label class="label">Item name / label</label>
+      <input id="invName" />
+
+      <div class="grid2">
+        <div>
+          <label class="label">Category</label>
+          <select id="invCategory">
+            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
+            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Source</label>
+          <select id="invSource">
+            <option>Purchased</option><option>Donated</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label class="label">Identifier type</label>
+          <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
+        </div>
+        <div>
+          <label class="label">Identifier value</label>
+          <input id="invIdValue" placeholder="(scan or type)" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label class="label">Unit</label>
+          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
+        </div>
+        <div>
+          <label class="label">Weight per unit (optional)</label>
+          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
+        </div>
+      </div>
+
+      <label class="label">Notes (optional)</label>
+      <input id="invNotes" />
+    </div>
+
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Cancel</button>
+      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 (function(){
   const VIEWS = [
@@ -128,8 +190,6 @@
       const el = document.getElementById("view" + v);
       if(el) el.classList.toggle("hide", v !== name);
     });
-
-    // Auto-render inventory when opening InventoryAvailable
     if(name === "InventoryAvailable"){
       renderInventoryAvailable();
     }
@@ -147,7 +207,23 @@
     });
   }
 
-  // ---- Inventory detection + rendering (read-only) ----
+  // ---- Inventory store (single stable key from now on) ----
+  const INV_STORE_KEY = "breederPro_inventory_store_v1";
+
+  function loadStore(){
+    try{
+      const raw = localStorage.getItem(INV_STORE_KEY);
+      if(!raw) return { inventory: [] };
+      const obj = JSON.parse(raw);
+      if(!obj.inventory) obj.inventory = [];
+      return obj;
+    }catch{
+      return { inventory: [] };
+    }
+  }
+  function saveStore(obj){
+    localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj));
+  }
 
   function escapeHtml(s){
     return String(s||"")
@@ -164,50 +240,18 @@
     return Number(it.qty) <= Number(t);
   }
 
-  // Finds the most likely inventory store in localStorage (no risk, just read)
-  function findInventoryStore(){
-    let best = null;
-
-    for(let i=0;i<localStorage.length;i++){
-      const key = localStorage.key(i);
-      if(!key) continue;
-
-      const raw = localStorage.getItem(key);
-      if(!raw || raw.length < 5) continue;
-
-      try{
-        const obj = JSON.parse(raw);
-        if(obj && Array.isArray(obj.inventory)){
-          const score = obj.inventory.length + raw.length/10000;
-          if(!best || score > best.score){
-            best = { key, score, obj };
-          }
-        }
-      }catch(e){}
-    }
-
-    return best; // {key, obj}
-  }
-
   function renderInventoryAvailable(){
     const meta = document.getElementById("invAvailableMeta");
     const list = document.getElementById("invAvailableList");
     const arch = document.getElementById("invAvailableArchived");
-    if(!meta || !list || !arch) return;
 
-    const store = findInventoryStore();
-    if(!store){
-      meta.textContent = "No saved inventory found yet.";
-      list.innerHTML = `<div class="muted small">No inventory items recorded yet.</div>`;
-      arch.innerHTML = "";
-      return;
-    }
+    const store = loadStore();
+    const inv = store.inventory || [];
 
-    const inv = store.obj.inventory || [];
     const active = inv.filter(i=>!i.archived);
     const archived = inv.filter(i=>i.archived);
 
-    meta.textContent = `Source: local saved inventory (${store.key}). Active: ${active.length}. Archived: ${archived.length}.`;
+    meta.textContent = `Source: local inventory (v1). Active: ${active.length}. Archived: ${archived.length}.`;
 
     if(!active.length){
       list.innerHTML = `<div class="muted small">No active inventory items recorded.</div>`;
@@ -241,6 +285,7 @@
       arch.innerHTML = archived.map(i=>{
         const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
         const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+
         const idLine = (i.identifierType && i.identifierType !== "None")
           ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
           : "Identifier: none";
@@ -268,15 +313,67 @@
     if(refresh) refresh.addEventListener("click", renderInventoryAvailable);
 
     if(toggle && arch){
-      toggle.addEventListener("click", ()=>{
-        arch.classList.toggle("hide");
-      });
+      toggle.addEventListener("click", ()=> arch.classList.toggle("hide"));
     }
+  }
+
+  // ---- Add inventory wiring ----
+  function openAddDialog(){
+    // reset
+    document.getElementById("invName").value = "";
+    document.getElementById("invCategory").value = "Food";
+    document.getElementById("invSource").value = "Other";
+    document.getElementById("invIdType").value = "None";
+    document.getElementById("invIdValue").value = "";
+    document.getElementById("invUnit").value = "count";
+    document.getElementById("invWeightPerUnit").value = "";
+    document.getElementById("invNotes").value = "";
+
+    document.getElementById("dlgInv").showModal();
+  }
+
+  function saveDefinition(){
+    const name = (document.getElementById("invName").value || "").trim();
+    if(!name){ alert("Item name is required."); return; }
+
+    const store = loadStore();
+
+    store.inventory.push({
+      itemId: "inv_" + Date.now(),
+      name,
+      category: document.getElementById("invCategory").value,
+      source: document.getElementById("invSource").value,
+      identifierType: document.getElementById("invIdType").value,
+      identifierValue: (document.getElementById("invIdValue").value || "").trim(),
+      unit: document.getElementById("invUnit").value,
+      weightPerUnit: (document.getElementById("invWeightPerUnit").value || "").trim(),
+      notes: (document.getElementById("invNotes").value || "").trim(),
+      qty: 0,
+      thresholdLow: null,
+      archived: false,
+      createdAt: new Date().toISOString()
+    });
+
+    saveStore(store);
+    document.getElementById("dlgInv").close();
+
+    // after add, show available list so it’s visible immediately
+    showView("InventoryAvailable");
+    renderInventoryAvailable();
+  }
+
+  function bindAddPage(){
+    document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
+    document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{
+      e.preventDefault();
+      saveDefinition();
+    });
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
     bindNav();
     bindInventoryAvailableButtons();
+    bindAddPage();
     showView("Home");
   });
 })();
