@@ -1,61 +1,94 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+// Minimal stable navigation + Inventory stub (restore after white-page recovery)
+// Goal: Inventory button always opens the Inventory view and shows content.
 
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1</div>
-  </div>
-  <div class="top-actions">
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
-  </div>
-</header>
+const $ = (s) => document.querySelector(s);
 
-<main class="shell">
-  <section class="card">
-    <h2>What is our goal today?</h2>
-    <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-nav="care">Care Timeline</button>
-      <button class="btn primary" data-nav="feeding">Feeding</button>
-      <button class="btn primary" data-nav="inventory">Inventory</button>
-      <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records &amp; Export</button>
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function show(view){
+  // these must match the IDs in index.html: viewDogs, viewCare, viewFeeding, viewInventory, viewHelpers, viewRecords
+  const views = ["dogs","care","feeding","inventory","helpers","records"];
+  views.forEach(v=>{
+    const el = document.getElementById(`view${cap(v)}`);
+    if (el) el.classList.toggle("hide", v !== view);
+  });
+}
+
+// Minimal inventory renderer (so user sees something immediately)
+const INV_KEY = "bp_inventory_min_v1";
+
+function loadInv(){
+  try { return JSON.parse(localStorage.getItem(INV_KEY) || "[]"); }
+  catch { return []; }
+}
+function saveInv(items){
+  localStorage.setItem(INV_KEY, JSON.stringify(items));
+}
+
+function renderInventory(){
+  const list = document.getElementById("inventoryList");
+  if(!list) return;
+
+  const items = loadInv();
+  if(!items.length){
+    list.innerHTML = `<div class="muted small">No inventory items recorded yet.</div>`;
+    return;
+  }
+  list.innerHTML = items.map((it)=>`
+    <div class="timeline-item">
+      <div><strong>${escapeHtml(it.name)}</strong></div>
+      <div class="muted small">${escapeHtml(it.category)} • Qty: ${escapeHtml(String(it.qty))}</div>
     </div>
-  </section>
+  `).join("");
+}
 
-  <section id="viewDogs" class="card"><h2>Dogs &amp; Pups</h2></section>
-  <section id="viewCare" class="card hide"><h2>Care Timeline</h2></section>
-  <section id="viewFeeding" class="card hide"><h2>Feeding</h2></section>
+function addInventoryItem(){
+  const name = prompt("Item name/label:", "");
+  if(!name) return;
+  const category = prompt("Category (Food/Treat/Toy/Blanket/Other):", "Food") || "Other";
+  const qty = Number(prompt("Quantity:", "1") || "1") || 1;
 
-  <section id="viewInventory" class="card hide">
-    <h2>Inventory</h2>
-    <div class="row">
-      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
-      <button class="btn" id="btnReviewInventory">Review list</button>
-      <button class="btn" id="btnToggleArchived">Show Archived</button>
-    </div>
-    <div id="inventoryList"></div>
-    <div id="inventoryArchived" class="hide"></div>
-    <div id="inventoryReview" class="hide">
-      <button class="btn" id="btnBackToInventory">Back</button>
-      <div id="inventoryReviewList"></div>
-    </div>
-  </section>
+  const items = loadInv();
+  items.push({ name: name.trim(), category: category.trim(), qty });
+  saveInv(items);
+  renderInventory();
+}
 
-  <section id="viewHelpers" class="card hide"><h2>Helpers</h2></section>
-  <section id="viewRecords" class="card hide"><h2>Records &amp; Export</h2></section>
-</main>
+function escapeHtml(s){
+  return String(s||"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
+function bindNav(){
+  document.querySelectorAll("[data-nav]").forEach(btn=>{
+    btn.addEventListener("click", ()=> {
+      const view = btn.dataset.nav;
+      show(view);
+      if(view === "inventory") renderInventory();
+    });
+  });
+}
 
-<script src="app.js?v=12345"></script>
-</body>
-</html>
+function bindInventory(){
+  const addBtn = document.getElementById("btnAddInventory");
+  if(addBtn) addBtn.addEventListener("click", addInventoryItem);
+
+  const backBtn = document.getElementById("btnBackToInventory");
+  if(backBtn) backBtn.addEventListener("click", ()=>{
+    const review = document.getElementById("inventoryReview");
+    if(review) review.classList.add("hide");
+    const list = document.getElementById("inventoryList");
+    if(list) list.classList.remove("hide");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  bindNav();
+  bindInventory();
+  // start on dogs by default
+  show("dogs");
+});
