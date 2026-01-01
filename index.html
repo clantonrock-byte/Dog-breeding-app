@@ -1,94 +1,27 @@
-// Minimal stable navigation + Inventory stub (restore after white-page recovery)
-// Goal: Inventory button always opens the Inventory view and shows content.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breeder Pro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="card">
+      <h2>Breeder Pro</h2>
+      <div class="goal-grid">
+        <button class="btn primary" data-nav="inventory">Inventory</button>
+      </div>
+    </section>
 
-const $ = (s) => document.querySelector(s);
+    <section id="viewInventory" class="card hide">
+      <h2>Inventory</h2>
+      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
+      <div id="inventoryList"></div>
+    </section>
+  </main>
 
-function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-
-function show(view){
-  // these must match the IDs in index.html: viewDogs, viewCare, viewFeeding, viewInventory, viewHelpers, viewRecords
-  const views = ["dogs","care","feeding","inventory","helpers","records"];
-  views.forEach(v=>{
-    const el = document.getElementById(`view${cap(v)}`);
-    if (el) el.classList.toggle("hide", v !== view);
-  });
-}
-
-// Minimal inventory renderer (so user sees something immediately)
-const INV_KEY = "bp_inventory_min_v1";
-
-function loadInv(){
-  try { return JSON.parse(localStorage.getItem(INV_KEY) || "[]"); }
-  catch { return []; }
-}
-function saveInv(items){
-  localStorage.setItem(INV_KEY, JSON.stringify(items));
-}
-
-function renderInventory(){
-  const list = document.getElementById("inventoryList");
-  if(!list) return;
-
-  const items = loadInv();
-  if(!items.length){
-    list.innerHTML = `<div class="muted small">No inventory items recorded yet.</div>`;
-    return;
-  }
-  list.innerHTML = items.map((it)=>`
-    <div class="timeline-item">
-      <div><strong>${escapeHtml(it.name)}</strong></div>
-      <div class="muted small">${escapeHtml(it.category)} • Qty: ${escapeHtml(String(it.qty))}</div>
-    </div>
-  `).join("");
-}
-
-function addInventoryItem(){
-  const name = prompt("Item name/label:", "");
-  if(!name) return;
-  const category = prompt("Category (Food/Treat/Toy/Blanket/Other):", "Food") || "Other";
-  const qty = Number(prompt("Quantity:", "1") || "1") || 1;
-
-  const items = loadInv();
-  items.push({ name: name.trim(), category: category.trim(), qty });
-  saveInv(items);
-  renderInventory();
-}
-
-function escapeHtml(s){
-  return String(s||"")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function bindNav(){
-  document.querySelectorAll("[data-nav]").forEach(btn=>{
-    btn.addEventListener("click", ()=> {
-      const view = btn.dataset.nav;
-      show(view);
-      if(view === "inventory") renderInventory();
-    });
-  });
-}
-
-function bindInventory(){
-  const addBtn = document.getElementById("btnAddInventory");
-  if(addBtn) addBtn.addEventListener("click", addInventoryItem);
-
-  const backBtn = document.getElementById("btnBackToInventory");
-  if(backBtn) backBtn.addEventListener("click", ()=>{
-    const review = document.getElementById("inventoryReview");
-    if(review) review.classList.add("hide");
-    const list = document.getElementById("inventoryList");
-    if(list) list.classList.remove("hide");
-  });
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-  bindNav();
-  bindInventory();
-  // start on dogs by default
-  show("dogs");
-});
+  <script src="app.js?v=12348"></script>
+</body>
+</html>
