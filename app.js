@@ -1,4 +1,4 @@
-const STORE_KEY = "breederPro_sepA1";
+const STORE_KEY = "breederPro_goC_v1";
 const $ = (s)=>document.querySelector(s);
 
 function nowISO(){ return new Date().toISOString(); }
@@ -140,6 +140,18 @@ function applyUndo(){
   undoPayload=null;
 }
 
+/* Identifier helpers */
+function normalizeId(t,v){
+  if(!t || t==="None") return "";
+  return `${String(t).trim()}::${String(v||"").trim()}`;
+}
+function findItemByIdentifier(type,value){
+  const t=String(type||"").trim();
+  const v=String(value||"").trim();
+  if(!t || t==="None" || !v) return null;
+  return state.inventory.find(it=>it.identifierType===t && String(it.identifierValue||"").trim()===v) || null;
+}
+
 /* Render */
 function renderInventory(){
   const list=$("#inventoryList");
@@ -152,7 +164,7 @@ function renderInventory(){
   list.innerHTML = active.length ? active.map(i=>{
     const low=inventoryLow(i);
     const w=i.weightPerUnit?` • W/unit: ${esc(i.weightPerUnit)}`:"";
-    const stock = `Qty: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
+    const stock = `On hand: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
     return `
       <div class="inv-item">
         <div class="inv-top">
@@ -172,7 +184,7 @@ function renderInventory(){
 
   arch.innerHTML = archived.length ? archived.map(i=>{
     const w=i.weightPerUnit?` • W/unit: ${esc(i.weightPerUnit)}`:"";
-    const stock = `Qty: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
+    const stock = `On hand: ${esc(i.qty)}${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}`;
     return `
       <div class="inv-item">
         <div class="inv-top">
@@ -189,10 +201,6 @@ function renderInventory(){
 
 /* Review + exact duplicates */
 function normalizeName(n){ return String(n||"").trim().toLowerCase(); }
-function normalizeId(t,v){
-  if(!t || t==="None") return "";
-  return `${String(t).trim().toLowerCase()}::${String(v||"").trim()}`;
-}
 function buildDupMaps(items){
   const nameMap=new Map();
   const idMap=new Map();
@@ -238,7 +246,7 @@ function renderReview(){
         <div class="inv-top">
           <div>
             <div class="inv-name ${yellow}">${esc(i.name)} ${labels}</div>
-            <div class="inv-meta">${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}${w}</div>
+            <div class="inv-meta">${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • On hand: ${esc(i.qty)}${w}</div>
             <div class="inv-meta">${i.identifierType!=="None"?`${esc(i.identifierType)}: ${esc(i.identifierValue||"")}`:"Identifier: none"}</div>
           </div>
         </div>
@@ -247,7 +255,7 @@ function renderReview(){
   }).join("") : `<div class="muted small">No active inventory items recorded.</div>`;
 }
 
-/* Definition-only Add/Edit modal */
+/* Definition-only Add/Edit */
 let editingItemId=null;
 
 function openInvDialog(item){
@@ -273,6 +281,21 @@ function saveInvFromDialog(){
   const notes=($("#invNotes").value||"").trim();
   const weightPerUnit=($("#invWeightPerUnit").value||"").trim();
 
+  // Prevent duplicate record on exact identifier match
+  if(!editingItemId && idType !== "None" && idValue){
+    const match = findItemByIdentifier(idType, idValue);
+    if(match){
+      // Route to match dialog (bulk add)
+      pendingMatchedItem = match;
+      $("#scanMatchName").textContent = `This matches: ${match.name}`;
+      $("#scanMatchMulti").value = "";
+      $("#scanMatchAssumeSession").checked = false;
+      $("#dlgInv")?.close();
+      $("#dlgScanMatch")?.showModal();
+      return;
+    }
+  }
+
   if(editingItemId){
     const it=state.inventory.find(x=>x.itemId===editingItemId);
     if(!it) return;
@@ -281,7 +304,6 @@ function saveInvFromDialog(){
     it.name=name; it.category=category; it.source=source;
     it.identifierType=idType; it.identifierValue=(idType==="None"?"":idValue);
     it.unit=unit; it.notes=notes; it.weightPerUnit=weightPerUnit;
-
     it.history.push({ts:nowISO(),action:"Edited",qtyDelta:0,note:"Definition updated"});
 
     undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: Edited ${it.name}`};
@@ -290,16 +312,12 @@ function saveInvFromDialog(){
   } else {
     const itemId=uid("inv");
     state.inventory.push({
-      itemId,
-      name,category,source,
-      identifierType:idType,
-      identifierValue:(idType==="None"?"":idValue),
+      itemId,name,category,source,
+      identifierType:idType,identifierValue:(idType==="None"?"":idValue),
       unit,
-      // Stock lives elsewhere:
-      qty: 0,
-      thresholdLow: null,
-      notes,
-      weightPerUnit,
+      qty:0,
+      thresholdLow:null,
+      notes,weightPerUnit,
       archived:false,
       history:[{ts:nowISO(),action:"Created",qtyDelta:0,note:"Definition recorded"}]
     });
@@ -313,7 +331,7 @@ function saveInvFromDialog(){
   $("#dlgInv")?.close(); editingItemId=null;
 }
 
-/* Update modal: stock + threshold live here */
+/* Update modal: stock + threshold + transfer metadata */
 let currentUpdateId=null;
 
 function openUpdateDialog(itemId){
@@ -323,11 +341,11 @@ function openUpdateDialog(itemId){
   currentUpdateId=itemId;
   $("#invUpdateItemName").textContent=`Item: ${it.name}`;
   $("#invUpdateCurrentQty").textContent=`Current on hand: ${it.qty} ${it.unit}`;
-  $("#invUpdateAction").value="Used";
+  $("#invUpdateAction").value="Added";
   $("#invUpdateQty").value="1";
   $("#invUpdateNote").value="";
   $("#invUpdateThreshold").value = (it.thresholdLow ?? "");
-  $("#invUpdateQtyWrap").classList.remove("hide");
+  $("#transferWrap").classList.add("hide");
   $("#dlgInvUpdate")?.showModal();
 }
 
@@ -338,27 +356,56 @@ function saveUpdateFromDialog(){
   const beforeItem=JSON.parse(JSON.stringify(it));
   const action=$("#invUpdateAction").value;
   const note=($("#invUpdateNote").value||"").trim();
+
   const threshRaw=($("#invUpdateThreshold").value||"").trim();
-  const newThreshold = threshRaw==="" ? null : (Number(threshRaw) || null);
+  it.thresholdLow = threshRaw==="" ? null : (Number(threshRaw) || null);
 
-  // Apply threshold change regardless of action (if entered)
-  it.thresholdLow = newThreshold;
+  // Transfer fields
+  let transfer = null;
+  if(action==="Transferred"){
+    transfer = {
+      destinationType: ($("#transferType").value||"").trim(),
+      destinationDetail: ($("#transferDetail").value||"").trim(),
+      contactPerson: ($("#transferContactPerson").value||"").trim(),
+      contactMethod: ($("#transferContactMethod").value||"").trim(),
+      contactDetails: ($("#transferContactDetails").value||"").trim()
+    };
+  }
 
-  if(action==="Retired"||action==="Transferred"){
-    it.archived=true;
-    it.history.push({ts:nowISO(),action,qtyDelta:0,note});
-    undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: ${action} ${it.name}`};
-    showUndo(`Undo: ${action} ${it.name}`);
-    setLastUpdate(`Last update: ${action} · ${it.name} · ${fmt(nowISO())}`);
+  // Retired archives item (out of active service)
+  if(action==="Retired"){
+    const qtyDeltaRaw = Number($("#invUpdateQty").value||"0")||0;
+    const dec = Math.abs(qtyDeltaRaw || it.qty || 0);
+    it.qty = Math.max(0, (Number(it.qty)||0) - dec);
+    it.archived = true;
+    it.history.push({ts:nowISO(),action:"Retired",qtyDelta:-dec,note,transfer:null});
+    undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: Retired ${it.name}`};
+    showUndo(`Undo: Retired ${it.name}`);
+    setLastUpdate(`Last update: Retired · ${it.name} · ${fmt(nowISO())}`);
     save(); renderInventory(); renderReview();
     $("#dlgInvUpdate")?.close(); currentUpdateId=null;
     return;
   }
 
+  // For Transferred: decreases on-hand, no auto-archive
+  if(action==="Transferred"){
+    const qtyDeltaRaw = Number($("#invUpdateQty").value||"0")||0;
+    const dec = Math.abs(qtyDeltaRaw);
+    it.qty = Math.max(0, (Number(it.qty)||0) - dec);
+    it.history.push({ts:nowISO(),action:"Transferred",qtyDelta:-dec,note,transfer});
+    undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: Transferred ${it.name}`};
+    showUndo(`Undo: Transferred ${it.name}`);
+    setLastUpdate(`Last update: Transferred · ${it.name} · ${fmt(nowISO())}`);
+    save(); renderInventory(); renderReview();
+    $("#dlgInvUpdate")?.close(); currentUpdateId=null;
+    return;
+  }
+
+  // Added / Used / Discarded
   const deltaRaw=Number($("#invUpdateQty").value||"0")||0;
   const signed=(action==="Added")?Math.abs(deltaRaw):-Math.abs(deltaRaw);
   it.qty=Math.max(0,(Number(it.qty)||0)+signed);
-  it.history.push({ts:nowISO(),action,qtyDelta:signed,note});
+  it.history.push({ts:nowISO(),action,qtyDelta:signed,note,transfer:null});
 
   undoPayload={kind:"update",itemId:it.itemId,beforeItem,label:`Undo: ${action} ${it.name}`};
   showUndo(`Undo: ${action} ${it.name}`);
@@ -368,18 +415,11 @@ function saveUpdateFromDialog(){
   $("#dlgInvUpdate")?.close(); currentUpdateId=null;
 }
 
-/* Scanner + match logic */
+/* Scanner + match logic (bulk add) */
 let scanStream=null;
 let lastScanValue="";
 let assumeSessionIdKey="";
 let pendingMatchedItem=null;
-
-function findItemByIdentifier(type,value){
-  const t=String(type||"").trim();
-  const v=String(value||"").trim();
-  if(!t || t==="None" || !v) return null;
-  return state.inventory.find(it=>it.identifierType===t && String(it.identifierValue||"").trim()===v) || null;
-}
 
 async function startScan(){
   const video=$("#scanVideo");
@@ -442,7 +482,7 @@ function addUnitsToMatched(count){
   if(add<=0) return;
 
   it.qty = (Number(it.qty)||0) + add;
-  it.history.push({ ts: nowISO(), action:"Added", qtyDelta:add, note:"Scan match add" });
+  it.history.push({ ts: nowISO(), action:"Added", qtyDelta:add, note:"Scan match add", transfer:null });
 
   undoPayload = { kind:"update", itemId: it.itemId, beforeItem, label:`Undo: Added ${add} units to ${it.name}` };
   showUndo(`Undo: Added ${add} units to ${it.name}`);
@@ -457,12 +497,13 @@ function confirmScan(){
   const scannedType = ($("#invIdType").value && $("#invIdType").value !== "None") ? $("#invIdType").value : "Barcode";
   const idKey = normalizeId(scannedType, lastScanValue);
 
+  // session assume => auto add +1
   if(assumeSessionIdKey && assumeSessionIdKey === idKey){
     const it = findItemByIdentifier(scannedType, lastScanValue);
     if(it){
       const beforeItem = JSON.parse(JSON.stringify(it));
       it.qty = (Number(it.qty)||0) + 1;
-      it.history.push({ ts: nowISO(), action:"Added", qtyDelta:1, note:"Scan add (session)" });
+      it.history.push({ ts: nowISO(), action:"Added", qtyDelta:1, note:"Scan add (session)", transfer:null });
       undoPayload = { kind:"update", itemId: it.itemId, beforeItem, label:`Undo: Added 1 unit to ${it.name}` };
       showUndo(`Undo: Added 1 unit to ${it.name}`);
       setLastUpdate(`Last update: Added · ${it.name} · ${fmt(nowISO())}`);
@@ -476,13 +517,6 @@ function confirmScan(){
   if(match){
     pendingMatchedItem = match;
 
-    // Auto-populate definition fields (no stock fields here)
-    $("#invName").value = match.name || "";
-    $("#invCategory").value = match.category || "Food";
-    $("#invSource").value = match.source || "Other";
-    $("#invUnit").value = match.unit || "count";
-    $("#invNotes").value = match.notes || "";
-    $("#invWeightPerUnit").value = match.weightPerUnit || "";
     $("#invIdType").value = match.identifierType || scannedType;
     $("#invIdValue").value = match.identifierValue || lastScanValue;
 
@@ -532,11 +566,21 @@ function bind(){
   });
   $("#btnToggleArchived")?.addEventListener("click", ()=> $("#inventoryArchived")?.classList.toggle("hide"));
 
+  // Update modal shows transfer fields only for Transfer action
   $("#invUpdateAction")?.addEventListener("change", ()=>{
     const a=$("#invUpdateAction").value;
-    if(a==="Retired"||a==="Transferred") $("#invUpdateQtyWrap").classList.add("hide");
-    else $("#invUpdateQtyWrap").classList.remove("hide");
+    if(a==="Transferred") $("#transferWrap").classList.remove("hide");
+    else $("#transferWrap").classList.add("hide");
+
+    if(a==="Retired"){
+      $("#invUpdateQtyWrap").classList.remove("hide");
+    } else if(a==="Transferred"){
+      $("#invUpdateQtyWrap").classList.remove("hide");
+    } else {
+      $("#invUpdateQtyWrap").classList.remove("hide");
+    }
   });
+
   $("#btnInvUpdateSave")?.addEventListener("click", (e)=>{ e.preventDefault(); saveUpdateFromDialog(); });
 
   $("#btnScanId")?.addEventListener("click", ()=> openScanDialog());
