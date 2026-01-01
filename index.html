@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
-  <link rel="stylesheet" href="style.css?v=restore1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -74,9 +74,9 @@
     <div id="info-inventory" class="info-text hide">
       <div class="info-summary">Inventory records what is on hand and how it changes.</div>
       <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">Adjustments are recorded as events. Items are archived, not deleted.</div>
+      <div class="info-more hide" id="info-inventory-more">Exact identifier match = same item. Quantity represents units.</div>
       <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">Exact identifier match = same item. Thresholds are optional; low items appear yellow.</div>
+      <div class="info-full hide" id="info-inventory-full">Mixed donations are supported naturally. Matching identifiers add to the same record.</div>
     </div>
 
     <div class="inv-banner">
@@ -143,18 +143,14 @@
         </div>
         <div>
           <label class="label">Source</label>
-          <select id="invSource">
-            <option>Purchased</option><option>Donated</option><option>Other</option>
-          </select>
+          <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
         </div>
       </div>
 
       <div class="grid2">
         <div>
           <label class="label">Identifier type</label>
-          <select id="invIdType">
-            <option>None</option><option>Barcode</option><option>QR</option>
-          </select>
+          <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
         </div>
         <div>
           <label class="label">Identifier value</label>
@@ -260,6 +256,39 @@
   </form>
 </dialog>
 
-<script src="app.js?v=restore1"></script>
+<!-- ✅ NEW: Same-barcode match dialog -->
+<dialog id="dlgScanMatch" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Same identifier found</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <div class="muted small" id="scanMatchName"></div>
+      <div class="muted small" style="margin-top:8px;">
+        There may be more bags with the same identifier.
+      </div>
+
+      <label class="label" style="margin-top:12px;">Add multiple (optional)</label>
+      <input id="scanMatchMulti" inputmode="decimal" placeholder="e.g., 40" />
+
+      <div class="muted small" style="margin-top:10px;">
+        <label style="display:flex; gap:10px; align-items:center;">
+          <input type="checkbox" id="scanMatchAssumeSession" />
+          Assume the next scan is the same item (this session)
+        </label>
+      </div>
+    </div>
+
+    <div class="dlg-f">
+      <button type="button" class="btn" id="btnScanAddOne">Add one unit</button>
+      <button type="button" class="btn primary" id="btnScanAddMulti">Add multiple</button>
+      <button class="btn" value="cancel" id="btnScanNotNow">Not now</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js?v=bulk1"></script>
 </body>
-</html>
+        </html>
