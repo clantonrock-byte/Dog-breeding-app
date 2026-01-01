@@ -22,6 +22,15 @@ function load(){
     const s = JSON.parse(raw);
     if(!Array.isArray(s.inventory)) s.inventory = [];
     if(!s.invMeta) s.invMeta = { lastUpdateText: "Last update: none" };
+
+    // Backward compatibility: ensure weightPerUnit exists
+    s.inventory.forEach(it=>{
+      if(it.weightPerUnit === undefined) it.weightPerUnit = "";
+      if(it.notes === undefined) it.notes = "";
+      if(it.identifierType === undefined) it.identifierType = "None";
+      if(it.identifierValue === undefined) it.identifierValue = "";
+    });
+
     return s;
   }catch{ return seed(); }
 }
@@ -37,7 +46,7 @@ function show(view){
   });
 }
 
-/* Emergency hold (kept simple) */
+/* Emergency hold */
 function bindEmergencyHold(){
   const btn = $("#btnEmergency");
   if(!btn) return;
@@ -74,7 +83,7 @@ function bindEmergencyHold(){
   btn.addEventListener("mouseleave", cancelHold);
 }
 
-/* Info tier toggles (if present) */
+/* Tiered info toggles (safe if panels exist) */
 function bindInfoButtons(){
   document.querySelectorAll(".info-btn").forEach(btn=>{
     btn.onclick = ()=>{
@@ -158,7 +167,7 @@ function applyUndo(){
   undoPayload = null;
 }
 
-/* Inventory rendering */
+/* Render inventory */
 function esc(s){
   return String(s||"")
     .replaceAll("&","&amp;")
@@ -178,6 +187,7 @@ function renderInventory(){
 
   list.innerHTML = active.length ? active.map(i=>{
     const low = inventoryLow(i);
+    const weightInfo = i.weightPerUnit ? ` • W/unit: ${esc(i.weightPerUnit)}` : "";
     return `
       <div class="inv-item">
         <div class="inv-top">
@@ -186,6 +196,7 @@ function renderInventory(){
             <div class="inv-meta">
               ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}
               ${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}
+              ${weightInfo}
             </div>
             <div class="inv-meta">
               ${i.identifierType && i.identifierType!=="None" ? `${esc(i.identifierType)}: ${esc(i.identifierValue||"")}` : "Identifier: none"}
@@ -200,22 +211,27 @@ function renderInventory(){
     `;
   }).join("") : `<div class="muted small">No active inventory items recorded.</div>`;
 
-  arch.innerHTML = archived.length ? archived.map(i=>`
-    <div class="inv-item">
-      <div class="inv-top">
-        <div>
-          <div class="inv-name">${esc(i.name)}</div>
-          <div class="inv-meta">Archived • ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}</div>
-          <div class="inv-meta">
-            ${i.identifierType && i.identifierType!=="None" ? `${esc(i.identifierType)}: ${esc(i.identifierValue||"")}` : "Identifier: none"}
+  arch.innerHTML = archived.length ? archived.map(i=>{
+    const weightInfo = i.weightPerUnit ? ` • W/unit: ${esc(i.weightPerUnit)}` : "";
+    return `
+      <div class="inv-item">
+        <div class="inv-top">
+          <div>
+            <div class="inv-name">${esc(i.name)}</div>
+            <div class="inv-meta">
+              Archived • ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}${weightInfo}
+            </div>
+            <div class="inv-meta">
+              ${i.identifierType && i.identifierType!=="None" ? `${esc(i.identifierType)}: ${esc(i.identifierValue||"")}` : "Identifier: none"}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  `).join("") : `<div class="muted small">No archived inventory items.</div>`;
+    `;
+  }).join("") : `<div class="muted small">No archived inventory items.</div>`;
 }
 
-/* Review list + exact duplicates (name exact case-insensitive/trim OR identifier exact) */
+/* Review list + exact duplicates */
 function normalizeName(n){ return String(n||"").trim().toLowerCase(); }
 function normalizeId(type,value){
   if(!type || type==="None") return "";
@@ -270,6 +286,7 @@ function renderReview(){
       low ? `<span class="inv-flag">Low</span>` : "",
       dup ? `<span class="inv-flag">Duplicate</span>` : ""
     ].filter(Boolean).join(" ");
+    const weightInfo = i.weightPerUnit ? ` • W/unit: ${esc(i.weightPerUnit)}` : "";
 
     return `
       <div class="inv-item">
@@ -279,6 +296,7 @@ function renderReview(){
             <div class="inv-meta">
               ${esc(i.category)} • ${esc(i.source)} • ${esc(i.unit)} • Qty: ${esc(i.qty)}
               ${i.thresholdLow!==null && i.thresholdLow!=="" ? ` • Low: ${esc(i.thresholdLow)}` : ""}
+              ${weightInfo}
             </div>
             <div class="inv-meta">
               ${i.identifierType && i.identifierType!=="None" ? `${esc(i.identifierType)}: ${esc(i.identifierValue||"")}` : "Identifier: none"}
@@ -294,7 +312,6 @@ function renderReview(){
 let editingItemId = null;
 
 function openInvDialog(item){
-  $("#invDlgTitle").textContent = "Inventory item";
   $("#invName").value = item?.name || "";
   $("#invCategory").value = item?.category || "Food";
   $("#invSource").value = item?.source || "Other";
@@ -304,6 +321,7 @@ function openInvDialog(item){
   $("#invQty").value = (item?.qty ?? "");
   $("#invThresh").value = (item?.thresholdLow ?? "");
   $("#invNotes").value = item?.notes || "";
+  $("#invWeightPerUnit").value = item?.weightPerUnit || "";
   $("#dlgInv")?.showModal();
 }
 
@@ -321,6 +339,7 @@ function saveInvFromDialog(){
   const threshRaw = ($("#invThresh").value||"").trim();
   const thresholdLow = threshRaw==="" ? null : (Number(threshRaw) || null);
   const notes = ($("#invNotes").value||"").trim();
+  const weightPerUnit = ($("#invWeightPerUnit").value||"").trim();
 
   if(editingItemId){
     const it = state.inventory.find(x=>x.itemId===editingItemId);
@@ -336,6 +355,7 @@ function saveInvFromDialog(){
     it.qty = qty;
     it.thresholdLow = thresholdLow;
     it.notes = notes;
+    it.weightPerUnit = weightPerUnit;
 
     it.history = it.history || [];
     it.history.push({ ts: nowISO(), action:"Edited", qtyDelta:0, note:"Record updated" });
@@ -351,6 +371,7 @@ function saveInvFromDialog(){
       identifierType: idType,
       identifierValue: idType==="None" ? "" : idValue,
       unit, qty, thresholdLow, notes,
+      weightPerUnit,
       archived:false,
       history:[{ ts: nowISO(), action:"Added", qtyDelta: qty, note:"Initial record" }]
     });
@@ -422,7 +443,7 @@ function saveUpdateFromDialog(){
   currentUpdateId = null;
 }
 
-/* Scanner (Confirm required) */
+/* Scanner */
 let scanStream = null;
 let lastScanValue = "";
 
@@ -502,10 +523,7 @@ function closeScanDialog(){
 function confirmScan(){
   if(!lastScanValue) return;
   $("#invIdValue").value = lastScanValue;
-
-  // cuz human: ensure type isn't None once a scan is confirmed
   if($("#invIdType").value === "None") $("#invIdType").value = "Barcode";
-
   closeScanDialog();
 }
 
@@ -516,59 +534,60 @@ function bind(){
   bindInfoButtons();
   bindEmergencyHold();
 
-  // Inventory UI
+  // Inventory Add/Edit
   $("#btnAddInventory")?.addEventListener("click", ()=>{
     editingItemId = null;
     openInvDialog(null);
   });
-
   $("#btnSaveInv")?.addEventListener("click", (e)=>{
     e.preventDefault();
     saveInvFromDialog();
   });
 
+  // Scanner
   $("#btnScanId")?.addEventListener("click", ()=> openScanDialog());
   $("#btnClearId")?.addEventListener("click", ()=> { $("#invIdValue").value=""; });
-
   $("#btnRescan")?.addEventListener("click", ()=> startScan());
   $("#btnConfirmScan")?.addEventListener("click", ()=> confirmScan());
   $("#btnCloseScan")?.addEventListener("click", ()=> closeScanDialog());
   $("#dlgScan")?.addEventListener("close", ()=> stopScanStream());
 
+  // Undo
   $("#btnInvUndo")?.addEventListener("click", ()=> applyUndo());
 
+  // Review
   $("#btnReviewInventory")?.addEventListener("click", ()=>{
     $("#inventoryList")?.classList.add("hide");
     $("#inventoryArchived")?.classList.add("hide");
     $("#inventoryReview")?.classList.remove("hide");
     renderReview();
   });
-
   $("#btnBackToInventory")?.addEventListener("click", ()=>{
     $("#inventoryReview")?.classList.add("hide");
     $("#inventoryList")?.classList.remove("hide");
   });
 
+  // Archived toggle
   $("#btnToggleArchived")?.addEventListener("click", ()=> $("#inventoryArchived")?.classList.toggle("hide"));
 
+  // Update modal hide qty
   $("#invUpdateAction")?.addEventListener("change", ()=>{
     const a = $("#invUpdateAction").value;
     if(a==="Retired" || a==="Transferred") $("#invUpdateQtyWrap").classList.add("hide");
     else $("#invUpdateQtyWrap").classList.remove("hide");
   });
-
   $("#btnInvUpdateSave")?.addEventListener("click", (e)=>{
     e.preventDefault();
     saveUpdateFromDialog();
   });
 
-  // Last update restore
+  // Restore last update
   $("#invLastUpdate") && ($("#invLastUpdate").textContent = state.invMeta.lastUpdateText || "Last update: none");
 
   $("#btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 }
 
-/* Hook buttons */
+/* Hooks */
 window.__invEdit = (id)=>{
   const it = state.inventory.find(x=>x.itemId===id);
   if(!it) return;
