@@ -21,98 +21,127 @@
 
 <main class="shell">
 
-  <section class="card">
+  <!-- VIEW: HOME -->
+  <section id="viewHome" class="card">
     <div class="card-h">
       <h2>What is our goal today?</h2>
-      <button class="info-btn" data-info="goal">ⓘ</button>
-    </div>
-
-    <div id="info-goal" class="info-text hide">
-      <div class="info-summary">One focus at a time keeps everything else from competing.</div>
-      <button class="info-more-btn" data-more="goal">More</button>
-      <div class="info-more hide" id="info-goal-more">Voice may be used at any time. Records remain available for review or export.</div>
-      <button class="info-full-btn" data-full="goal">Full</button>
-      <div class="info-full hide" id="info-goal-full">Deeper detail appears only when requested. This records what occurred.</div>
     </div>
 
     <div class="goal-grid">
-      <button class="btn primary" data-nav="dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-nav="care">Care Timeline</button>
-      <button class="btn primary" data-nav="feeding">Feeding</button>
-      <button class="btn primary" data-nav="inventory">Inventory</button>
-      <button class="btn primary" data-nav="helpers">Helpers</button>
-      <button class="btn primary" data-nav="records">Records &amp; Export</button>
+      <button class="btn primary" data-go="dogs">Dogs &amp; Pups</button>
+      <button class="btn primary" data-go="care">Care Timeline</button>
+      <button class="btn primary" data-go="feeding">Feeding</button>
+      <button class="btn primary" data-go="inventory">Inventory</button>
+      <button class="btn primary" data-go="helpers">Helpers</button>
+      <button class="btn primary" data-go="records">Records &amp; Export</button>
     </div>
   </section>
 
-  <section id="viewDogs" class="card">
-    <h2>Dogs &amp; Pups</h2>
-    <div class="muted small">A central record for each dog or pup.</div>
-    <div class="muted small" style="margin-top:12px;">
-      (Dog records will display linked transfers in a later step.)
-    </div>
-  </section>
-
-  <section id="viewCare" class="card hide">
-    <h2>Care Timeline</h2>
-    <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
-  </section>
-
-  <section id="viewFeeding" class="card hide">
-    <h2>Feeding</h2>
-    <div class="muted small">Records feeding-related information and notes.</div>
-  </section>
-
-  <section id="viewInventory" class="card hide">
+  <!-- VIEW: INVENTORY MENU -->
+  <section id="viewInventoryMenu" class="card hide">
     <div class="card-h">
       <h2>Inventory</h2>
-      <button class="info-btn" data-info="inventory">ⓘ</button>
-    </div>
-
-    <div id="info-inventory" class="info-text hide">
-      <div class="info-summary">Exact identifier match = same item. Quantity represents units.</div>
-      <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">
-        Added increases on-hand. Used/Discarded/Transferred decreases on-hand.
-      </div>
-      <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">
-        Transfer records where items went (dog/org/contact). This supports follow-up and recall readiness.
-      </div>
-    </div>
-
-    <div class="inv-banner">
-      <div id="invLastUpdate" class="muted small">Last update: none</div>
-      <button id="btnInvUndo" class="inv-undo hide">Undo</button>
     </div>
 
     <div class="row">
-      <button class="btn primary" id="btnAddInventory">+ Add Inventory Item</button>
-      <button class="btn" id="btnReviewInventory">Review list</button>
-      <button class="btn" id="btnToggleArchived">Show Archived</button>
+      <button class="btn" data-back="home">Back</button>
+      <button class="btn" data-home="home">Home</button>
+    </div>
+
+    <div class="goal-grid">
+      <button class="btn primary" data-inv="current">Current inventory</button>
+      <button class="btn primary" data-inv="add">Add inventory</button>
+      <button class="btn primary" data-inv="transfer">Transfer</button>
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" data-inv="review">Review list</button>
+      <button class="btn" id="btnToggleArchivedMenu">Show Archived</button>
+    </div>
+
+    <div id="inventoryArchivedMenu" class="hide"></div>
+  </section>
+
+  <!-- VIEW: INVENTORY CURRENT -->
+  <section id="viewInventoryCurrent" class="card hide">
+    <div class="card-h">
+      <h2>Current inventory</h2>
+    </div>
+
+    <div class="row">
+      <button class="btn" data-back="inventoryMenu">Back</button>
+      <button class="btn" data-home="home">Home</button>
     </div>
 
     <div id="inventoryList"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="btnToggleArchivedCurrent">Show Archived</button>
+    </div>
     <div id="inventoryArchived" class="hide"></div>
+  </section>
 
-    <div id="inventoryReview" class="hide">
-      <div class="inv-review-h">
-        <h3>Inventory review</h3>
-        <button class="btn" id="btnBackToInventory">Back</button>
-      </div>
-      <div class="muted small" id="invReviewContext"></div>
-      <div id="inventoryReviewList"></div>
+  <!-- VIEW: INVENTORY ADD -->
+  <section id="viewInventoryAdd" class="card hide">
+    <div class="card-h">
+      <h2>Add inventory</h2>
+    </div>
+
+    <div class="row">
+      <button class="btn" data-back="inventoryMenu">Back</button>
+      <button class="btn" data-home="home">Home</button>
+    </div>
+
+    <div class="muted small" style="margin:10px 0;">
+      Item definition is recorded here. Stock changes are recorded in Update.
+    </div>
+
+    <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
+
+    <div class="muted small" style="margin-top:12px;">
+      After saving, use “Current inventory” → Update to add on-hand quantity.
     </div>
   </section>
 
-  <section id="viewHelpers" class="card hide">
-    <h2>Helpers</h2>
-    <div class="muted small">A shared view for coordination and support.</div>
+  <!-- VIEW: INVENTORY TRANSFER -->
+  <section id="viewInventoryTransfer" class="card hide">
+    <div class="card-h">
+      <h2>Transfer</h2>
+    </div>
+
+    <div class="row">
+      <button class="btn" data-back="inventoryMenu">Back</button>
+      <button class="btn" data-home="home">Home</button>
+    </div>
+
+    <div class="muted small" style="margin:10px 0;">
+      Scan an identifier to transfer stock. Exact match routes to the item’s Transfer update.
+    </div>
+
+    <button class="btn primary" id="btnTransferScan">Scan item to transfer</button>
   </section>
 
+  <!-- VIEW: INVENTORY REVIEW -->
+  <section id="viewInventoryReview" class="card hide">
+    <div class="card-h">
+      <h2>Inventory review</h2>
+    </div>
+
+    <div class="row">
+      <button class="btn" data-back="inventoryMenu">Back</button>
+      <button class="btn" data-home="home">Home</button>
+    </div>
+
+    <div class="muted small" id="invReviewContext"></div>
+    <div id="inventoryReviewList"></div>
+  </section>
+
+  <!-- PLACEHOLDER VIEWS FOR OTHER MODULES -->
+  <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2></section>
+  <section id="viewCare" class="card hide"><h2>Care Timeline</h2></section>
+  <section id="viewFeeding" class="card hide"><h2>Feeding</h2></section>
+  <section id="viewHelpers" class="card hide"><h2>Helpers</h2></section>
   <section id="viewRecords" class="card hide">
     <h2>Records &amp; Export</h2>
-    <div class="muted small">Information recorded across the app, available for review or export.</div>
     <button class="btn primary" id="btnExport">Export</button>
     <pre id="exportOut" class="pre"></pre>
   </section>
@@ -185,7 +214,7 @@
   </form>
 </dialog>
 
-<!-- Update Inventory Dialog (stock + threshold + transfer destination) -->
+<!-- Update Inventory (stock + threshold + transfer destination) -->
 <dialog id="dlgInvUpdate" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -214,7 +243,6 @@
       <label class="label">Low threshold (optional)</label>
       <input id="invUpdateThreshold" inputmode="decimal" placeholder="e.g., 2" />
 
-      <!-- Transfer details (only shown when action = Transferred) -->
       <div id="transferWrap" class="hide">
         <label class="label">Transfer destination</label>
         <select id="transferType">
@@ -242,11 +270,7 @@
           <div>
             <label class="label">Contact method (optional)</label>
             <select id="transferContactMethod">
-              <option>None</option>
-              <option>Phone</option>
-              <option>Email</option>
-              <option>Both</option>
-              <option>Other</option>
+              <option>None</option><option>Phone</option><option>Email</option><option>Both</option><option>Other</option>
             </select>
           </div>
           <div>
@@ -323,6 +347,6 @@
   </form>
 </dialog>
 
-<script src="app.js?v=sepA1"></script>
+<script src="app.js?v=menu1"></script>
 </body>
-  </html>
+        </html>
