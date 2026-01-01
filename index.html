@@ -33,58 +33,56 @@
     </div>
   </section>
 
-  <!-- INVENTORY MENU -->
+  <!-- INVENTORY MENU (2nd level) -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
+
     <div class="row">
       <button class="btn" data-back="Home">Back</button>
       <button class="btn" data-home="Home">Home</button>
     </div>
+
     <div class="goal-grid">
-      <button class="btn primary" data-go="InventoryCurrent">Current inventory</button>
-      <button class="btn primary" data-go="InventoryAdd">Add inventory</button>
-      <button class="btn primary" data-go="InventoryTransfer">Transfer</button>
-    </div>
-    <div class="goal-grid" style="margin-top:12px;">
-      <button class="btn" data-go="InventoryReview">Review list</button>
+      <button class="btn primary" data-go="InventoryAvailable">Inventory available</button>
+      <button class="btn primary" data-go="InventoryAdd">Add to inventory</button>
+      <button class="btn primary" data-go="InventoryTransfer">Transfer inventory</button>
     </div>
   </section>
 
-  <!-- INVENTORY PAGES -->
-  <section id="viewInventoryCurrent" class="card hide">
-    <h2>Current inventory</h2>
+  <!-- INVENTORY: AVAILABLE (3rd level) -->
+  <section id="viewInventoryAvailable" class="card hide">
+    <h2>Inventory available</h2>
+
     <div class="row">
       <button class="btn" data-back="InventoryMenu">Back</button>
       <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Navigation test page.</div>
+
+    <div class="muted small">Navigation test page. (We’ll reattach the live list next.)</div>
   </section>
 
+  <!-- INVENTORY: ADD -->
   <section id="viewInventoryAdd" class="card hide">
-    <h2>Add inventory</h2>
+    <h2>Add to inventory</h2>
+
     <div class="row">
       <button class="btn" data-back="InventoryMenu">Back</button>
       <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Navigation test page.</div>
+
+    <div class="muted small">Navigation test page. (We’ll reattach the add form next.)</div>
   </section>
 
+  <!-- INVENTORY: TRANSFER -->
   <section id="viewInventoryTransfer" class="card hide">
-    <h2>Transfer</h2>
-    <div class="row">
-      <button class="btn" data-back="InventoryMenu">Back</button>
-      <button class="btn" data-home="Home">Home</button>
-    </div>
-    <div class="muted small">Navigation test page.</div>
-  </section>
+    <h2>Transfer inventory</h2>
 
-  <section id="viewInventoryReview" class="card hide">
-    <h2>Inventory review</h2>
     <div class="row">
       <button class="btn" data-back="InventoryMenu">Back</button>
       <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Navigation test page.</div>
+
+    <div class="muted small">Navigation test page. (We’ll reattach scan→transfer next.)</div>
   </section>
 
   <!-- OTHER MODULE PLACEHOLDERS -->
@@ -103,10 +101,9 @@
   const VIEWS = [
     "Home",
     "InventoryMenu",
-    "InventoryCurrent",
+    "InventoryAvailable",
     "InventoryAdd",
     "InventoryTransfer",
-    "InventoryReview",
     "Dogs","Care","Feeding","Helpers","Records"
   ];
 
