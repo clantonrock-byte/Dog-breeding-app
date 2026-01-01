@@ -78,7 +78,7 @@
     </div>
 
     <div class="muted small" style="margin:10px 0;">
-      This records item definition (what it is). Stock changes are handled later through Update.
+      This records item definition (what it is). Stock changes are handled through Transfer/Update.
     </div>
 
     <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
@@ -88,7 +88,7 @@
     </div>
   </section>
 
-  <!-- INVENTORY: TRANSFER (next step) -->
+  <!-- INVENTORY: TRANSFER -->
   <section id="viewInventoryTransfer" class="card hide">
     <h2>Transfer inventory</h2>
 
@@ -97,9 +97,66 @@
       <button class="btn" data-home="Home">Home</button>
     </div>
 
-    <div class="muted small" style="margin-top:10px;">
-      Next step: wire scan → match → transfer update (destination + contact).
+    <div class="muted small" style="margin:10px 0;">
+      Scan an identifier to locate an item, then record the transfer destination and quantity.
     </div>
+
+    <div class="row">
+      <button class="btn primary" id="btnTransferScan">Scan item</button>
+      <button class="btn" id="btnTransferRefreshList">Refresh list</button>
+    </div>
+
+    <label class="label">Or select an item (manual)</label>
+    <select id="transferSelect"></select>
+
+    <div id="transferForm" class="hide" style="margin-top:12px;">
+      <div class="timeline-item">
+        <div><strong id="transferItemName"></strong></div>
+        <div class="muted small" id="transferItemMeta"></div>
+      </div>
+
+      <label class="label">Quantity to transfer</label>
+      <input id="transferQty" inputmode="decimal" placeholder="e.g., 5" />
+
+      <label class="label">Transfer destination</label>
+      <select id="transferType">
+        <option>With a dog</option>
+        <option>To adopter</option>
+        <option>To foster</option>
+        <option>To another organization</option>
+        <option>Returned to donor</option>
+        <option>Moved to storage</option>
+        <option>Other</option>
+      </select>
+
+      <label class="label">Destination details (optional)</label>
+      <input id="transferDetail" placeholder="e.g., Dog name / org name / storage location" />
+
+      <label class="label">Contact person (optional)</label>
+      <input id="transferContactPerson" placeholder="e.g., Jordan Smith" />
+
+      <label class="label">Contact method (optional)</label>
+      <select id="transferContactMethod">
+        <option>None</option>
+        <option>Phone</option>
+        <option>Email</option>
+        <option>Both</option>
+        <option>Other</option>
+      </select>
+
+      <label class="label">Contact details (optional)</label>
+      <input id="transferContactDetails" placeholder="e.g., 555-555-5555 / name@email.com" />
+
+      <label class="label">Note (optional)</label>
+      <input id="transferNote" placeholder="Any factual notes" />
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn primary" id="btnConfirmTransfer">Confirm transfer</button>
+        <button class="btn" id="btnCancelTransfer">Cancel</button>
+      </div>
+    </div>
+
+    <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
   <!-- OTHER MODULE PLACEHOLDERS -->
@@ -113,7 +170,7 @@
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<!-- ✅ Definition-only Add/Edit dialog -->
+<!-- ✅ Definition-only Add dialog -->
 <dialog id="dlgInv" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -174,14 +231,37 @@
   </form>
 </dialog>
 
+<!-- ✅ Scan dialog (Confirm required) -->
+<dialog id="dlgScan" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Scan</h3>
+      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
+    </div>
+
+    <div class="dlg-b">
+      <video id="scanVideo" playsinline></video>
+
+      <div id="scanResultBox" class="scan-result hide">
+        <div class="muted small">Identifier captured</div>
+        <div id="scanValue" class="scan-value"></div>
+      </div>
+
+      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="dlg-f">
+      <button type="button" class="btn" id="btnRescan">Rescan</button>
+      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
+      <button class="btn" value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 (function(){
   const VIEWS = [
-    "Home",
-    "InventoryMenu",
-    "InventoryAvailable",
-    "InventoryAdd",
-    "InventoryTransfer",
+    "Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryTransfer",
     "Dogs","Care","Feeding","Helpers","Records"
   ];
 
@@ -190,9 +270,8 @@
       const el = document.getElementById("view" + v);
       if(el) el.classList.toggle("hide", v !== name);
     });
-    if(name === "InventoryAvailable"){
-      renderInventoryAvailable();
-    }
+    if(name === "InventoryAvailable") renderInventoryAvailable();
+    if(name === "InventoryTransfer") populateTransferSelect();
   }
 
   function bindNav(){
@@ -207,7 +286,7 @@
     });
   }
 
-  // ---- Inventory store (single stable key from now on) ----
+  // ---- Inventory store (single stable key) ----
   const INV_STORE_KEY = "breederPro_inventory_store_v1";
 
   function loadStore(){
@@ -253,56 +332,46 @@
 
     meta.textContent = `Source: local inventory (v1). Active: ${active.length}. Archived: ${archived.length}.`;
 
-    if(!active.length){
-      list.innerHTML = `<div class="muted small">No active inventory items recorded.</div>`;
-    } else {
-      list.innerHTML = active.map(i=>{
-        const low = inventoryLow(i);
-        const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
-        const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+    list.innerHTML = active.length ? active.map(i=>{
+      const low = inventoryLow(i);
+      const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
+      const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+      const idLine = (i.identifierType && i.identifierType !== "None")
+        ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
+        : "Identifier: none";
 
-        const idLine = (i.identifierType && i.identifierType !== "None")
-          ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
-          : "Identifier: none";
-
-        return `
-          <div class="inv-item">
-            <div class="inv-top">
-              <div>
-                <div class="inv-name ${low ? "low" : ""}">${escapeHtml(i.name||"(unnamed)")}</div>
-                <div class="inv-meta">${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
-                <div class="inv-meta">${idLine}</div>
-              </div>
+      return `
+        <div class="inv-item">
+          <div class="inv-top">
+            <div>
+              <div class="inv-name ${low ? "low" : ""}">${escapeHtml(i.name||"(unnamed)")}</div>
+              <div class="inv-meta">${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
+              <div class="inv-meta">${idLine}</div>
             </div>
           </div>
-        `;
-      }).join("");
-    }
+        </div>
+      `;
+    }).join("") : `<div class="muted small">No active inventory items recorded.</div>`;
 
-    if(!archived.length){
-      arch.innerHTML = `<div class="muted small">No archived inventory items.</div>`;
-    } else {
-      arch.innerHTML = archived.map(i=>{
-        const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
-        const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+    arch.innerHTML = archived.length ? archived.map(i=>{
+      const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
+      const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+      const idLine = (i.identifierType && i.identifierType !== "None")
+        ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
+        : "Identifier: none";
 
-        const idLine = (i.identifierType && i.identifierType !== "None")
-          ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
-          : "Identifier: none";
-
-        return `
-          <div class="inv-item">
-            <div class="inv-top">
-              <div>
-                <div class="inv-name">${escapeHtml(i.name||"(unnamed)")}</div>
-                <div class="inv-meta">Archived • ${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
-                <div class="inv-meta">${idLine}</div>
-              </div>
+      return `
+        <div class="inv-item">
+          <div class="inv-top">
+            <div>
+              <div class="inv-name">${escapeHtml(i.name||"(unnamed)")}</div>
+              <div class="inv-meta">Archived • ${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
+              <div class="inv-meta">${idLine}</div>
             </div>
           </div>
-        `;
-      }).join("");
-    }
+        </div>
+      `;
+    }).join("") : `<div class="muted small">No archived inventory items.</div>`;
   }
 
   function bindInventoryAvailableButtons(){
@@ -311,15 +380,11 @@
     const arch = document.getElementById("invAvailableArchived");
 
     if(refresh) refresh.addEventListener("click", renderInventoryAvailable);
-
-    if(toggle && arch){
-      toggle.addEventListener("click", ()=> arch.classList.toggle("hide"));
-    }
+    if(toggle && arch) toggle.addEventListener("click", ()=> arch.classList.toggle("hide"));
   }
 
   // ---- Add inventory wiring ----
   function openAddDialog(){
-    // reset
     document.getElementById("invName").value = "";
     document.getElementById("invCategory").value = "Food";
     document.getElementById("invSource").value = "Other";
@@ -328,7 +393,6 @@
     document.getElementById("invUnit").value = "count";
     document.getElementById("invWeightPerUnit").value = "";
     document.getElementById("invNotes").value = "";
-
     document.getElementById("dlgInv").showModal();
   }
 
@@ -351,13 +415,12 @@
       qty: 0,
       thresholdLow: null,
       archived: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      history: []
     });
 
     saveStore(store);
     document.getElementById("dlgInv").close();
-
-    // after add, show available list so it’s visible immediately
     showView("InventoryAvailable");
     renderInventoryAvailable();
   }
@@ -370,10 +433,216 @@
     });
   }
 
+  // ---- Transfer wiring ----
+
+  function populateTransferSelect(){
+    const sel = document.getElementById("transferSelect");
+    if(!sel) return;
+
+    const store = loadStore();
+    const active = (store.inventory||[]).filter(i=>!i.archived);
+
+    sel.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = "";
+    opt0.textContent = "Select item…";
+    sel.appendChild(opt0);
+
+    active.forEach(i=>{
+      const opt = document.createElement("option");
+      opt.value = i.itemId;
+      opt.textContent = `${i.name} (on hand: ${i.qty ?? 0})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  let transferItemId = null;
+
+  function showTransferForm(itemId){
+    const store = loadStore();
+    const it = (store.inventory||[]).find(x=>x.itemId === itemId);
+    if(!it){
+      document.getElementById("transferStatus").textContent = "Item not found.";
+      return;
+    }
+
+    transferItemId = itemId;
+
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferItemName").textContent = it.name;
+    const idLine = (it.identifierType && it.identifierType !== "None") ? `${it.identifierType}: ${it.identifierValue}` : "Identifier: none";
+    document.getElementById("transferItemMeta").textContent = `${it.category} • ${it.source} • ${it.unit} • On hand: ${it.qty ?? 0} • ${idLine}`;
+
+    document.getElementById("transferQty").value = "1";
+    document.getElementById("transferType").value = "With a dog";
+    document.getElementById("transferDetail").value = "";
+    document.getElementById("transferContactPerson").value = "";
+    document.getElementById("transferContactMethod").value = "None";
+    document.getElementById("transferContactDetails").value = "";
+    document.getElementById("transferNote").value = "";
+    document.getElementById("transferStatus").textContent = "";
+  }
+
+  function applyTransfer(){
+    const store = loadStore();
+    const inv = store.inventory || [];
+    const it = inv.find(x=>x.itemId === transferItemId);
+    if(!it){ document.getElementById("transferStatus").textContent = "Item not found."; return; }
+
+    const qty = Math.abs(Number(document.getElementById("transferQty").value || "0") || 0);
+    if(qty <= 0){ document.getElementById("transferStatus").textContent = "Quantity needs to be greater than 0."; return; }
+
+    const before = Number(it.qty || 0);
+    const after = Math.max(0, before - qty);
+    it.qty = after;
+
+    const transfer = {
+      destinationType: document.getElementById("transferType").value,
+      destinationDetail: (document.getElementById("transferDetail").value||"").trim(),
+      contactPerson: (document.getElementById("transferContactPerson").value||"").trim(),
+      contactMethod: document.getElementById("transferContactMethod").value,
+      contactDetails: (document.getElementById("transferContactDetails").value||"").trim()
+    };
+
+    const note = (document.getElementById("transferNote").value||"").trim();
+
+    it.history = it.history || [];
+    it.history.push({
+      ts: new Date().toISOString(),
+      action: "Transferred",
+      qtyDelta: -qty,
+      note,
+      transfer
+    });
+
+    saveStore(store);
+
+    document.getElementById("transferStatus").textContent = "Transfer recorded.";
+    renderInventoryAvailable();
+    populateTransferSelect();
+  }
+
+  function cancelTransfer(){
+    transferItemId = null;
+    document.getElementById("transferForm").classList.add("hide");
+    document.getElementById("transferStatus").textContent = "";
+  }
+
+  function bindTransferPage(){
+    document.getElementById("btnTransferRefreshList")?.addEventListener("click", populateTransferSelect);
+    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{
+      if(e.target.value) showTransferForm(e.target.value);
+    });
+    document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
+    document.getElementById("btnCancelTransfer")?.addEventListener("click", cancelTransfer);
+  }
+
+  // ---- Scan (Confirm required) ----
+  let scanStream = null;
+  let lastScanValue = "";
+
+  async function startScan(){
+    const video = document.getElementById("scanVideo");
+    const help = document.getElementById("scanHelp");
+    const box = document.getElementById("scanResultBox");
+    const val = document.getElementById("scanValue");
+
+    lastScanValue = "";
+    box.classList.add("hide");
+    val.textContent = "";
+    help.textContent = "";
+
+    try{
+      scanStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false });
+      video.srcObject = scanStream;
+      await video.play();
+    }catch{
+      help.textContent = "Camera access unavailable. Manual entry remains available.";
+      return;
+    }
+
+    if(!("BarcodeDetector" in window)){
+      help.textContent = "Scanner not supported on this browser. Manual entry remains available.";
+      return;
+    }
+
+    let detector;
+    try{ detector = new BarcodeDetector({ formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"] }); }
+    catch{ detector = new BarcodeDetector(); }
+
+    help.textContent = "Point camera at code. Confirm is required after a scan.";
+
+    const loop = async ()=>{
+      if(!scanStream) return;
+      try{
+        const codes = await detector.detect(video);
+        if(codes && codes.length){
+          const raw = codes[0].rawValue || "";
+          if(raw){
+            lastScanValue = raw;
+            box.classList.remove("hide");
+            val.textContent = raw;
+            stopScanStream();
+            return;
+          }
+        }
+      }catch{}
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  function stopScanStream(){
+    const video = document.getElementById("scanVideo");
+    if(video) video.pause();
+    if(scanStream){
+      scanStream.getTracks().forEach(t=>t.stop());
+      scanStream = null;
+    }
+  }
+
+  function openScanDialog(){
+    document.getElementById("dlgScan").showModal();
+    startScan();
+  }
+
+  function closeScanDialog(){
+    stopScanStream();
+    document.getElementById("dlgScan").close();
+  }
+
+  function confirmScan(){
+    if(!lastScanValue) return;
+
+    const store = loadStore();
+    const inv = store.inventory || [];
+
+    const match = inv.find(i => i.identifierType === "Barcode" && String(i.identifierValue||"").trim() === String(lastScanValue).trim());
+    closeScanDialog();
+
+    if(!match){
+      document.getElementById("transferStatus").textContent = "No matching item found for this identifier. Create the item definition first.";
+      return;
+    }
+    // Jump into transfer form
+    showTransferForm(match.itemId);
+  }
+
+  function bindScan(){
+    document.getElementById("btnTransferScan")?.addEventListener("click", openScanDialog);
+    document.getElementById("btnRescan")?.addEventListener("click", startScan);
+    document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
+    document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
+    document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
+  }
+
+  // ---- Bind everything ----
   document.addEventListener("DOMContentLoaded", ()=>{
     bindNav();
     bindInventoryAvailableButtons();
     bindAddPage();
+    bindTransferPage();
+    bindScan();
     showView("Home");
   });
 })();
