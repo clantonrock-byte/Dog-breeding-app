@@ -48,6 +48,9 @@
   <section id="viewDogs" class="card">
     <h2>Dogs &amp; Pups</h2>
     <div class="muted small">A central record for each dog or pup.</div>
+    <div class="muted small" style="margin-top:12px;">
+      (Dog records will display linked transfers in a later step.)
+    </div>
   </section>
 
   <section id="viewCare" class="card hide">
@@ -69,9 +72,13 @@
     <div id="info-inventory" class="info-text hide">
       <div class="info-summary">Exact identifier match = same item. Quantity represents units.</div>
       <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">Mixed donations are supported naturally. Matching identifiers add to the same record.</div>
+      <div class="info-more hide" id="info-inventory-more">
+        Added increases on-hand. Used/Discarded/Transferred decreases on-hand.
+      </div>
       <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">Low items appear yellow. Review highlights exact duplicates.</div>
+      <div class="info-full hide" id="info-inventory-full">
+        Transfer records where items went (dog/org/contact). This supports follow-up and recall readiness.
+      </div>
     </div>
 
     <div class="inv-banner">
@@ -178,7 +185,7 @@
   </form>
 </dialog>
 
-<!-- Update Inventory Dialog (stock + threshold live here) -->
+<!-- Update Inventory Dialog (stock + threshold + transfer destination) -->
 <dialog id="dlgInvUpdate" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -192,7 +199,11 @@
 
       <label class="label">Action</label>
       <select id="invUpdateAction">
-        <option>Added</option><option>Used</option><option>Discarded</option><option>Retired</option><option>Transferred</option>
+        <option>Added</option>
+        <option>Used</option>
+        <option>Discarded</option>
+        <option>Transferred</option>
+        <option>Retired</option>
       </select>
 
       <div id="invUpdateQtyWrap">
@@ -202,6 +213,48 @@
 
       <label class="label">Low threshold (optional)</label>
       <input id="invUpdateThreshold" inputmode="decimal" placeholder="e.g., 2" />
+
+      <!-- Transfer details (only shown when action = Transferred) -->
+      <div id="transferWrap" class="hide">
+        <label class="label">Transfer destination</label>
+        <select id="transferType">
+          <option>With a dog</option>
+          <option>To adopter</option>
+          <option>To foster</option>
+          <option>To another organization</option>
+          <option>Returned to donor</option>
+          <option>Moved to storage</option>
+          <option>Other</option>
+        </select>
+
+        <div class="grid2">
+          <div>
+            <label class="label">Destination details (optional)</label>
+            <input id="transferDetail" placeholder="e.g., Dog name / org name / storage location" />
+          </div>
+          <div>
+            <label class="label">Contact person (optional)</label>
+            <input id="transferContactPerson" placeholder="e.g., Jordan Smith" />
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label class="label">Contact method (optional)</label>
+            <select id="transferContactMethod">
+              <option>None</option>
+              <option>Phone</option>
+              <option>Email</option>
+              <option>Both</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Contact details (optional)</label>
+            <input id="transferContactDetails" placeholder="e.g., 555-555-5555 / name@email.com" />
+          </div>
+        </div>
+      </div>
 
       <label class="label">Note (optional)</label>
       <input id="invUpdateNote" />
@@ -224,12 +277,10 @@
 
     <div class="dlg-b">
       <video id="scanVideo" playsinline></video>
-
       <div id="scanResultBox" class="scan-result hide">
         <div class="muted small">Identifier captured</div>
         <div id="scanValue" class="scan-value"></div>
       </div>
-
       <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
     </div>
 
@@ -274,4 +325,4 @@
 
 <script src="app.js?v=sepA1"></script>
 </body>
-</html>
+  </html>
