@@ -21,7 +21,6 @@
 
 <main class="shell">
 
-  <!-- GOAL NAVIGATION -->
   <section class="card">
     <div class="card-h">
       <h2>What is our goal today?</h2>
@@ -46,25 +45,21 @@
     </div>
   </section>
 
-  <!-- DOGS -->
   <section id="viewDogs" class="card">
     <h2>Dogs &amp; Pups</h2>
     <div class="muted small">A central record for each dog or pup.</div>
   </section>
 
-  <!-- CARE -->
   <section id="viewCare" class="card hide">
     <h2>Care Timeline</h2>
     <div class="muted small">A time-stamped record of actions taken and observations noted.</div>
   </section>
 
-  <!-- FEEDING -->
   <section id="viewFeeding" class="card hide">
     <h2>Feeding</h2>
     <div class="muted small">Records feeding-related information and notes.</div>
   </section>
 
-  <!-- INVENTORY -->
   <section id="viewInventory" class="card hide">
     <div class="card-h">
       <h2>Inventory</h2>
@@ -72,11 +67,11 @@
     </div>
 
     <div id="info-inventory" class="info-text hide">
-      <div class="info-summary">Inventory records what is on hand and how it changes.</div>
+      <div class="info-summary">Exact identifier match = same item. Quantity represents units.</div>
       <button class="info-more-btn" data-more="inventory">More</button>
-      <div class="info-more hide" id="info-inventory-more">Exact identifier match = same item. Quantity represents units.</div>
+      <div class="info-more hide" id="info-inventory-more">Mixed donations are supported naturally. Matching identifiers add to the same record.</div>
       <button class="info-full-btn" data-full="inventory">Full</button>
-      <div class="info-full hide" id="info-inventory-full">Mixed donations are supported naturally. Matching identifiers add to the same record.</div>
+      <div class="info-full hide" id="info-inventory-full">Low items appear yellow. Review highlights exact duplicates.</div>
     </div>
 
     <div class="inv-banner">
@@ -103,13 +98,11 @@
     </div>
   </section>
 
-  <!-- HELPERS -->
   <section id="viewHelpers" class="card hide">
     <h2>Helpers</h2>
     <div class="muted small">A shared view for coordination and support.</div>
   </section>
 
-  <!-- RECORDS -->
   <section id="viewRecords" class="card hide">
     <h2>Records &amp; Export</h2>
     <div class="muted small">Information recorded across the app, available for review or export.</div>
@@ -256,7 +249,7 @@
   </form>
 </dialog>
 
-<!-- ✅ NEW: Same-barcode match dialog -->
+<!-- ✅ Same identifier found dialog -->
 <dialog id="dlgScanMatch" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -266,9 +259,7 @@
 
     <div class="dlg-b">
       <div class="muted small" id="scanMatchName"></div>
-      <div class="muted small" style="margin-top:8px;">
-        There may be more bags with the same identifier.
-      </div>
+      <div class="muted small" style="margin-top:8px;">There may be more bags with the same identifier.</div>
 
       <label class="label" style="margin-top:12px;">Add multiple (optional)</label>
       <input id="scanMatchMulti" inputmode="decimal" placeholder="e.g., 40" />
@@ -291,4 +282,4 @@
 
 <script src="app.js?v=bulk1"></script>
 </body>
-        </html>
+</html>
