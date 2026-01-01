@@ -24,70 +24,67 @@
   <section id="viewHome" class="card">
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
-      <button class="btn primary" data-go="dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-go="care">Care Timeline</button>
-      <button class="btn primary" data-go="feeding">Feeding</button>
-      <button class="btn primary" data-go="inventory">Inventory</button>
-      <button class="btn primary" data-go="helpers">Helpers</button>
-      <button class="btn primary" data-go="records">Records &amp; Export</button>
+      <button class="btn primary" data-go="Dogs">Dogs &amp; Pups</button>
+      <button class="btn primary" data-go="Care">Care Timeline</button>
+      <button class="btn primary" data-go="Feeding">Feeding</button>
+      <button class="btn primary" data-go="InventoryMenu">Inventory</button>
+      <button class="btn primary" data-go="Helpers">Helpers</button>
+      <button class="btn primary" data-go="Records">Records &amp; Export</button>
     </div>
   </section>
 
-  <!-- INVENTORY MENU (2nd level) -->
+  <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
-
     <div class="row">
-      <button class="btn" data-back="home">Back</button>
-      <button class="btn" data-home="home">Home</button>
+      <button class="btn" data-back="Home">Back</button>
+      <button class="btn" data-home="Home">Home</button>
     </div>
-
     <div class="goal-grid">
-      <button class="btn primary" data-inv="current">Current inventory</button>
-      <button class="btn primary" data-inv="add">Add inventory</button>
-      <button class="btn primary" data-inv="transfer">Transfer</button>
+      <button class="btn primary" data-go="InventoryCurrent">Current inventory</button>
+      <button class="btn primary" data-go="InventoryAdd">Add inventory</button>
+      <button class="btn primary" data-go="InventoryTransfer">Transfer</button>
     </div>
-
     <div class="goal-grid" style="margin-top:12px;">
-      <button class="btn" data-inv="review">Review list</button>
+      <button class="btn" data-go="InventoryReview">Review list</button>
     </div>
   </section>
 
-  <!-- INVENTORY ACTION PAGES (3rd level) -->
+  <!-- INVENTORY PAGES -->
   <section id="viewInventoryCurrent" class="card hide">
     <h2>Current inventory</h2>
     <div class="row">
-      <button class="btn" data-back="inventoryMenu">Back</button>
-      <button class="btn" data-home="home">Home</button>
+      <button class="btn" data-back="InventoryMenu">Back</button>
+      <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Inventory list will appear here once we reattach inventory logic.</div>
+    <div class="muted small">Navigation test page.</div>
   </section>
 
   <section id="viewInventoryAdd" class="card hide">
     <h2>Add inventory</h2>
     <div class="row">
-      <button class="btn" data-back="inventoryMenu">Back</button>
-      <button class="btn" data-home="home">Home</button>
+      <button class="btn" data-back="InventoryMenu">Back</button>
+      <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Add item definition UI will appear here once we reattach inventory logic.</div>
+    <div class="muted small">Navigation test page.</div>
   </section>
 
   <section id="viewInventoryTransfer" class="card hide">
     <h2>Transfer</h2>
     <div class="row">
-      <button class="btn" data-back="inventoryMenu">Back</button>
-      <button class="btn" data-home="home">Home</button>
+      <button class="btn" data-back="InventoryMenu">Back</button>
+      <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Transfer flow will appear here once we reattach inventory logic.</div>
+    <div class="muted small">Navigation test page.</div>
   </section>
 
   <section id="viewInventoryReview" class="card hide">
     <h2>Inventory review</h2>
     <div class="row">
-      <button class="btn" data-back="inventoryMenu">Back</button>
-      <button class="btn" data-home="home">Home</button>
+      <button class="btn" data-back="InventoryMenu">Back</button>
+      <button class="btn" data-home="Home">Home</button>
     </div>
-    <div class="muted small">Review list will appear here once we reattach inventory logic.</div>
+    <div class="muted small">Navigation test page.</div>
   </section>
 
   <!-- OTHER MODULE PLACEHOLDERS -->
@@ -101,6 +98,42 @@
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<script src="app.js?v=navfix1"></script>
+<script>
+(function(){
+  const VIEWS = [
+    "Home",
+    "InventoryMenu",
+    "InventoryCurrent",
+    "InventoryAdd",
+    "InventoryTransfer",
+    "InventoryReview",
+    "Dogs","Care","Feeding","Helpers","Records"
+  ];
+
+  function showView(name){
+    VIEWS.forEach(v=>{
+      const el = document.getElementById("view" + v);
+      if(el) el.classList.toggle("hide", v !== name);
+    });
+  }
+
+  function bind(){
+    document.querySelectorAll("[data-go]").forEach(btn=>{
+      btn.addEventListener("click", ()=> showView(btn.dataset.go));
+    });
+    document.querySelectorAll("[data-back]").forEach(btn=>{
+      btn.addEventListener("click", ()=> showView(btn.dataset.back));
+    });
+    document.querySelectorAll("[data-home]").forEach(btn=>{
+      btn.addEventListener("click", ()=> showView("Home"));
+    });
+
+    showView("Home");
+  }
+
+  document.addEventListener("DOMContentLoaded", bind);
+})();
+</script>
+
 </body>
 </html>
