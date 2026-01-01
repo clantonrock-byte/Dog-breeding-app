@@ -47,6 +47,10 @@
       <button class="btn primary" data-go="InventoryAdd">Add to inventory</button>
       <button class="btn primary" data-go="InventoryTransfer">Transfer inventory</button>
     </div>
+
+    <div class="muted small" style="margin-top:12px;">
+      This section is designed to stay calm and skimmable.
+    </div>
   </section>
 
   <!-- INVENTORY: AVAILABLE (3rd level) -->
@@ -58,7 +62,15 @@
       <button class="btn" data-home="Home">Home</button>
     </div>
 
-    <div class="muted small">Navigation test page. (We’ll reattach the live list next.)</div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="btnInvRefresh">Refresh list</button>
+      <button class="btn" id="btnInvToggleArchived">Show archived</button>
+    </div>
+
+    <div id="invAvailableMeta" class="muted small" style="margin-top:10px;"></div>
+
+    <div id="invAvailableList"></div>
+    <div id="invAvailableArchived" class="hide"></div>
   </section>
 
   <!-- INVENTORY: ADD -->
@@ -70,7 +82,9 @@
       <button class="btn" data-home="Home">Home</button>
     </div>
 
-    <div class="muted small">Navigation test page. (We’ll reattach the add form next.)</div>
+    <div class="muted small" style="margin-top:10px;">
+      Next step: wire this page to open the item-definition form (dropdowns + scan).
+    </div>
   </section>
 
   <!-- INVENTORY: TRANSFER -->
@@ -82,7 +96,9 @@
       <button class="btn" data-home="Home">Home</button>
     </div>
 
-    <div class="muted small">Navigation test page. (We’ll reattach scan→transfer next.)</div>
+    <div class="muted small" style="margin-top:10px;">
+      Next step: wire scan → match → transfer update (destination + contact).
+    </div>
   </section>
 
   <!-- OTHER MODULE PLACEHOLDERS -->
@@ -112,9 +128,14 @@
       const el = document.getElementById("view" + v);
       if(el) el.classList.toggle("hide", v !== name);
     });
+
+    // Auto-render inventory when opening InventoryAvailable
+    if(name === "InventoryAvailable"){
+      renderInventoryAvailable();
+    }
   }
 
-  function bind(){
+  function bindNav(){
     document.querySelectorAll("[data-go]").forEach(btn=>{
       btn.addEventListener("click", ()=> showView(btn.dataset.go));
     });
@@ -124,11 +145,140 @@
     document.querySelectorAll("[data-home]").forEach(btn=>{
       btn.addEventListener("click", ()=> showView("Home"));
     });
-
-    showView("Home");
   }
 
-  document.addEventListener("DOMContentLoaded", bind);
+  // ---- Inventory detection + rendering (read-only) ----
+
+  function escapeHtml(s){
+    return String(s||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function inventoryLow(it){
+    const t = it.thresholdLow;
+    if(t === null || t === undefined || t === "") return false;
+    return Number(it.qty) <= Number(t);
+  }
+
+  // Finds the most likely inventory store in localStorage (no risk, just read)
+  function findInventoryStore(){
+    let best = null;
+
+    for(let i=0;i<localStorage.length;i++){
+      const key = localStorage.key(i);
+      if(!key) continue;
+
+      const raw = localStorage.getItem(key);
+      if(!raw || raw.length < 5) continue;
+
+      try{
+        const obj = JSON.parse(raw);
+        if(obj && Array.isArray(obj.inventory)){
+          const score = obj.inventory.length + raw.length/10000;
+          if(!best || score > best.score){
+            best = { key, score, obj };
+          }
+        }
+      }catch(e){}
+    }
+
+    return best; // {key, obj}
+  }
+
+  function renderInventoryAvailable(){
+    const meta = document.getElementById("invAvailableMeta");
+    const list = document.getElementById("invAvailableList");
+    const arch = document.getElementById("invAvailableArchived");
+    if(!meta || !list || !arch) return;
+
+    const store = findInventoryStore();
+    if(!store){
+      meta.textContent = "No saved inventory found yet.";
+      list.innerHTML = `<div class="muted small">No inventory items recorded yet.</div>`;
+      arch.innerHTML = "";
+      return;
+    }
+
+    const inv = store.obj.inventory || [];
+    const active = inv.filter(i=>!i.archived);
+    const archived = inv.filter(i=>i.archived);
+
+    meta.textContent = `Source: local saved inventory (${store.key}). Active: ${active.length}. Archived: ${archived.length}.`;
+
+    if(!active.length){
+      list.innerHTML = `<div class="muted small">No active inventory items recorded.</div>`;
+    } else {
+      list.innerHTML = active.map(i=>{
+        const low = inventoryLow(i);
+        const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
+        const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+
+        const idLine = (i.identifierType && i.identifierType !== "None")
+          ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
+          : "Identifier: none";
+
+        return `
+          <div class="inv-item">
+            <div class="inv-top">
+              <div>
+                <div class="inv-name ${low ? "low" : ""}">${escapeHtml(i.name||"(unnamed)")}</div>
+                <div class="inv-meta">${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
+                <div class="inv-meta">${idLine}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    if(!archived.length){
+      arch.innerHTML = `<div class="muted small">No archived inventory items.</div>`;
+    } else {
+      arch.innerHTML = archived.map(i=>{
+        const w = i.weightPerUnit ? ` • W/unit: ${escapeHtml(i.weightPerUnit)}` : "";
+        const stock = `On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null && i.thresholdLow!=="" && i.thresholdLow!==undefined) ? ` • Low: ${escapeHtml(String(i.thresholdLow))}` : ""}`;
+        const idLine = (i.identifierType && i.identifierType !== "None")
+          ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
+          : "Identifier: none";
+
+        return `
+          <div class="inv-item">
+            <div class="inv-top">
+              <div>
+                <div class="inv-name">${escapeHtml(i.name||"(unnamed)")}</div>
+                <div class="inv-meta">Archived • ${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
+                <div class="inv-meta">${idLine}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  function bindInventoryAvailableButtons(){
+    const refresh = document.getElementById("btnInvRefresh");
+    const toggle = document.getElementById("btnInvToggleArchived");
+    const arch = document.getElementById("invAvailableArchived");
+
+    if(refresh) refresh.addEventListener("click", renderInventoryAvailable);
+
+    if(toggle && arch){
+      toggle.addEventListener("click", ()=>{
+        arch.classList.toggle("hide");
+      });
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    bindNav();
+    bindInventoryAvailableButtons();
+    showView("Home");
+  });
 })();
 </script>
 
