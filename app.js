@@ -1,4 +1,4 @@
-// app.js — navigation with one-step Back stack + Home reset + view hook
+// app.js — navigation with one-step Back stack + Home reset + afterShow hook
 
 (function () {
   const views = [
@@ -26,7 +26,7 @@
     });
     current = name;
 
-    // 🔔 Optional hook: let index.html refresh lists when a page opens
+    // Let index.html refresh lists whenever a page is shown
     if (typeof window.__afterShow === "function") {
       try { window.__afterShow(name); } catch (e) {}
     }
