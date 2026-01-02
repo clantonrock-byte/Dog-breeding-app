@@ -1,4 +1,4 @@
-// app.js — navigation with one-step Back stack + Home reset
+// app.js — navigation with one-step Back stack + Home reset + view hook
 
 (function () {
   const views = [
@@ -7,7 +7,7 @@
     "InventoryAvailable",
     "InventoryAdd",
     "InventoryAddStock",
-    "InventoryReduceStock", // ✅ REQUIRED
+    "InventoryReduceStock",
     "InventoryTransfer",
     "Dogs",
     "Care",
@@ -25,6 +25,11 @@
       if (el) el.classList.toggle("hide", v !== name);
     });
     current = name;
+
+    // 🔔 Optional hook: let index.html refresh lists when a page opens
+    if (typeof window.__afterShow === "function") {
+      try { window.__afterShow(name); } catch (e) {}
+    }
   }
 
   window.__go = function (name) {
