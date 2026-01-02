@@ -23,39 +23,40 @@
   <!-- HOME -->
   <section id="viewHome" class="card">
     <h2>What is our goal today?</h2>
+
     <div class="goal-grid">
-      <button class="btn primary" data-go="Dogs">Dogs &amp; Pups</button>
-      <button class="btn primary" data-go="Care">Care Timeline</button>
-      <button class="btn primary" data-go="Feeding">Feeding</button>
-      <button class="btn primary" data-go="InventoryMenu">Inventory</button>
-      <button class="btn primary" data-go="Helpers">Helpers</button>
-      <button class="btn primary" data-go="Records">Records &amp; Export</button>
+      <button class="btn primary" onclick="window.__go && window.__go('Dogs')">Dogs &amp; Pups</button>
+      <button class="btn primary" onclick="window.__go && window.__go('Care')">Care Timeline</button>
+      <button class="btn primary" onclick="window.__go && window.__go('Feeding')">Feeding</button>
+      <button class="btn primary" onclick="window.__go && window.__go('InventoryMenu')">Inventory</button>
+      <button class="btn primary" onclick="window.__go && window.__go('Helpers')">Helpers</button>
+      <button class="btn primary" onclick="window.__go && window.__go('Records')">Records &amp; Export</button>
     </div>
   </section>
 
-  <!-- INVENTORY MENU (2nd level) -->
+  <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
 
     <div class="row">
-      <button class="btn" data-back="Home">Back</button>
-      <button class="btn" data-home="Home">Home</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Back</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
     </div>
 
     <div class="goal-grid">
-      <button class="btn primary" data-go="InventoryAvailable">Inventory available</button>
-      <button class="btn primary" data-go="InventoryAdd">Add to inventory</button>
-      <button class="btn primary" data-go="InventoryTransfer">Transfer inventory</button>
+      <button class="btn primary" onclick="window.__go && window.__go('InventoryAvailable')">Inventory available</button>
+      <button class="btn primary" onclick="window.__go && window.__go('InventoryAdd')">Add to inventory</button>
+      <button class="btn primary" onclick="window.__go && window.__go('InventoryTransfer')">Transfer inventory</button>
     </div>
   </section>
 
-  <!-- INVENTORY: AVAILABLE (3rd level) -->
+  <!-- INVENTORY: AVAILABLE -->
   <section id="viewInventoryAvailable" class="card hide">
     <h2>Inventory available</h2>
 
     <div class="row">
-      <button class="btn" data-back="InventoryMenu">Back</button>
-      <button class="btn" data-home="Home">Home</button>
+      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
     </div>
 
     <div class="row" style="margin-top:12px;">
@@ -73,8 +74,8 @@
     <h2>Add to inventory</h2>
 
     <div class="row">
-      <button class="btn" data-back="InventoryMenu">Back</button>
-      <button class="btn" data-home="Home">Home</button>
+      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
     </div>
 
     <div class="muted small" style="margin:10px 0;">
@@ -93,8 +94,8 @@
     <h2>Transfer inventory</h2>
 
     <div class="row">
-      <button class="btn" data-back="InventoryMenu">Back</button>
-      <button class="btn" data-home="Home">Home</button>
+      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
     </div>
 
     <div class="muted small" style="margin:10px 0;">
@@ -102,8 +103,7 @@
     </div>
 
     <div class="row">
-      <!-- Extra redundancy: onclick opens scan dialog even if wiring ever fails -->
-      <button class="btn primary" id="btnTransferScan" onclick="window.__openScanDialog && window.__openScanDialog()">Scan item</button>
+      <button class="btn primary" id="btnTransferScan">Scan item</button>
       <button class="btn" id="btnTransferRefreshList">Refresh list</button>
     </div>
 
@@ -160,7 +160,7 @@
     <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- PLACEHOLDERS (later) -->
+  <!-- PLACEHOLDERS -->
   <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2></section>
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2></section>
@@ -171,7 +171,7 @@
 
 <button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
 
-<!-- ✅ Add Definition Dialog -->
+<!-- ADD DIALOG -->
 <dialog id="dlgInv" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -232,7 +232,7 @@
   </form>
 </dialog>
 
-<!-- ✅ Scan Dialog (Confirm required + manual fallback) -->
+<!-- SCAN DIALOG -->
 <dialog id="dlgScan" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -250,7 +250,6 @@
 
       <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
 
-      <!-- Manual fallback -->
       <label class="label" style="margin-top:12px;">Manual entry (if needed)</label>
       <input id="scanManual" placeholder="Type or paste barcode here" inputmode="numeric" />
     </div>
@@ -265,19 +264,18 @@
 
 <script>
 (function(){
-  // ----- Views -----
   const VIEWS = ["Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryTransfer","Dogs","Care","Feeding","Helpers","Records"];
-  function showView(name){
+  window.__go = function(name){
     VIEWS.forEach(v=>{
       const el = document.getElementById("view"+v);
       if(el) el.classList.toggle("hide", v !== name);
     });
     if(name === "InventoryAvailable") renderInventoryAvailable();
     if(name === "InventoryTransfer") populateTransferSelect();
-  }
+  };
 
-  // ----- Store -----
   const INV_STORE_KEY = "breederPro_inventory_store_v1";
+
   function loadStore(){
     try{
       const raw = localStorage.getItem(INV_STORE_KEY);
@@ -289,7 +287,6 @@
   }
   function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
 
-  // ----- Rendering: Available -----
   function escapeHtml(s){
     return String(s||"")
       .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
@@ -300,6 +297,7 @@
     if(t === null || t === undefined || t === "") return false;
     return Number(it.qty) <= Number(t);
   }
+
   function renderInventoryAvailable(){
     const meta = document.getElementById("invAvailableMeta");
     const list = document.getElementById("invAvailableList");
@@ -319,7 +317,6 @@
       const idLine = (i.identifierType && i.identifierType !== "None")
         ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
         : "Identifier: none";
-
       return `
         <div class="inv-item">
           <div class="inv-top">
@@ -339,7 +336,6 @@
       const idLine = (i.identifierType && i.identifierType !== "None")
         ? `${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`
         : "Identifier: none";
-
       return `
         <div class="inv-item">
           <div class="inv-top">
@@ -354,7 +350,7 @@
     }).join("") : `<div class="muted small">No archived inventory items.</div>`;
   }
 
-  // ----- Add definition -----
+  // Add definition
   function openAddDialog(){
     document.getElementById("invName").value = "";
     document.getElementById("invCategory").value = "Food";
@@ -391,26 +387,20 @@
 
     saveStore(store);
     document.getElementById("dlgInv").close();
-    showView("InventoryAvailable");
-    renderInventoryAvailable();
+    window.__go("InventoryAvailable");
   }
 
-  // ----- Transfer -----
+  // Transfer
   let transferItemId = null;
 
   function populateTransferSelect(){
     const sel = document.getElementById("transferSelect");
-    if(!sel) return;
-
     const store = loadStore();
     const active = (store.inventory||[]).filter(i=>!i.archived);
-
     sel.innerHTML = "";
-    const opt0 = document.createElement("option");
-    opt0.value = "";
-    opt0.textContent = "Select item…";
-    sel.appendChild(opt0);
-
+    const o0 = document.createElement("option");
+    o0.value = ""; o0.textContent = "Select item…";
+    sel.appendChild(o0);
     active.forEach(i=>{
       const opt = document.createElement("option");
       opt.value = i.itemId;
@@ -427,14 +417,11 @@
       return;
     }
     transferItemId = itemId;
-
     document.getElementById("transferForm").classList.remove("hide");
     document.getElementById("transferItemName").textContent = it.name;
-
     const idLine = (it.identifierType && it.identifierType !== "None") ? `${it.identifierType}: ${it.identifierValue}` : "Identifier: none";
     document.getElementById("transferItemMeta").textContent =
       `${it.category} • ${it.source} • ${it.unit} • On hand: ${it.qty ?? 0} • ${idLine}`;
-
     document.getElementById("transferQty").value = "1";
     document.getElementById("transferType").value = "With a dog";
     document.getElementById("transferDetail").value = "";
@@ -454,26 +441,21 @@
     const qty = Math.abs(Number(document.getElementById("transferQty").value || "0") || 0);
     if(qty <= 0){ document.getElementById("transferStatus").textContent = "Quantity needs to be greater than 0."; return; }
 
-    const before = Number(it.qty || 0);
-    const after = Math.max(0, before - qty);
-    it.qty = after;
-
-    const transfer = {
-      destinationType: document.getElementById("transferType").value,
-      destinationDetail: (document.getElementById("transferDetail").value||"").trim(),
-      contactPerson: (document.getElementById("transferContactPerson").value||"").trim(),
-      contactMethod: document.getElementById("transferContactMethod").value,
-      contactDetails: (document.getElementById("transferContactDetails").value||"").trim()
-    };
-    const note = (document.getElementById("transferNote").value||"").trim();
+    it.qty = Math.max(0, Number(it.qty||0) - qty);
 
     it.history = it.history || [];
     it.history.push({
       ts: new Date().toISOString(),
       action: "Transferred",
       qtyDelta: -qty,
-      note,
-      transfer
+      note: (document.getElementById("transferNote").value||"").trim(),
+      transfer: {
+        destinationType: document.getElementById("transferType").value,
+        destinationDetail: (document.getElementById("transferDetail").value||"").trim(),
+        contactPerson: (document.getElementById("transferContactPerson").value||"").trim(),
+        contactMethod: document.getElementById("transferContactMethod").value,
+        contactDetails: (document.getElementById("transferContactDetails").value||"").trim()
+      }
     });
 
     saveStore(store);
@@ -488,51 +470,40 @@
     document.getElementById("transferStatus").textContent = "";
   }
 
-  // ----- Scan (Confirm required + manual fallback) -----
-  let scanStream = null;
-  let lastScanValue = "";
+  // Scan: confirm uses camera result OR manual field
+  let scanStream=null, lastScanValue="";
 
   async function startScan(){
-    const video = document.getElementById("scanVideo");
-    const help = document.getElementById("scanHelp");
-    const box = document.getElementById("scanResultBox");
-    const val = document.getElementById("scanValue");
-
-    lastScanValue = "";
-    box.classList.add("hide");
-    val.textContent = "";
-    help.textContent = "";
-
+    const video=document.getElementById("scanVideo");
+    const help=document.getElementById("scanHelp");
+    const box=document.getElementById("scanResultBox");
+    const val=document.getElementById("scanValue");
+    lastScanValue=""; box.classList.add("hide"); val.textContent=""; help.textContent="";
     try{
-      scanStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false });
-      video.srcObject = scanStream;
-      await video.play();
+      scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+      video.srcObject=scanStream; await video.play();
     }catch{
-      help.textContent = "Camera access unavailable. Manual entry remains available.";
+      help.textContent="Camera access unavailable. Manual entry remains available.";
       return;
     }
-
     if(!("BarcodeDetector" in window)){
-      help.textContent = "Scanner not supported on this browser. Manual entry remains available.";
+      help.textContent="Scanner not supported on this browser. Manual entry remains available.";
       return;
     }
-
     let detector;
-    try{ detector = new BarcodeDetector({ formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"] }); }
-    catch{ detector = new BarcodeDetector(); }
-
-    help.textContent = "Point camera at code. Confirm is required after a scan.";
-
-    const loop = async ()=>{
+    try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
+    catch{ detector=new BarcodeDetector(); }
+    help.textContent="Point camera at code. Confirm is required after a scan.";
+    const loop=async()=>{
       if(!scanStream) return;
       try{
-        const codes = await detector.detect(video);
+        const codes=await detector.detect(video);
         if(codes && codes.length){
-          const raw = codes[0].rawValue || "";
+          const raw=codes[0].rawValue||"";
           if(raw){
-            lastScanValue = raw;
+            lastScanValue=raw;
             box.classList.remove("hide");
-            val.textContent = raw;
+            val.textContent=raw;
             stopScanStream();
             return;
           }
@@ -542,19 +513,16 @@
     };
     requestAnimationFrame(loop);
   }
-
   function stopScanStream(){
-    const video = document.getElementById("scanVideo");
+    const video=document.getElementById("scanVideo");
     if(video) video.pause();
     if(scanStream){
       scanStream.getTracks().forEach(t=>t.stop());
-      scanStream = null;
+      scanStream=null;
     }
   }
-
   function openScanDialog(){
-    // clear manual field each time
-    document.getElementById("scanManual").value = "";
+    document.getElementById("scanManual").value="";
     document.getElementById("dlgScan").showModal();
     startScan();
   }
@@ -562,48 +530,35 @@
     stopScanStream();
     document.getElementById("dlgScan").close();
   }
-
   function confirmScan(){
-    const manual = (document.getElementById("scanManual")?.value || "").trim();
-    const code = (lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
-
+    const manual=(document.getElementById("scanManual").value||"").trim();
+    const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
     if(!code){
-      document.getElementById("scanHelp").textContent = "No identifier captured. Manual entry is available.";
+      document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
       return;
     }
-
-    const store = loadStore();
-    const inv = store.inventory || [];
-
-    const match = inv.find(i =>
-      (i.identifierType === "Barcode" || i.identifierType === "QR") &&
-      String(i.identifierValue||"").trim() === code
+    const store=loadStore();
+    const inv=store.inventory||[];
+    const match=inv.find(i =>
+      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
+      String(i.identifierValue||"").trim()===code
     );
-
     closeScanDialog();
-
     if(!match){
-      document.getElementById("transferStatus").textContent =
-        "No matching item found for this identifier. Create the item definition first.";
+      document.getElementById("transferStatus").textContent="No matching item found for this identifier. Create the item definition first.";
       return;
     }
-
     showTransferForm(match.itemId);
   }
 
-  // expose openScanDialog for button redundancy
-  window.__openScanDialog = openScanDialog;
-
-  // ----- bindings -----
+  // Bind
   document.addEventListener("DOMContentLoaded", ()=>{
-    bindNav();
-    renderInventoryAvailable();
+    // Home navigation backup
+    window.__go("Home");
 
-    // Available page
+    // Available buttons
     document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
-    document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=>{
-      document.getElementById("invAvailableArchived")?.classList.toggle("hide");
-    });
+    document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invAvailableArchived").classList.toggle("hide"));
 
     // Add page
     document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
@@ -615,9 +570,8 @@
     document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
     document.getElementById("btnCancelTransfer")?.addEventListener("click", cancelTransfer);
 
+    // Scan
     document.getElementById("btnTransferScan")?.addEventListener("click", openScanDialog);
-
-    // Scan dialog
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
@@ -625,11 +579,9 @@
 
     // Voice
     document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
-
-    showView("Home");
   });
 })();
 </script>
 
 </body>
-        </html>
+</html>
