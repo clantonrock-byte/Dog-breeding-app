@@ -1,4 +1,4 @@
-// app.js — navigation with 1-step Back stack (cuz human)
+// app.js — navigation with one-step Back stack + Home reset
 
 (function () {
   const views = [
@@ -7,6 +7,7 @@
     "InventoryAvailable",
     "InventoryAdd",
     "InventoryAddStock",
+    "InventoryReduceStock",   // ✅ REQUIRED for Reduce stock button
     "InventoryTransfer",
     "Dogs",
     "Care",
@@ -16,7 +17,7 @@
   ];
 
   let current = "Home";
-  const stack = []; // navigation history
+  const stack = [];
 
   function show(name) {
     views.forEach(v => {
@@ -26,27 +27,20 @@
     current = name;
   }
 
-  // Go to a view and remember where we came from
   window.__go = function (name) {
     if (!name || name === current) return;
-
-    // Only push if current is a valid view
     if (views.includes(current)) stack.push(current);
-
     show(name);
   };
 
-  // Back goes one step back
   window.__back = function () {
     if (stack.length === 0) {
       show("Home");
       return;
     }
-    const prev = stack.pop();
-    show(prev);
+    show(stack.pop());
   };
 
-  // Home resets the stack
   window.__home = function () {
     stack.length = 0;
     show("Home");
