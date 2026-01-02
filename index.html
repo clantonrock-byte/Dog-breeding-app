@@ -81,10 +81,9 @@
       This records item definition (what it is). Stock changes happen through Transfer and future Add-stock tools.
     </div>
 
-    <!-- ✅ Two clear actions -->
     <div class="row">
       <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
-      <button class="btn" id="btnAddScanTop" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan identifier</button>
+      <button class="btn" id="btnAddScanTop" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan now (QR or barcode)</button>
     </div>
 
     <div class="muted small" style="margin-top:12px;">
@@ -214,8 +213,8 @@
       </div>
 
       <div class="row">
-        <button type="button" class="btn" id="btnAddScan" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan identifier</button>
-        <button type="button" class="btn" id="btnAddClearId">Clear identifier</button>
+        <button type="button" class="btn" id="btnAddScan" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan now (QR or barcode)</button>
+        <button type="button" class="btn" id="btnAddClearId">Delete now</button>
       </div>
 
       <div class="grid2">
@@ -240,7 +239,7 @@
   </form>
 </dialog>
 
-<!-- SCAN DIALOG -->
+<!-- SCAN DIALOG (patched) -->
 <dialog id="dlgScan" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -272,8 +271,8 @@
 
 <script>
 (function(){
-  const VIEWS = ["Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryTransfer","Dogs","Care","Feeding","Helpers","Records"];
-  window.__go = function(name){
+  const VIEWS=["Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryTransfer","Dogs","Care","Feeding","Helpers","Records"];
+  window.__go=function(name){
     VIEWS.forEach(v=>{
       const el=document.getElementById("view"+v);
       if(el) el.classList.toggle("hide", v!==name);
@@ -285,7 +284,6 @@
   const INV_STORE_KEY="breederPro_inventory_store_v1";
   function loadStore(){ try{ const raw=localStorage.getItem(INV_STORE_KEY); if(!raw) return {inventory:[]}; const obj=JSON.parse(raw); if(!obj.inventory) obj.inventory=[]; return obj; }catch{ return {inventory:[]}; } }
   function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
-
   function escapeHtml(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
   function inventoryLow(it){ const t=it.thresholdLow; if(t===null||t===undefined||t==="") return false; return Number(it.qty)<=Number(t); }
 
@@ -323,6 +321,7 @@
     }).join("") : `<div class="muted small">No archived inventory items.</div>`;
   }
 
+  // Add definition
   function openAddDialog(){
     document.getElementById("invName").value="";
     document.getElementById("invCategory").value="Food";
@@ -334,7 +333,6 @@
     document.getElementById("invNotes").value="";
     document.getElementById("dlgInv").showModal();
   }
-
   function saveDefinition(){
     const name=(document.getElementById("invName").value||"").trim();
     if(!name){ alert("Item name is required."); return; }
@@ -367,8 +365,8 @@
     sel.innerHTML="";
     const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
     active.forEach(i=>{
-      const opt=document.createElement("option");
-      opt.value=i.itemId; opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
+      const opt=document.createElement("option"); opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
       sel.appendChild(opt);
     });
   }
@@ -418,7 +416,7 @@
     document.getElementById("transferStatus").textContent="";
   }
 
-  // Scan (context-aware)
+  // Scan context-aware
   let scanStream=null, lastScanValue="", scanContext="transfer";
   async function startScan(){
     const video=document.getElementById("scanVideo");
@@ -536,4 +534,4 @@
 </script>
 
 </body>
-</html>
+  </html>
