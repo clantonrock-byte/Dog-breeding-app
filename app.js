@@ -1,4 +1,4 @@
-// app.js — navigation only (stable on mobile)
+// app.js — navigation only (stable)
 
 (function () {
   const views = [
@@ -23,7 +23,6 @@
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Always start on Home
     window.__go("Home");
   });
 })();
