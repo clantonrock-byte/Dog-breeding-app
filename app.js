@@ -1,4 +1,4 @@
-// app.js — stable navigation stack (Back = 1 step, Home = Home)
+// app.js — navigation with one-step Back stack + Home reset + afterShow hook
 
 (function () {
   const views = [
@@ -10,6 +10,7 @@
     "InventoryReduceStock",
     "InventoryTransfer",
     "Dogs",
+    "DogProfile",            // ✅ NEW
     "Care",
     "Feeding",
     "Helpers",
