@@ -40,7 +40,6 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
-
     <div class="goal-grid">
       <button class="btn primary" onclick="__go('InventoryAvailable')">Inventory available</button>
       <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
@@ -63,12 +62,12 @@
       <button class="btn" id="btnInvToggleArchived">Show archived</button>
     </div>
 
-    <div id="invAvailableMeta" class="muted small" style="margin-top:10px;"></div>
-    <div id="invAvailableList"></div>
-    <div id="invAvailableArchived" class="hide"></div>
+    <div id="invMeta" class="muted small" style="margin-top:10px;"></div>
+    <div id="invList"></div>
+    <div id="invArchived" class="hide"></div>
   </section>
 
-  <!-- ADD INVENTORY -->
+  <!-- ADD INVENTORY (definition) -->
   <section id="viewInventoryAdd" class="card hide">
     <h2>Add to inventory</h2>
     <div class="row">
@@ -78,11 +77,11 @@
 
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
-      <button class="btn" onclick="__openScanDialog('add')">Scan now (QR or barcode)</button>
+      <button class="btn" id="btnScanForAdd">Scan now (QR or barcode)</button>
     </div>
 
     <div class="muted small" style="margin-top:10px;">
-      Create definition first. Stock changes are recorded in Add stock / Reduce / Transfer.
+      Create a definition first. Then use Add stock / Reduce / Transfer to adjust on-hand.
     </div>
   </section>
 
@@ -94,10 +93,13 @@
       <button class="btn" onclick="__home()">Home</button>
     </div>
 
-    <div class="row">
-      <button class="btn primary" onclick="__openScanDialog('addstock')">Scan item</button>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn primary" id="btnScanAddStock">Scan item</button>
       <button class="btn" id="btnAddStockRefresh">Refresh list</button>
     </div>
+
+    <label class="label">Search (optional)</label>
+    <input id="addStockSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="addStockSelect"></select>
@@ -132,9 +134,12 @@
     </div>
 
     <div class="row" style="margin-top:12px;">
-      <button class="btn primary" onclick="__openScanDialog('reduce')">Scan item</button>
+      <button class="btn primary" id="btnScanReduce">Scan item</button>
       <button class="btn" id="btnReduceRefresh">Refresh list</button>
     </div>
+
+    <label class="label">Search (optional)</label>
+    <input id="reduceSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="reduceSelect"></select>
@@ -175,9 +180,12 @@
     </div>
 
     <div class="row" style="margin-top:12px;">
-      <button class="btn primary" onclick="__openScanDialog('transfer')">Scan item</button>
+      <button class="btn primary" id="btnScanTransfer">Scan item</button>
       <button class="btn" id="btnTransferRefresh">Refresh list</button>
     </div>
+
+    <label class="label">Search (optional)</label>
+    <input id="transferSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="transferSelect"></select>
@@ -213,7 +221,7 @@
     <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- PLACEHOLDERS -->
+  <!-- OTHER PAGES -->
   <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
@@ -229,9 +237,8 @@
       <h3>Inventory item</h3>
       <button class="info-btn" value="cancel" aria-label="Close">✕</button>
     </div>
-
     <div class="dlg-b">
-      <label class="label">Item name / label</label>
+      <label class="label">Item name</label>
       <input id="invName" />
 
       <label class="label">Category</label>
@@ -248,16 +255,17 @@
       <label class="label">Identifier value</label>
       <input id="invIdValue" />
 
+      <div class="row" style="margin-top:10px;">
+        <button type="button" class="btn" id="btnScanInsideAdd">Scan now (QR or barcode)</button>
+        <button type="button" class="btn" id="btnDeleteId">Delete now</button>
+      </div>
+
       <label class="label">Unit</label>
       <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
 
-      <label class="label">Weight per unit (optional)</label>
-      <input id="invWeightPerUnit" />
-
-      <label class="label">Notes (optional)</label>
+      <label class="label">Notes</label>
       <input id="invNotes" />
     </div>
-
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
       <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
@@ -274,12 +282,15 @@
     </div>
     <div class="dlg-b">
       <video id="scanVideo" playsinline autoplay muted></video>
+
       <div id="scanResultBox" class="scan-result hide">
         <div class="muted small">Identifier captured</div>
         <div id="scanValue" class="scan-value"></div>
       </div>
-      <div id="scanHelp" class="muted small"></div>
-      <label class="label">Manual entry</label>
+
+      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
+
+      <label class="label" style="margin-top:12px;">Manual entry</label>
       <input id="scanManual" />
     </div>
     <div class="dlg-f">
@@ -294,103 +305,416 @@
 
 <script>
 (function(){
-  const STORE_KEY="breederPro_inventory_store_v1";
+  // SINGLE SOURCE OF TRUTH
+  const STORE_KEY = "breederPro_inventory_store_v1";
 
   function loadStore(){
     try{
-      const raw=localStorage.getItem(STORE_KEY);
-      if(!raw) return {inventory:[]};
-      const obj=JSON.parse(raw);
-      if(!obj.inventory) obj.inventory=[];
+      const raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return { inventory: [] };
+      const obj = JSON.parse(raw);
+      if(!Array.isArray(obj.inventory)) obj.inventory = [];
+      // normalize
+      obj.inventory.forEach(it=>{
+        if(!it.itemId) it.itemId = "inv_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+        if(it.qty === undefined) it.qty = 0;
+        if(it.archived === undefined) it.archived = false;
+        if(!it.identifierType) it.identifierType = "None";
+        if(it.identifierValue === undefined) it.identifierValue = "";
+      });
       return obj;
-    }catch{ return {inventory:[]}; }
-  }
-  function saveStore(obj){ localStorage.setItem(STORE_KEY, JSON.stringify(obj)); }
-
-  function findLegacyInventory(){
-    let best=null;
-    for(let i=0;i<localStorage.length;i++){
-      const key=localStorage.key(i);
-      if(!key) continue;
-      const raw=localStorage.getItem(key);
-      if(!raw) continue;
-      try{
-        const obj=JSON.parse(raw);
-        if(obj && Array.isArray(obj.inventory) && obj.inventory.length){
-          if(!best || obj.inventory.length>best.inventory.length){
-            best=obj;
-          }
-        }
-      }catch(e){}
-    }
-    return best;
-  }
-
-  // One-time import if empty
-  function importIfEmpty(){
-    const cur=loadStore();
-    if((cur.inventory||[]).length>0) return;
-    const legacy=findLegacyInventory();
-    if(legacy && legacy.inventory && legacy.inventory.length){
-      localStorage.setItem(STORE_KEY, JSON.stringify({inventory: legacy.inventory}));
+    }catch{
+      return { inventory: [] };
     }
   }
 
-  function getActiveItems(){
-    const store=loadStore();
-    return (store.inventory||[]).filter(i=>!i.archived);
+  function saveStore(obj){
+    localStorage.setItem(STORE_KEY, JSON.stringify(obj));
+  }
+
+  function activeItems(){
+    return loadStore().inventory.filter(i=>!i.archived);
+  }
+
+  function setStatus(elId, msg){
+    const el = document.getElementById(elId);
+    if(el) el.textContent = msg || "";
   }
 
   function populateSelect(selectId){
-    const sel=document.getElementById(selectId);
+    const sel = document.getElementById(selectId);
     if(!sel) return;
-    const items=getActiveItems();
-    sel.innerHTML="";
-    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    const items = activeItems();
+    sel.innerHTML = "";
+    const o0 = document.createElement("option");
+    o0.value = "";
+    o0.textContent = "Select item…";
+    sel.appendChild(o0);
     items.forEach(i=>{
-      const opt=document.createElement("option");
-      opt.value=i.itemId;
-      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
+      const opt = document.createElement("option");
+      opt.value = i.itemId;
+      opt.textContent = `${i.name} (on hand: ${i.qty})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  function filterSelect(searchId, selectId){
+    const q = (document.getElementById(searchId)?.value || "").trim().toLowerCase();
+    const sel = document.getElementById(selectId);
+    if(!sel) return;
+
+    const items = activeItems().filter(i=>{
+      if(!q) return true;
+      const hay = `${i.name} ${i.category||""} ${i.source||""} ${i.identifierValue||""}`.toLowerCase();
+      return hay.includes(q);
+    });
+
+    sel.innerHTML = "";
+    const o0 = document.createElement("option");
+    o0.value = "";
+    o0.textContent = "Select item…";
+    sel.appendChild(o0);
+    items.forEach(i=>{
+      const opt = document.createElement("option");
+      opt.value = i.itemId;
+      opt.textContent = `${i.name} (on hand: ${i.qty})`;
       sel.appendChild(opt);
     });
   }
 
   function renderAvailable(){
-    const list=document.getElementById("invAvailableList");
-    const meta=document.getElementById("invAvailableMeta");
-    const items=getActiveItems();
-    if(meta) meta.textContent = `Items: ${items.length}`;
+    const store = loadStore();
+    const items = store.inventory.filter(i=>!i.archived);
+    const archived = store.inventory.filter(i=>i.archived);
+
+    const meta = document.getElementById("invMeta");
+    const list = document.getElementById("invList");
+    const arch = document.getElementById("invArchived");
+
+    if(meta) meta.textContent = `Active: ${items.length}. Archived: ${archived.length}.`;
+
     if(list){
-      list.innerHTML = items.length
-        ? items.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
-        : `<div class="muted small">No items found.</div>`;
+      list.innerHTML = items.length ? items.map(i=>`
+        <div class="timeline-item">
+          <div><strong>${i.name}</strong></div>
+          <div class="muted small">On hand: ${i.qty} • ${i.identifierType !== "None" ? (i.identifierType + ": " + (i.identifierValue||"")) : "Identifier: none"}</div>
+        </div>
+      `).join("") : `<div class="muted small">No active items.</div>`;
+    }
+
+    if(arch){
+      arch.innerHTML = archived.length ? archived.map(i=>`
+        <div class="timeline-item">
+          <div><strong>${i.name}</strong></div>
+          <div class="muted small">Archived • On hand: ${i.qty}</div>
+        </div>
+      `).join("") : `<div class="muted small">No archived items.</div>`;
     }
   }
 
-  // afterShow hook from app.js
-  window.__afterShow = function(viewName){
-    importIfEmpty();
-    if(viewName === "InventoryAvailable") renderAvailable();
-    if(viewName === "InventoryAddStock") populateSelect("addStockSelect");
-    if(viewName === "InventoryReduceStock") populateSelect("reduceSelect");
-    if(viewName === "InventoryTransfer") populateSelect("transferSelect");
+  // After-show hook: auto refresh lists on entry
+  window.__afterShow = function(view){
+    if(view === "InventoryAvailable") renderAvailable();
+    if(view === "InventoryAddStock") populateSelect("addStockSelect");
+    if(view === "InventoryReduceStock") populateSelect("reduceSelect");
+    if(view === "InventoryTransfer") populateSelect("transferSelect");
   };
 
-  // Button wiring
-  document.addEventListener("DOMContentLoaded", ()=>{
-    importIfEmpty();
-    renderAvailable();
+  // ----- Add definition -----
+  function openAddDialog(){
+    document.getElementById("invName").value = "";
+    document.getElementById("invCategory").value = "Food";
+    document.getElementById("invSource").value = "Other";
+    document.getElementById("invIdType").value = "Barcode";
+    document.getElementById("invIdValue").value = "";
+    document.getElementById("invUnit").value = "count";
+    document.getElementById("invNotes").value = "";
+    document.getElementById("dlgInv").showModal();
+  }
 
+  function saveDefinition(){
+    const name = (document.getElementById("invName").value || "").trim();
+    if(!name){ alert("Item name required."); return; }
+
+    const store = loadStore();
+    store.inventory.push({
+      itemId: "inv_" + Date.now(),
+      name,
+      category: document.getElementById("invCategory").value,
+      source: document.getElementById("invSource").value,
+      identifierType: document.getElementById("invIdType").value,
+      identifierValue: (document.getElementById("invIdValue").value || "").trim(),
+      unit: document.getElementById("invUnit").value,
+      notes: (document.getElementById("invNotes").value || "").trim(),
+      qty: 0,
+      archived: false
+    });
+
+    saveStore(store);
+    document.getElementById("dlgInv").close();
+
+    renderAvailable();
+    populateSelect("addStockSelect");
+    populateSelect("reduceSelect");
+    populateSelect("transferSelect");
+  }
+
+  // ----- Form helpers -----
+  let addStockItemId = null;
+  let reduceItemId = null;
+  let transferItemId = null;
+
+  function showAddStockForm(itemId){
+    const it = activeItems().find(x=>x.itemId===itemId);
+    if(!it){ setStatus("addStockStatus","Item not found."); return; }
+    addStockItemId = itemId;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockItemName").textContent = it.name;
+    document.getElementById("addStockItemMeta").textContent = `On hand: ${it.qty}`;
+    document.getElementById("addStockQty").value = "1";
+    setStatus("addStockStatus","");
+  }
+
+  function showReduceForm(itemId){
+    const it = activeItems().find(x=>x.itemId===itemId);
+    if(!it){ setStatus("reduceStatus","Item not found."); return; }
+    reduceItemId = itemId;
+    document.getElementById("reduceForm").classList.remove("hide");
+    document.getElementById("reduceItemName").textContent = it.name;
+    document.getElementById("reduceItemMeta").textContent = `On hand: ${it.qty}`;
+    document.getElementById("reduceQty").value = "1";
+    setStatus("reduceStatus","");
+  }
+
+  function showTransferForm(itemId){
+    const it = activeItems().find(x=>x.itemId===itemId);
+    if(!it){ setStatus("transferStatus","Item not found."); return; }
+    transferItemId = itemId;
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferItemName").textContent = it.name;
+    document.getElementById("transferItemMeta").textContent = `On hand: ${it.qty}`;
+    document.getElementById("transferQty").value = "1";
+    setStatus("transferStatus","");
+  }
+
+  // ----- Apply actions -----
+  function applyAddStock(){
+    const qty = Math.abs(Number(document.getElementById("addStockQty").value || "0") || 0);
+    if(!addStockItemId || qty<=0){ setStatus("addStockStatus","Pick item + qty"); return; }
+    const store = loadStore();
+    const it = store.inventory.find(x=>x.itemId===addStockItemId);
+    if(!it){ setStatus("addStockStatus","Item not found."); return; }
+    it.qty = Number(it.qty||0) + qty;
+    saveStore(store);
+    setStatus("addStockStatus","Added.");
+    renderAvailable();
+    populateSelect("addStockSelect");
+  }
+
+  function applyReduce(){
+    const qty = Math.abs(Number(document.getElementById("reduceQty").value || "0") || 0);
+    if(!reduceItemId || qty<=0){ setStatus("reduceStatus","Pick item + qty"); return; }
+    const store = loadStore();
+    const it = store.inventory.find(x=>x.itemId===reduceItemId);
+    if(!it){ setStatus("reduceStatus","Item not found."); return; }
+    it.qty = Math.max(0, Number(it.qty||0) - qty);
+    saveStore(store);
+    setStatus("reduceStatus","Recorded.");
+    renderAvailable();
+    populateSelect("reduceSelect");
+  }
+
+  function applyTransfer(){
+    const qty = Math.abs(Number(document.getElementById("transferQty").value || "0") || 0);
+    if(!transferItemId || qty<=0){ setStatus("transferStatus","Pick item + qty"); return; }
+    const store = loadStore();
+    const it = store.inventory.find(x=>x.itemId===transferItemId);
+    if(!it){ setStatus("transferStatus","Item not found."); return; }
+    it.qty = Math.max(0, Number(it.qty||0) - qty);
+    saveStore(store);
+    setStatus("transferStatus","Transferred.");
+    renderAvailable();
+    populateSelect("transferSelect");
+  }
+
+  // ----- Scan engine (single, consistent) -----
+  let scanStream = null;
+  let lastScanValue = "";
+  let scanContext = "transfer";
+
+  function stopScanStream(){
+    const video = document.getElementById("scanVideo");
+    if(video) video.pause();
+    if(scanStream){
+      scanStream.getTracks().forEach(t=>t.stop());
+      scanStream = null;
+    }
+  }
+
+  async function startScan(){
+    const video = document.getElementById("scanVideo");
+    const help = document.getElementById("scanHelp");
+    const box = document.getElementById("scanResultBox");
+    const val = document.getElementById("scanValue");
+
+    lastScanValue = "";
+    box.classList.add("hide");
+    val.textContent = "";
+    help.textContent = "";
+
+    try{
+      scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+      video.srcObject = scanStream;
+      video.setAttribute("playsinline","");
+      video.muted = true;
+      video.autoplay = true;
+      try { await video.play(); } catch { setTimeout(()=>{ video.play().catch(()=>{}); }, 250); }
+    }catch{
+      help.textContent="Camera unavailable. Manual entry works.";
+      return;
+    }
+
+    if(!("BarcodeDetector" in window)){
+      help.textContent="Scanner unsupported. Manual entry works.";
+      return;
+    }
+
+    let detector;
+    try{ detector = new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
+    catch{ detector = new BarcodeDetector(); }
+
+    help.textContent="Point camera at code. Confirm is required.";
+
+    const loop = async ()=>{
+      if(!scanStream) return;
+      try{
+        const codes = await detector.detect(video);
+        if(codes && codes.length){
+          const raw = codes[0].rawValue || "";
+          if(raw){
+            lastScanValue = raw;
+            box.classList.remove("hide");
+            val.textContent = raw;
+            stopScanStream();
+            return;
+          }
+        }
+      }catch{}
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  window.__openScanDialog = function(context){
+    scanContext = context || "transfer";
+    document.getElementById("scanManual").value = "";
+    document.getElementById("dlgScan").showModal();
+    startScan();
+  };
+
+  function closeScanDialog(){
+    stopScanStream();
+    document.getElementById("dlgScan").close();
+  }
+
+  function findMatch(code){
+    const c = String(code||"").trim();
+    const store = loadStore();
+    return store.inventory.find(i =>
+      (i.identifierType === "Barcode" || i.identifierType === "QR") &&
+      String(i.identifierValue||"").trim() === c
+    ) || null;
+  }
+
+  function confirmScan(){
+    const manual = (document.getElementById("scanManual").value || "").trim();
+    const code = (lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
+
+    if(!code){
+      document.getElementById("scanHelp").textContent = "No code captured. Manual entry works.";
+      return;
+    }
+
+    if(scanContext === "add"){
+      document.getElementById("invIdType").value = "Barcode";
+      document.getElementById("invIdValue").value = code;
+      closeScanDialog();
+      return;
+    }
+
+    const match = findMatch(code);
+    closeScanDialog();
+
+    if(!match){
+      if(scanContext === "addstock") setStatus("addStockStatus","No match found. Create definition first.");
+      else if(scanContext === "reduce") setStatus("reduceStatus","No match found. Create definition first.");
+      else setStatus("transferStatus","No match found. Create definition first.");
+      return;
+    }
+
+    if(scanContext === "addstock") showAddStockForm(match.itemId);
+    else if(scanContext === "reduce") showReduceForm(match.itemId);
+    else showTransferForm(match.itemId);
+  }
+
+  // ----- Bind UI -----
+  document.addEventListener("DOMContentLoaded", ()=>{
+    // available
     document.getElementById("btnInvRefresh")?.addEventListener("click", renderAvailable);
+    document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invArchived").classList.toggle("hide"));
+
+    // add definition
+    document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
+    document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
+    document.getElementById("btnDeleteId")?.addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
+
+    // scan buttons
+    document.getElementById("btnScanForAdd")?.addEventListener("click", ()=> __openScanDialog("add"));
+    document.getElementById("btnScanInsideAdd")?.addEventListener("click", ()=> __openScanDialog("add"));
+    document.getElementById("btnScanAddStock")?.addEventListener("click", ()=> __openScanDialog("addstock"));
+    document.getElementById("btnScanReduce")?.addEventListener("click", ()=> __openScanDialog("reduce"));
+    document.getElementById("btnScanTransfer")?.addEventListener("click", ()=> __openScanDialog("transfer"));
+
+    // selects + refresh
     document.getElementById("btnAddStockRefresh")?.addEventListener("click", ()=> populateSelect("addStockSelect"));
     document.getElementById("btnReduceRefresh")?.addEventListener("click", ()=> populateSelect("reduceSelect"));
     document.getElementById("btnTransferRefresh")?.addEventListener("click", ()=> populateSelect("transferSelect"));
+
+    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showAddStockForm(e.target.value); });
+    document.getElementById("reduceSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showReduceForm(e.target.value); });
+    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
+
+    // search filters
+    document.getElementById("addStockSearch")?.addEventListener("input", ()=> filterSelect("addStockSearch","addStockSelect"));
+    document.getElementById("reduceSearch")?.addEventListener("input", ()=> filterSelect("reduceSearch","reduceSelect"));
+    document.getElementById("transferSearch")?.addEventListener("input", ()=> filterSelect("transferSearch","transferSelect"));
+
+    // confirm/cancel
+    document.getElementById("btnAddStockConfirm")?.addEventListener("click", applyAddStock);
+    document.getElementById("btnReduceConfirm")?.addEventListener("click", applyReduce);
+    document.getElementById("btnTransferConfirm")?.addEventListener("click", applyTransfer);
+
+    document.getElementById("btnAddStockCancel")?.addEventListener("click", ()=>{ document.getElementById("addStockForm").classList.add("hide"); setStatus("addStockStatus",""); });
+    document.getElementById("btnReduceCancel")?.addEventListener("click", ()=>{ document.getElementById("reduceForm").classList.add("hide"); setStatus("reduceStatus",""); });
+    document.getElementById("btnTransferCancel")?.addEventListener("click", ()=>{ document.getElementById("transferForm").classList.add("hide"); setStatus("transferStatus",""); });
+
+    // scan dialog controls
+    document.getElementById("btnRescan")?.addEventListener("click", startScan);
+    document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
+    document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
+    document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
+
+    // talk
+    document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
+
+    // initial view data
+    renderAvailable();
+    populateSelect("addStockSelect");
+    populateSelect("reduceSelect");
+    populateSelect("transferSelect");
   });
 })();
 </script>
-
-<!-- ✅ Keep scan unchanged: existing scan code is already working in your current build.
-     We are not reintroducing another scan engine here. -->
 
 </body>
 </html>
