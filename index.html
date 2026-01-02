@@ -129,11 +129,9 @@
       <button class="btn" onclick="__home()">Home</button>
     </div>
 
-    <div class="muted small" style="margin-top:10px;">
-      Records daily reduction events (Used / Discarded). This does not change scan in this patch.
-    </div>
-
+    <!-- ✅ NEW: Scan item button added here -->
     <div class="row" style="margin-top:12px;">
+      <button class="btn primary" onclick="__openScanDialog('reduce')">Scan item</button>
       <button class="btn" id="btnReduceRefreshList">Refresh list</button>
     </div>
 
@@ -159,7 +157,7 @@
       <input id="reduceQty" inputmode="decimal" placeholder="e.g., 1" />
 
       <label class="label">Note (optional)</label>
-      <input id="reduceNote" placeholder="e.g., fed, spilled, damaged bag, wet blanket" />
+      <input id="reduceNote" placeholder="fed / spilled / damaged bag / wet blanket" />
 
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnConfirmReduce">Confirm</button>
@@ -246,67 +244,6 @@
 
 <button class="btn danger emergency-fixed">Emergency</button>
 
-<!-- QUICK ADJUST DIALOG -->
-<dialog id="dlgQuickAdjust" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Quick adjust</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-
-    <div class="dlg-b">
-      <div class="muted small" id="qaItemName"></div>
-      <div class="muted small" id="qaItemMeta"></div>
-
-      <label class="label">Action</label>
-      <select id="qaAction">
-        <option>Added</option>
-        <option>Used</option>
-        <option>Discarded</option>
-        <option>Transferred</option>
-      </select>
-
-      <label class="label">Quantity</label>
-      <input id="qaQty" inputmode="decimal" placeholder="e.g., 1" />
-
-      <div id="qaTransferFields" class="hide">
-        <label class="label">Destination type</label>
-        <select id="qaTransferType">
-          <option>With a dog</option>
-          <option>To adopter</option>
-          <option>To foster</option>
-          <option>To another organization</option>
-          <option>Returned to donor</option>
-          <option>Moved to storage</option>
-          <option>Other</option>
-        </select>
-
-        <label class="label">Destination details (optional)</label>
-        <input id="qaTransferDetail" placeholder="Dog name / org / storage" />
-
-        <label class="label">Contact person (optional)</label>
-        <input id="qaContactPerson" placeholder="Jordan Smith" />
-
-        <label class="label">Contact method (optional)</label>
-        <select id="qaContactMethod">
-          <option>None</option><option>Phone</option><option>Email</option><option>Both</option><option>Other</option>
-        </select>
-
-        <label class="label">Contact details (optional)</label>
-        <input id="qaContactDetails" placeholder="555-555-5555 / name@email.com" />
-      </div>
-
-      <label class="label">Note (optional)</label>
-      <input id="qaNote" placeholder="Any factual notes" />
-    </div>
-
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnQaConfirm" value="ok">Confirm</button>
-    </div>
-  </form>
-</dialog>
-
 <!-- ADD/EDIT DEFINITION -->
 <dialog id="dlgInv" class="dlg">
   <form method="dialog" class="dlg-card">
@@ -314,56 +251,43 @@
       <h3>Inventory item</h3>
       <button class="info-btn" value="cancel" aria-label="Close">✕</button>
     </div>
-
     <div class="dlg-b">
       <label class="label">Item name / label</label>
       <input id="invName" />
-
       <div class="grid2">
-        <div>
-          <label class="label">Category</label>
+        <div><label class="label">Category</label>
           <select id="invCategory">
             <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
             <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
           </select>
         </div>
-        <div>
-          <label class="label">Source</label>
+        <div><label class="label">Source</label>
           <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
         </div>
       </div>
-
       <div class="grid2">
-        <div>
-          <label class="label">Identifier type</label>
+        <div><label class="label">Identifier type</label>
           <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
         </div>
-        <div>
-          <label class="label">Identifier value</label>
+        <div><label class="label">Identifier value</label>
           <input id="invIdValue" placeholder="(scan or type)" />
         </div>
       </div>
-
       <div class="row">
         <button type="button" class="btn" onclick="__openScanDialog('add')">Scan now (QR or barcode)</button>
         <button type="button" class="btn" id="btnAddClearId">Delete now</button>
       </div>
-
       <div class="grid2">
-        <div>
-          <label class="label">Unit</label>
+        <div><label class="label">Unit</label>
           <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
         </div>
-        <div>
-          <label class="label">Weight per unit (optional)</label>
+        <div><label class="label">Weight per unit (optional)</label>
           <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
         </div>
       </div>
-
       <label class="label">Notes (optional)</label>
       <input id="invNotes" />
     </div>
-
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
       <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
@@ -378,21 +302,16 @@
       <h3>Scan</h3>
       <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
     </div>
-
     <div class="dlg-b">
       <video id="scanVideo" playsinline autoplay muted></video>
-
       <div id="scanResultBox" class="scan-result hide">
         <div class="muted small">Identifier captured</div>
         <div id="scanValue" class="scan-value"></div>
       </div>
-
       <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-
       <label class="label" style="margin-top:12px;">Manual entry (if needed)</label>
       <input id="scanManual" placeholder="Type or paste barcode here" inputmode="numeric" />
     </div>
-
     <div class="dlg-f">
       <button type="button" class="btn" id="btnRescan">Rescan</button>
       <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
@@ -405,220 +324,8 @@
 
 <script>
 (function(){
-  // Store + helpers
   const INV_STORE_KEY="breederPro_inventory_store_v1";
   function loadStore(){ try{ const raw=localStorage.getItem(INV_STORE_KEY); if(!raw) return {inventory:[]}; const obj=JSON.parse(raw); if(!obj.inventory) obj.inventory=[]; return obj; }catch{ return {inventory:[]}; } }
-  function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
-  function escapeHtml(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
-  function inventoryLow(it){ const t=it.thresholdLow; if(t===null||t===undefined||t==="") return false; return Number(it.qty)<=Number(t); }
-
-  // Render available
-  window.__renderInventoryAvailable = function(){
-    const meta=document.getElementById("invAvailableMeta");
-    const list=document.getElementById("invAvailableList");
-    const arch=document.getElementById("invAvailableArchived");
-    const store=loadStore();
-    const inv=store.inventory||[];
-    const active=inv.filter(i=>!i.archived);
-    const archived=inv.filter(i=>i.archived);
-
-    if(meta) meta.textContent=`Source: local inventory (v1). Active: ${active.length}. Archived: ${archived.length}.`;
-
-    if(list){
-      list.innerHTML = active.length ? active.map(i=>{
-        const low=inventoryLow(i);
-        const w=i.weightPerUnit?` • W/unit: ${escapeHtml(i.weightPerUnit)}`:"";
-        const stock=`On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null&&i.thresholdLow!==""&&i.thresholdLow!==undefined)?` • Low: ${escapeHtml(String(i.thresholdLow))}`:""}`;
-        const idLine=(i.identifierType && i.identifierType!=="None")?`${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`:"Identifier: none";
-        return `
-          <div class="inv-item">
-            <div class="inv-top">
-              <div style="width:100%;">
-                <div class="inv-name ${low?"low":""}">${escapeHtml(i.name||"(unnamed)")}</div>
-                <div class="inv-meta">${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
-                <div class="inv-meta">${idLine}</div>
-                <div class="row" style="margin-top:10px;">
-                  <button class="btn" onclick="__quickAdjust('${i.itemId}')">Quick adjust</button>
-                </div>
-              </div>
-            </div>
-          </div>`;
-      }).join("") : `<div class="muted small">No active inventory items recorded.</div>`;
-    }
-
-    if(arch){
-      arch.innerHTML = archived.length ? archived.map(i=>{
-        const w=i.weightPerUnit?` • W/unit: ${escapeHtml(i.weightPerUnit)}`:"";
-        const stock=`On hand: ${escapeHtml(String(i.qty ?? 0))}${(i.thresholdLow!==null&&i.thresholdLow!==""&&i.thresholdLow!==undefined)?` • Low: ${escapeHtml(String(i.thresholdLow))}`:""}`;
-        const idLine=(i.identifierType && i.identifierType!=="None")?`${escapeHtml(i.identifierType)}: ${escapeHtml(i.identifierValue||"")}`:"Identifier: none";
-        return `<div class="inv-item"><div class="inv-top"><div>
-          <div class="inv-name">${escapeHtml(i.name||"(unnamed)")}</div>
-          <div class="inv-meta">Archived • ${escapeHtml(i.category||"")} • ${escapeHtml(i.source||"")} • ${escapeHtml(i.unit||"")} • ${stock}${w}</div>
-          <div class="inv-meta">${idLine}</div>
-        </div></div></div>`;
-      }).join("") : `<div class="muted small">No archived inventory items.</div>`;
-    }
-  };
-
-  // Helpers for selects
-  function getActiveItems(){ return (loadStore().inventory||[]).filter(i=>!i.archived); }
-  function populateSelect(selectId){
-    const sel=document.getElementById(selectId);
-    if(!sel) return;
-    const items=getActiveItems();
-    sel.innerHTML="";
-    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
-    items.forEach(i=>{
-      const opt=document.createElement("option");
-      opt.value=i.itemId;
-      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
-      sel.appendChild(opt);
-    });
-  }
-  function filterSelect(searchId, selectId){
-    const q=(document.getElementById(searchId).value||"").trim().toLowerCase();
-    const sel=document.getElementById(selectId);
-    if(!sel) return;
-    const items=getActiveItems().filter(i=>{
-      if(!q) return true;
-      const hay=`${i.name||""} ${i.category||""} ${i.source||""} ${i.unit||""} ${i.identifierValue||""}`.toLowerCase();
-      return hay.includes(q);
-    });
-    sel.innerHTML="";
-    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
-    items.forEach(i=>{
-      const opt=document.createElement("option");
-      opt.value=i.itemId;
-      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
-      sel.appendChild(opt);
-    });
-  }
-
-  // Definition
-  function openAddDialog(){
-    document.getElementById("invName").value="";
-    document.getElementById("invCategory").value="Food";
-    document.getElementById("invSource").value="Other";
-    document.getElementById("invIdType").value="Barcode";
-    document.getElementById("invIdValue").value="";
-    document.getElementById("invUnit").value="count";
-    document.getElementById("invWeightPerUnit").value="";
-    document.getElementById("invNotes").value="";
-    document.getElementById("dlgInv").showModal();
-  }
-  function saveDefinition(){
-    const name=(document.getElementById("invName").value||"").trim();
-    if(!name){ alert("Item name is required."); return; }
-    const store=loadStore();
-    store.inventory.push({
-      itemId:"inv_"+Date.now(),
-      name,
-      category:document.getElementById("invCategory").value,
-      source:document.getElementById("invSource").value,
-      identifierType:document.getElementById("invIdType").value,
-      identifierValue:(document.getElementById("invIdValue").value||"").trim(),
-      unit:document.getElementById("invUnit").value,
-      weightPerUnit:(document.getElementById("invWeightPerUnit").value||"").trim(),
-      notes:(document.getElementById("invNotes").value||"").trim(),
-      qty:0, thresholdLow:null, archived:false, createdAt:new Date().toISOString(),
-      history:[]
-    });
-    saveStore(store);
-    document.getElementById("dlgInv").close();
-    window.__renderInventoryAvailable();
-  }
-
-  // Add stock
-  let addStockItemId=null;
-  window.__showAddStockForm = function(itemId){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===itemId);
-    if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
-    addStockItemId=itemId;
-    document.getElementById("addStockForm").classList.remove("hide");
-    document.getElementById("addStockItemName").textContent=it.name;
-    document.getElementById("addStockItemMeta").textContent=`On hand: ${it.qty ?? 0} • ${it.unit}`;
-    document.getElementById("addStockQty").value="1";
-    document.getElementById("addStockNote").value="";
-    document.getElementById("addStockStatus").textContent="";
-  };
-  function applyAddStock(){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===addStockItemId);
-    if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
-    const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
-    if(qty<=0){ document.getElementById("addStockStatus").textContent="Quantity must be > 0."; return; }
-    it.qty = Number(it.qty||0) + qty;
-    it.history=it.history||[];
-    it.history.push({ ts:new Date().toISOString(), action:"Added", qtyDelta: qty, note:(document.getElementById("addStockNote").value||"").trim() });
-    saveStore(store);
-    document.getElementById("addStockStatus").textContent="Stock added.";
-    window.__renderInventoryAvailable();
-    populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect");
-  }
-
-  // Transfer
-  let transferItemId=null;
-  window.__showTransferForm = function(itemId){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===itemId);
-    if(!it){ document.getElementById("transferStatus").textContent="Item not found."; return; }
-    transferItemId=itemId;
-    document.getElementById("transferForm").classList.remove("hide");
-    document.getElementById("transferItemName").textContent=it.name;
-    document.getElementById("transferItemMeta").textContent=`On hand: ${it.qty ?? 0} • ${it.unit}`;
-    document.getElementById("transferQty").value="1";
-    document.getElementById("transferStatus").textContent="";
-  };
-  function applyTransfer(){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===transferItemId);
-    if(!it){ document.getElementById("transferStatus").textContent="Item not found."; return; }
-    const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
-    if(qty<=0){ document.getElementById("transferStatus").textContent="Quantity must be > 0."; return; }
-    it.qty = Math.max(0, Number(it.qty||0) - qty);
-    it.history=it.history||[];
-    it.history.push({ ts:new Date().toISOString(), action:"Transferred", qtyDelta:-qty, note:(document.getElementById("transferNote").value||"").trim() });
-    saveStore(store);
-    document.getElementById("transferStatus").textContent="Transfer recorded.";
-    window.__renderInventoryAvailable();
-    populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect");
-  }
-
-  // Quick adjust
-  let qaItemId=null;
-  window.__quickAdjust=function(itemId){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===itemId);
-    if(!it) return;
-    qaItemId=itemId;
-    document.getElementById("qaItemName").textContent=`Item: ${it.name}`;
-    document.getElementById("qaItemMeta").textContent=`On hand: ${it.qty ?? 0} • ${it.unit || ""}`;
-    document.getElementById("qaAction").value="Added";
-    document.getElementById("qaQty").value="1";
-    document.getElementById("qaNote").value="";
-    document.getElementById("qaTransferFields").classList.add("hide");
-    document.getElementById("dlgQuickAdjust").showModal();
-  };
-  function updateQaUI(){
-    const a=document.getElementById("qaAction").value;
-    document.getElementById("qaTransferFields").classList.toggle("hide", a!=="Transferred");
-  }
-  function applyQuickAdjust(){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===qaItemId);
-    if(!it) return;
-    const action=document.getElementById("qaAction").value;
-    const qty=Math.abs(Number(document.getElementById("qaQty").value||"0")||0);
-    if(qty<=0){ alert("Quantity must be > 0."); return; }
-    if(action==="Added") it.qty = Number(it.qty||0)+qty;
-    else it.qty = Math.max(0, Number(it.qty||0)-qty);
-    it.history=it.history||[];
-    it.history.push({ ts:new Date().toISOString(), action, qtyDelta:(action==="Added"?qty:-qty), note:(document.getElementById("qaNote").value||"").trim() });
-    saveStore(store);
-    document.getElementById("dlgQuickAdjust").close();
-    window.__renderInventoryAvailable();
-  }
 
   // Scan engine
   let scanStream=null, lastScanValue="", scanContext="transfer";
@@ -652,7 +359,6 @@
     let detector;
     try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
     catch{ detector=new BarcodeDetector(); }
-
     help.textContent="Point camera at code. Confirm is required after a scan.";
     const loop=async()=>{
       if(!scanStream) return;
@@ -686,71 +392,66 @@
     document.getElementById("dlgScan").close();
   }
 
+  function findMatch(code){
+    const inv=(loadStore().inventory||[]);
+    const c=String(code||"").trim();
+    return inv.find(i =>
+      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
+      String(i.identifierValue||"").trim()===c
+    ) || null;
+  }
+
   function confirmScan(){
     const manual=(document.getElementById("scanManual").value||"").trim();
     const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
+
     if(!code){
       document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
       return;
     }
+
     if(scanContext==="add"){
       document.getElementById("invIdType").value="Barcode";
       document.getElementById("invIdValue").value=code;
       closeScanDialog();
       return;
     }
-    const store=loadStore();
-    const match=(store.inventory||[]).find(i =>
-      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
-      String(i.identifierValue||"").trim()===String(code).trim()
-    );
+
+    const match=findMatch(code);
     closeScanDialog();
+
     if(!match){
       if(scanContext==="addstock") document.getElementById("addStockStatus").textContent="No match found. Create definition first.";
+      else if(scanContext==="reduce") document.getElementById("reduceStatus").textContent="No match found. Create definition first.";
       else document.getElementById("transferStatus").textContent="No match found. Create definition first.";
       return;
     }
-    if(scanContext==="addstock") window.__showAddStockForm(match.itemId);
-    else window.__showTransferForm(match.itemId);
+
+    if(scanContext==="addstock"){
+      // Use existing selection behavior
+      const sel=document.getElementById("addStockSelect");
+      if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
+      return;
+    }
+
+    if(scanContext==="reduce"){
+      const sel=document.getElementById("reduceSelect");
+      if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
+      return;
+    }
+
+    const sel=document.getElementById("transferSelect");
+    if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
   }
 
-  // Bindings
   document.addEventListener("DOMContentLoaded", ()=>{
-    document.getElementById("btnInvRefresh")?.addEventListener("click", window.__renderInventoryAvailable);
-    document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invAvailableArchived").classList.toggle("hide"));
-
-    document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
-    document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
-    document.getElementById("btnAddClearId")?.addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
-
-    document.getElementById("addStockSearch")?.addEventListener("input", ()=> filterSelect("addStockSearch","addStockSelect"));
-    document.getElementById("transferSearch")?.addEventListener("input", ()=> filterSelect("transferSearch","transferSelect"));
-
-    document.getElementById("btnAddStockRefreshList")?.addEventListener("click", ()=>{ populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect"); });
-    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) window.__showAddStockForm(e.target.value); });
-    document.getElementById("btnConfirmAddStock")?.addEventListener("click", applyAddStock);
-
-    document.getElementById("btnTransferRefreshList")?.addEventListener("click", ()=>{ populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect"); });
-    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) window.__showTransferForm(e.target.value); });
-    document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
-
-    document.getElementById("qaAction")?.addEventListener("change", updateQaUI);
-    document.getElementById("btnQaConfirm")?.addEventListener("click", (e)=>{ e.preventDefault(); applyQuickAdjust(); });
-
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
-
-    document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
-
-    // Initial list + selects
-    window.__renderInventoryAvailable();
-    populateSelect("addStockSelect");
-    populateSelect("transferSelect");
   });
 })();
 </script>
 
 </body>
-</html>
+          </html>
