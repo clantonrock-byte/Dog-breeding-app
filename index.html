@@ -44,6 +44,7 @@
       <button class="btn primary" onclick="__go('InventoryAvailable')">Inventory available</button>
       <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
       <button class="btn primary" onclick="__go('InventoryAddStock')">Add stock</button>
+      <button class="btn primary" onclick="__go('InventoryReduceStock')">Reduce stock</button>
       <button class="btn primary" onclick="__go('InventoryTransfer')">Transfer inventory</button>
     </div>
   </section>
@@ -120,6 +121,55 @@
     <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
+  <!-- REDUCE STOCK (Used / Discarded) -->
+  <section id="viewInventoryReduceStock" class="card hide">
+    <h2>Reduce stock</h2>
+    <div class="row">
+      <button class="btn" onclick="__back()">Back</button>
+      <button class="btn" onclick="__home()">Home</button>
+    </div>
+
+    <div class="muted small" style="margin-top:10px;">
+      Records daily reduction events (Used / Discarded). This does not change scan in this patch.
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="btnReduceRefreshList">Refresh list</button>
+    </div>
+
+    <label class="label">Search (optional)</label>
+    <input id="reduceSearch" placeholder="Type to filter…" />
+
+    <label class="label">Select item</label>
+    <select id="reduceSelect"></select>
+
+    <div id="reduceForm" class="hide" style="margin-top:12px;">
+      <div class="timeline-item">
+        <div><strong id="reduceItemName"></strong></div>
+        <div class="muted small" id="reduceItemMeta"></div>
+      </div>
+
+      <label class="label">Action</label>
+      <select id="reduceAction">
+        <option>Used</option>
+        <option>Discarded</option>
+      </select>
+
+      <label class="label">Quantity</label>
+      <input id="reduceQty" inputmode="decimal" placeholder="e.g., 1" />
+
+      <label class="label">Note (optional)</label>
+      <input id="reduceNote" placeholder="e.g., fed, spilled, damaged bag, wet blanket" />
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn primary" id="btnConfirmReduce">Confirm</button>
+        <button class="btn" onclick="__back()">Cancel</button>
+      </div>
+    </div>
+
+    <div id="reduceStatus" class="muted small" style="margin-top:10px;"></div>
+  </section>
+
   <!-- TRANSFER -->
   <section id="viewInventoryTransfer" class="card hide">
     <h2>Transfer inventory</h2>
@@ -186,51 +236,17 @@
   </section>
 
   <!-- PLACEHOLDERS -->
-  <section id="viewDogs" class="card hide">
-    <h2>Dogs &amp; Pups</h2>
-    <div class="row">
-      <button class="btn" onclick="__back()">Back</button>
-      <button class="btn" onclick="__home()">Home</button>
-    </div>
-  </section>
-
-  <section id="viewCare" class="card hide">
-    <h2>Care Timeline</h2>
-    <div class="row">
-      <button class="btn" onclick="__back()">Back</button>
-      <button class="btn" onclick="__home()">Home</button>
-    </div>
-  </section>
-
-  <section id="viewFeeding" class="card hide">
-    <h2>Feeding</h2>
-    <div class="row">
-      <button class="btn" onclick="__back()">Back</button>
-      <button class="btn" onclick="__home()">Home</button>
-    </div>
-  </section>
-
-  <section id="viewHelpers" class="card hide">
-    <h2>Helpers</h2>
-    <div class="row">
-      <button class="btn" onclick="__back()">Back</button>
-      <button class="btn" onclick="__home()">Home</button>
-    </div>
-  </section>
-
-  <section id="viewRecords" class="card hide">
-    <h2>Records &amp; Export</h2>
-    <div class="row">
-      <button class="btn" onclick="__back()">Back</button>
-      <button class="btn" onclick="__home()">Home</button>
-    </div>
-  </section>
+  <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <section id="viewHelpers" class="card hide"><h2>Helpers</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <section id="viewRecords" class="card hide"><h2>Records &amp; Export</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
 
 </main>
 
 <button class="btn danger emergency-fixed">Emergency</button>
 
-<!-- QUICK ADJUST (no-scan items) -->
+<!-- QUICK ADJUST DIALOG -->
 <dialog id="dlgQuickAdjust" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -385,17 +401,19 @@
   </form>
 </dialog>
 
+<script src="app.js"></script>
+
 <script>
 (function(){
-  // Data store
+  // Store + helpers
   const INV_STORE_KEY="breederPro_inventory_store_v1";
   function loadStore(){ try{ const raw=localStorage.getItem(INV_STORE_KEY); if(!raw) return {inventory:[]}; const obj=JSON.parse(raw); if(!obj.inventory) obj.inventory=[]; return obj; }catch{ return {inventory:[]}; } }
   function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
   function escapeHtml(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
   function inventoryLow(it){ const t=it.thresholdLow; if(t===null||t===undefined||t==="") return false; return Number(it.qty)<=Number(t); }
 
-  // Inventory available rendering + quick adjust button
-  function renderInventoryAvailable(){
+  // Render available
+  window.__renderInventoryAvailable = function(){
     const meta=document.getElementById("invAvailableMeta");
     const list=document.getElementById("invAvailableList");
     const arch=document.getElementById("invAvailableArchived");
@@ -440,12 +458,10 @@
         </div></div></div>`;
       }).join("") : `<div class="muted small">No archived inventory items.</div>`;
     }
-  }
+  };
 
-  // Utility: active items and filtering
-  function getActiveItems(){
-    return (loadStore().inventory||[]).filter(i=>!i.archived);
-  }
+  // Helpers for selects
+  function getActiveItems(){ return (loadStore().inventory||[]).filter(i=>!i.archived); }
   function populateSelect(selectId){
     const sel=document.getElementById(selectId);
     if(!sel) return;
@@ -465,7 +481,7 @@
     if(!sel) return;
     const items=getActiveItems().filter(i=>{
       if(!q) return true;
-      const hay = `${i.name||""} ${i.category||""} ${i.source||""} ${i.unit||""} ${i.identifierValue||""}`.toLowerCase();
+      const hay=`${i.name||""} ${i.category||""} ${i.source||""} ${i.unit||""} ${i.identifierValue||""}`.toLowerCase();
       return hay.includes(q);
     });
     sel.innerHTML="";
@@ -478,7 +494,7 @@
     });
   }
 
-  // Add definition dialog
+  // Definition
   function openAddDialog(){
     document.getElementById("invName").value="";
     document.getElementById("invCategory").value="Food";
@@ -504,79 +520,68 @@
       unit:document.getElementById("invUnit").value,
       weightPerUnit:(document.getElementById("invWeightPerUnit").value||"").trim(),
       notes:(document.getElementById("invNotes").value||"").trim(),
-      qty:0, thresholdLow:null, archived:false,
-      createdAt:new Date().toISOString(),
+      qty:0, thresholdLow:null, archived:false, createdAt:new Date().toISOString(),
       history:[]
     });
     saveStore(store);
     document.getElementById("dlgInv").close();
+    window.__renderInventoryAvailable();
   }
 
-  // Add stock flow
+  // Add stock
   let addStockItemId=null;
-  function showAddStockForm(itemId){
+  window.__showAddStockForm = function(itemId){
     const store=loadStore();
     const it=(store.inventory||[]).find(x=>x.itemId===itemId);
     if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
     addStockItemId=itemId;
     document.getElementById("addStockForm").classList.remove("hide");
     document.getElementById("addStockItemName").textContent=it.name;
-    const idLine=(it.identifierType && it.identifierType!=="None")?`${it.identifierType}: ${it.identifierValue}`:"Identifier: none";
-    document.getElementById("addStockItemMeta").textContent=`${it.category} • ${it.source} • ${it.unit} • On hand: ${it.qty ?? 0} • ${idLine}`;
+    document.getElementById("addStockItemMeta").textContent=`On hand: ${it.qty ?? 0} • ${it.unit}`;
     document.getElementById("addStockQty").value="1";
     document.getElementById("addStockNote").value="";
     document.getElementById("addStockStatus").textContent="";
-  }
+  };
   function applyAddStock(){
     const store=loadStore();
     const it=(store.inventory||[]).find(x=>x.itemId===addStockItemId);
     if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
     const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
-    if(qty<=0){ document.getElementById("addStockStatus").textContent="Quantity needs to be greater than 0."; return; }
+    if(qty<=0){ document.getElementById("addStockStatus").textContent="Quantity must be > 0."; return; }
     it.qty = Number(it.qty||0) + qty;
-    it.history = it.history || [];
+    it.history=it.history||[];
     it.history.push({ ts:new Date().toISOString(), action:"Added", qtyDelta: qty, note:(document.getElementById("addStockNote").value||"").trim() });
     saveStore(store);
     document.getElementById("addStockStatus").textContent="Stock added.";
-    renderInventoryAvailable();
+    window.__renderInventoryAvailable();
     populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect");
   }
 
-  // Transfer flow
+  // Transfer
   let transferItemId=null;
-  function showTransferForm(itemId){
+  window.__showTransferForm = function(itemId){
     const store=loadStore();
     const it=(store.inventory||[]).find(x=>x.itemId===itemId);
     if(!it){ document.getElementById("transferStatus").textContent="Item not found."; return; }
     transferItemId=itemId;
     document.getElementById("transferForm").classList.remove("hide");
     document.getElementById("transferItemName").textContent=it.name;
-    const idLine=(it.identifierType && it.identifierType!=="None")?`${it.identifierType}: ${it.identifierValue}`:"Identifier: none";
-    document.getElementById("transferItemMeta").textContent=`${it.category} • ${it.source} • ${it.unit} • On hand: ${it.qty ?? 0} • ${idLine}`;
+    document.getElementById("transferItemMeta").textContent=`On hand: ${it.qty ?? 0} • ${it.unit}`;
     document.getElementById("transferQty").value="1";
     document.getElementById("transferStatus").textContent="";
-  }
+  };
   function applyTransfer(){
     const store=loadStore();
     const it=(store.inventory||[]).find(x=>x.itemId===transferItemId);
     if(!it){ document.getElementById("transferStatus").textContent="Item not found."; return; }
     const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
-    if(qty<=0){ document.getElementById("transferStatus").textContent="Quantity needs to be greater than 0."; return; }
-    it.qty=Math.max(0, Number(it.qty||0)-qty);
+    if(qty<=0){ document.getElementById("transferStatus").textContent="Quantity must be > 0."; return; }
+    it.qty = Math.max(0, Number(it.qty||0) - qty);
     it.history=it.history||[];
-    it.history.push({ ts:new Date().toISOString(), action:"Transferred", qtyDelta:-qty,
-      note:(document.getElementById("transferNote").value||"").trim(),
-      transfer:{
-        destinationType:document.getElementById("transferType").value,
-        destinationDetail:(document.getElementById("transferDetail").value||"").trim(),
-        contactPerson:(document.getElementById("transferContactPerson").value||"").trim(),
-        contactMethod:document.getElementById("transferContactMethod").value,
-        contactDetails:(document.getElementById("transferContactDetails").value||"").trim()
-      }
-    });
+    it.history.push({ ts:new Date().toISOString(), action:"Transferred", qtyDelta:-qty, note:(document.getElementById("transferNote").value||"").trim() });
     saveStore(store);
     document.getElementById("transferStatus").textContent="Transfer recorded.";
-    renderInventoryAvailable();
+    window.__renderInventoryAvailable();
     populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect");
   }
 
@@ -605,29 +610,23 @@
     if(!it) return;
     const action=document.getElementById("qaAction").value;
     const qty=Math.abs(Number(document.getElementById("qaQty").value||"0")||0);
-    if(qty<=0){ alert("Quantity needs to be greater than 0."); return; }
-
-    if(action==="Added") it.qty = Number(it.qty||0) + qty;
-    else it.qty = Math.max(0, Number(it.qty||0) - qty);
-
+    if(qty<=0){ alert("Quantity must be > 0."); return; }
+    if(action==="Added") it.qty = Number(it.qty||0)+qty;
+    else it.qty = Math.max(0, Number(it.qty||0)-qty);
     it.history=it.history||[];
     it.history.push({ ts:new Date().toISOString(), action, qtyDelta:(action==="Added"?qty:-qty), note:(document.getElementById("qaNote").value||"").trim() });
-
     saveStore(store);
     document.getElementById("dlgQuickAdjust").close();
-    renderInventoryAvailable();
+    window.__renderInventoryAvailable();
   }
 
-  // SCAN ENGINE
+  // Scan engine
   let scanStream=null, lastScanValue="", scanContext="transfer";
 
   function stopScanStream(){
     const video=document.getElementById("scanVideo");
     if(video) video.pause();
-    if(scanStream){
-      scanStream.getTracks().forEach(t=>t.stop());
-      scanStream=null;
-    }
+    if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
   }
 
   async function startScan(){
@@ -635,35 +634,26 @@
     const help=document.getElementById("scanHelp");
     const box=document.getElementById("scanResultBox");
     const val=document.getElementById("scanValue");
-
-    lastScanValue="";
-    box.classList.add("hide");
-    val.textContent="";
-    help.textContent="";
-
+    lastScanValue=""; box.classList.add("hide"); val.textContent=""; help.textContent="";
     try{
       scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
       video.srcObject=scanStream;
       video.setAttribute("playsinline","");
-      video.muted=true;
-      video.autoplay=true;
+      video.muted=true; video.autoplay=true;
       try{ await video.play(); }catch(e){ setTimeout(()=>{ video.play().catch(()=>{}); },250); }
     }catch{
       help.textContent="Camera access unavailable. Manual entry is available below.";
       return;
     }
-
     if(!("BarcodeDetector" in window)){
       help.textContent="Scanner not supported on this browser. Manual entry is available below.";
       return;
     }
-
     let detector;
     try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
     catch{ detector=new BarcodeDetector(); }
 
     help.textContent="Point camera at code. Confirm is required after a scan.";
-
     const loop=async()=>{
       if(!scanStream) return;
       try{
@@ -699,40 +689,34 @@
   function confirmScan(){
     const manual=(document.getElementById("scanManual").value||"").trim();
     const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
-
     if(!code){
       document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
       return;
     }
-
     if(scanContext==="add"){
       document.getElementById("invIdType").value="Barcode";
       document.getElementById("invIdValue").value=code;
       closeScanDialog();
       return;
     }
-
     const store=loadStore();
     const match=(store.inventory||[]).find(i =>
       (i.identifierType==="Barcode" || i.identifierType==="QR") &&
       String(i.identifierValue||"").trim()===String(code).trim()
     );
-
     closeScanDialog();
-
     if(!match){
       if(scanContext==="addstock") document.getElementById("addStockStatus").textContent="No match found. Create definition first.";
       else document.getElementById("transferStatus").textContent="No match found. Create definition first.";
       return;
     }
-
-    if(scanContext==="addstock") showAddStockForm(match.itemId);
-    else showTransferForm(match.itemId);
+    if(scanContext==="addstock") window.__showAddStockForm(match.itemId);
+    else window.__showTransferForm(match.itemId);
   }
 
-  // Bind buttons
+  // Bindings
   document.addEventListener("DOMContentLoaded", ()=>{
-    document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
+    document.getElementById("btnInvRefresh")?.addEventListener("click", window.__renderInventoryAvailable);
     document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invAvailableArchived").classList.toggle("hide"));
 
     document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
@@ -743,11 +727,11 @@
     document.getElementById("transferSearch")?.addEventListener("input", ()=> filterSelect("transferSearch","transferSelect"));
 
     document.getElementById("btnAddStockRefreshList")?.addEventListener("click", ()=>{ populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect"); });
-    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showAddStockForm(e.target.value); });
+    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) window.__showAddStockForm(e.target.value); });
     document.getElementById("btnConfirmAddStock")?.addEventListener("click", applyAddStock);
 
     document.getElementById("btnTransferRefreshList")?.addEventListener("click", ()=>{ populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect"); });
-    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
+    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) window.__showTransferForm(e.target.value); });
     document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
 
     document.getElementById("qaAction")?.addEventListener("change", updateQaUI);
@@ -760,13 +744,13 @@
 
     document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 
-    renderInventoryAvailable();
-    populateSelect("addStockSelect"); populateSelect("transferSelect");
+    // Initial list + selects
+    window.__renderInventoryAvailable();
+    populateSelect("addStockSelect");
+    populateSelect("transferSelect");
   });
 })();
 </script>
 
-<script src="app.js"></script>
-
 </body>
-    </html>
+</html>
