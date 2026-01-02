@@ -1,4 +1,4 @@
-// app.js — navigation with one-step Back stack + Home reset + afterShow hook
+// app.js — stable navigation stack (Back = 1 step, Home = Home)
 
 (function () {
   const views = [
@@ -27,7 +27,7 @@
     current = name;
 
     if (typeof window.__afterShow === "function") {
-      try { window.__afterShow(name); } catch (e) {}
+      try { window.__afterShow(name); } catch (_) {}
     }
   }
 
@@ -38,7 +38,7 @@
   };
 
   window.__back = function () {
-    if (stack.length === 0) { show("Home"); return; }
+    if (stack.length === 0) return show("Home");
     show(stack.pop());
   };
 
