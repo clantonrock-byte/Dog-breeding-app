@@ -72,7 +72,7 @@
     <!-- Photo block -->
     <div class="timeline-item" style="margin-top:12px;">
       <div><strong>Photo</strong></div>
-      <div class="muted small">Tap the photo area to add/update (active dogs). Archived dogs are view-only.</div>
+      <div class="muted small">Tap photo/placeholder to add or update (active dogs). Archived dogs are view-only.</div>
 
       <div id="dogPhotoTap" style="margin-top:10px; border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
         <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
@@ -164,10 +164,12 @@
       <div><strong>Notes</strong></div>
       <div class="muted small">Notes remain editable even when archived.</div>
       <textarea id="dogNotes" rows="5" style="width:100%; margin-top:8px;"></textarea>
+
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnSaveDog">Save</button>
         <button class="btn" id="btnCancelDog">Cancel</button>
       </div>
+
       <div class="muted small" id="dogSaveStatus" style="margin-top:10px;"></div>
     </div>
   </section>
@@ -216,9 +218,6 @@
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
       <button class="btn" id="btnScanForAdd">Scan now (QR or barcode)</button>
-    </div>
-    <div class="muted small" style="margin-top:10px;">
-      Create definition first. Stock changes are recorded in Add stock / Reduce / Transfer.
     </div>
   </section>
 
@@ -374,7 +373,6 @@
       <button class="info-btn" value="cancel" aria-label="Close">✕</button>
     </div>
     <div class="dlg-b">
-      <div class="muted small">Choose camera or gallery.</div>
       <div class="row" style="margin-top:12px;">
         <button type="button" class="btn primary" id="btnTakePhoto">Take photo</button>
         <button type="button" class="btn" id="btnChoosePhoto">Choose from gallery</button>
@@ -483,7 +481,7 @@
   function nowISO(){ return new Date().toISOString(); }
   function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
 
-  // ====== INVENTORY HELPERS ======
+  // ====== INVENTORY ======
   function invActive(){ return loadInv().inventory.filter(i=>!i.archived); }
   function setText(id, msg){ const el=document.getElementById(id); if(el) el.textContent = msg || ""; }
 
@@ -491,12 +489,12 @@
     const sel=document.getElementById(selectId);
     if(!sel) return;
     const items = invActive();
-    sel.innerHTML = "";
+    sel.innerHTML="";
     const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
     items.forEach(i=>{
       const opt=document.createElement("option");
       opt.value=i.itemId;
-      opt.textContent = `${i.name} (on hand: ${Number(i.qty||0)})`;
+      opt.textContent=`${i.name} (on hand: ${Number(i.qty||0)})`;
       sel.appendChild(opt);
     });
   }
@@ -515,21 +513,21 @@
     items.forEach(i=>{
       const opt=document.createElement("option");
       opt.value=i.itemId;
-      opt.textContent = `${i.name} (on hand: ${Number(i.qty||0)})`;
+      opt.textContent=`${i.name} (on hand: ${Number(i.qty||0)})`;
       sel.appendChild(opt);
     });
   }
 
   function renderInv(){
-    const store = loadInv();
-    const items = store.inventory.filter(i=>!i.archived);
-    const archived = store.inventory.filter(i=>i.archived);
+    const store=loadInv();
+    const items=store.inventory.filter(i=>!i.archived);
+    const archived=store.inventory.filter(i=>i.archived);
 
-    const meta = document.getElementById("invMeta");
-    const list = document.getElementById("invList");
-    const arch = document.getElementById("invArchived");
+    const meta=document.getElementById("invMeta");
+    const list=document.getElementById("invList");
+    const arch=document.getElementById("invArchived");
 
-    if(meta) meta.textContent = `Active: ${items.length}. Archived: ${archived.length}.`;
+    if(meta) meta.textContent=`Active: ${items.length}. Archived: ${archived.length}.`;
 
     if(list){
       list.innerHTML = items.length ? items.map(i=>`
@@ -553,21 +551,23 @@
   // ====== DOGS ======
   let currentDogId = null;
 
-  function dogActive(d){ return !d.archived; }
-  function dogArchived(d){ return !!d.archived; }
+  function getDogById(id){
+    return loadDogs().dogs.find(d=>d.dogId===id) || null;
+  }
 
   function renderDogs(){
-    const store = loadDogs();
-    const active = store.dogs.filter(dogActive);
-    const archived = store.dogs.filter(dogArchived);
+    const store=loadDogs();
+    const active=store.dogs.filter(d=>!d.archived);
+    const archived=store.dogs.filter(d=>d.archived);
 
-    const activeMeta = document.getElementById("dogsActiveMeta");
-    const activeList = document.getElementById("dogsActiveList");
-    const archWrap = document.getElementById("dogsArchivedWrap");
-    const archMeta = document.getElementById("dogsArchivedMeta");
-    const archList = document.getElementById("dogsArchivedList");
+    const activeMeta=document.getElementById("dogsActiveMeta");
+    const activeList=document.getElementById("dogsActiveList");
+    const archWrap=document.getElementById("dogsArchivedWrap");
+    const archMeta=document.getElementById("dogsArchivedMeta");
+    const archList=document.getElementById("dogsArchivedList");
 
-    if(activeMeta) activeMeta.textContent = `Active dogs: ${active.length}`;
+    if(activeMeta) activeMeta.textContent=`Active dogs: ${active.length}`;
+
     if(activeList){
       activeList.innerHTML = active.length ? active.map(d=>`
         <div class="timeline-item">
@@ -582,16 +582,15 @@
       `).join("") : `<div class="muted small">No active dogs yet.</div>`;
     }
 
-    const showArch = !archWrap.classList.contains("hide");
-    if(showArch){
-      if(archMeta) archMeta.textContent = `Archived dogs: ${archived.length}`;
+    if(!archWrap.classList.contains("hide")){
+      if(archMeta) archMeta.textContent=`Archived dogs: ${archived.length}`;
       if(archList){
         archList.innerHTML = archived.length ? archived.map(d=>`
           <div class="timeline-item">
             <div class="row" style="justify-content:space-between; gap:10px;">
               <div>
                 <div><strong>${d.callName}</strong></div>
-                <div class="muted small">Archived — ${d.status} • ${d.archivedAt ? new Date(d.archivedAt).toLocaleString() : ""}</div>
+                <div class="muted small">Archived — ${d.status} • ${d.archivedAt ? fmt(d.archivedAt) : ""}</div>
               </div>
               <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
             </div>
@@ -601,121 +600,9 @@
     }
   }
 
-  function getDogById(id){
-    const store = loadDogs();
-    return store.dogs.find(d=>d.dogId===id) || null;
-  }
-
-  function setDogProfileReadOnly(archived){
-    const inputs = [
-      "dogCallName","dogRegisteredName","dogKennelName","dogNicknames","dogBreed",
-      "dogSex","dogDob","dogMicrochip","dogStatus","dogStatusNote","dogDobEstimated"
-    ];
-    inputs.forEach(id=>{
-      const el=document.getElementById(id);
-      if(!el) return;
-      el.disabled = archived;
-    });
-
-    // Notes always editable:
-    const notes = document.getElementById("dogNotes");
-    if(notes) notes.disabled = false;
-
-    // Save button disabled if archived? (still allow Notes save)
-    const saveBtn = document.getElementById("btnSaveDog");
-    if(saveBtn) saveBtn.textContent = archived ? "Save notes" : "Save";
-
-    // Photo tap disabled when archived (but viewable)
-    const photoTap = document.getElementById("dogPhotoTap");
-    if(photoTap) photoTap.style.opacity = archived ? "0.85" : "1";
-  }
-
-  function renderDogProfile(dog){
-    if(!dog) return;
-
-    currentDogId = dog.dogId;
-
-    document.getElementById("dogProfileTitle").textContent = dog.callName || "Dog Profile";
-
-    // Archived banner
-    const banner = document.getElementById("dogArchivedBanner");
-    const bannerText = document.getElementById("dogArchivedBannerText");
-    const bannerMeta = document.getElementById("dogArchivedBannerMeta");
-
-    if(dog.archived){
-      banner.classList.remove("hide");
-      bannerText.textContent = `Archived — ${dog.status}`;
-      bannerMeta.textContent = dog.archivedAt ? `Archived at: ${fmt(dog.archivedAt)}` : "";
-    } else {
-      banner.classList.add("hide");
-    }
-
-    // Photo
-    const img = document.getElementById("dogPhotoImg");
-    const ph = document.getElementById("dogPhotoPlaceholder");
-    if(dog.photoDataUrl){
-      img.src = dog.photoDataUrl;
-      img.style.display = "block";
-      ph.style.display = "none";
-    } else {
-      img.src = "";
-      img.style.display = "none";
-      ph.style.display = "block";
-    }
-
-    // Fields
-    document.getElementById("dogCallName").value = dog.callName || "";
-    document.getElementById("dogRegisteredName").value = dog.registeredName || "";
-    document.getElementById("dogKennelName").value = dog.kennelName || "";
-    document.getElementById("dogNicknames").value = (dog.nicknames||[]).join(", ");
-    document.getElementById("dogBreed").value = dog.breed || "German Shorthaired Pointer";
-    document.getElementById("dogSex").value = dog.sex || "";
-    document.getElementById("dogDob").value = dog.dob || "";
-    document.getElementById("dogDobEstimated").checked = !!dog.dobEstimated;
-    document.getElementById("dogMicrochip").value = dog.microchip || "";
-
-    // Rabies summary (read-only, auto-fed later)
-    document.getElementById("dogRabiesSummary").textContent =
-      dog.rabiesLastDate ? `Last recorded: ${dog.rabiesLastDate}` : "No rabies record on file";
-
-    // Status
-    document.getElementById("dogStatus").value = dog.status || "Adult";
-    document.getElementById("dogStatusNote").value = dog.statusNote || "";
-
-    const ts = [];
-    if(dog.statusChangedAt) ts.push(`Status set: ${fmt(dog.statusChangedAt)}`);
-    if(dog.archivedAt) ts.push(`Archived: ${fmt(dog.archivedAt)}`);
-    document.getElementById("dogStatusTimestamps").textContent = ts.join(" • ");
-
-    // Note requirement UI
-    const status = document.getElementById("dogStatus").value;
-    const noteWrap = document.getElementById("statusNoteWrap");
-    if(status==="Transferred" || status==="Deceased"){
-      noteWrap.classList.remove("hide");
-    } else {
-      noteWrap.classList.add("hide");
-    }
-
-    // Notes
-    document.getElementById("dogNotes").value = dog.notes || "";
-
-    // Read-only rules
-    setDogProfileReadOnly(!!dog.archived);
-
-    // View photo button
-    document.getElementById("btnViewPhoto").disabled = !dog.photoDataUrl;
-  }
-
-  window.__openDog = function(dogId){
-    const dog = getDogById(dogId);
-    if(!dog) return;
-    __go("DogProfile");
-    renderDogProfile(dog);
-  };
-
   function addDog(callName){
-    const store = loadDogs();
-    const dogId = "dog_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+    const store=loadDogs();
+    const dogId="dog_"+Date.now()+"_"+Math.random().toString(16).slice(2);
     store.dogs.push({
       dogId,
       callName,
@@ -727,7 +614,7 @@
       dob:"",
       dobEstimated:false,
       microchip:"",
-      rabiesLastDate:null, // read-only summary placeholder
+      rabiesLastDate:null,
       status:"Adult",
       statusChangedAt: nowISO(),
       archived:false,
@@ -740,124 +627,172 @@
     renderDogs();
   }
 
+  function setDogProfileReadOnly(archived){
+    const lockIds = [
+      "dogCallName","dogRegisteredName","dogKennelName","dogNicknames","dogBreed",
+      "dogSex","dogDob","dogMicrochip","dogStatus","dogStatusNote","dogDobEstimated"
+    ];
+    lockIds.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.disabled = archived;
+    });
+    document.getElementById("dogNotes").disabled = false;
+    document.getElementById("btnSaveDog").textContent = archived ? "Save notes" : "Save";
+    document.getElementById("btnViewPhoto").disabled = !getDogById(currentDogId)?.photoDataUrl;
+  }
+
+  function renderDogProfile(d){
+    currentDogId = d.dogId;
+    document.getElementById("dogProfileTitle").textContent = d.callName || "Dog Profile";
+
+    const banner=document.getElementById("dogArchivedBanner");
+    if(d.archived){
+      banner.classList.remove("hide");
+      document.getElementById("dogArchivedBannerText").textContent = `Archived — ${d.status}`;
+      document.getElementById("dogArchivedBannerMeta").textContent = d.archivedAt ? `Archived at: ${fmt(d.archivedAt)}` : "";
+    } else {
+      banner.classList.add("hide");
+    }
+
+    const img=document.getElementById("dogPhotoImg");
+    const ph=document.getElementById("dogPhotoPlaceholder");
+    if(d.photoDataUrl){
+      img.src=d.photoDataUrl;
+      img.style.display="block";
+      ph.style.display="none";
+    } else {
+      img.src="";
+      img.style.display="none";
+      ph.style.display="block";
+    }
+
+    document.getElementById("dogCallName").value=d.callName||"";
+    document.getElementById("dogRegisteredName").value=d.registeredName||"";
+    document.getElementById("dogKennelName").value=d.kennelName||"";
+    document.getElementById("dogNicknames").value=(d.nicknames||[]).join(", ");
+    document.getElementById("dogBreed").value=d.breed||"German Shorthaired Pointer";
+    document.getElementById("dogSex").value=d.sex||"";
+    document.getElementById("dogDob").value=d.dob||"";
+    document.getElementById("dogDobEstimated").checked=!!d.dobEstimated;
+    document.getElementById("dogMicrochip").value=d.microchip||"";
+    document.getElementById("dogRabiesSummary").textContent = d.rabiesLastDate ? `Last recorded: ${d.rabiesLastDate}` : "No rabies record on file";
+
+    document.getElementById("dogStatus").value=d.status||"Adult";
+    document.getElementById("dogStatusNote").value=d.statusNote||"";
+    document.getElementById("dogNotes").value=d.notes||"";
+
+    const st=document.getElementById("dogStatus").value;
+    const wrap=document.getElementById("statusNoteWrap");
+    if(st==="Transferred" || st==="Deceased") wrap.classList.remove("hide"); else wrap.classList.add("hide");
+
+    const ts=[];
+    if(d.statusChangedAt) ts.push(`Status set: ${fmt(d.statusChangedAt)}`);
+    if(d.archivedAt) ts.push(`Archived: ${fmt(d.archivedAt)}`);
+    document.getElementById("dogStatusTimestamps").textContent=ts.join(" • ");
+
+    setDogProfileReadOnly(!!d.archived);
+  }
+
+  window.__openDog=function(dogId){
+    const d=getDogById(dogId);
+    if(!d) return;
+    __go("DogProfile");
+    renderDogProfile(d);
+  };
+
   function saveDogProfile(){
-    const store = loadDogs();
-    const dog = store.dogs.find(d=>d.dogId===currentDogId);
-    if(!dog) return;
+    const store=loadDogs();
+    const d=store.dogs.find(x=>x.dogId===currentDogId);
+    if(!d) return;
 
-    const isArchived = !!dog.archived;
+    // notes always editable
+    d.notes=(document.getElementById("dogNotes").value||"").trim();
 
-    // Notes always writable
-    dog.notes = (document.getElementById("dogNotes").value || "").trim();
-
-    if(isArchived){
-      // read-only except notes
+    if(d.archived){
       saveDogs(store);
-      document.getElementById("dogSaveStatus").textContent = "Saved notes.";
+      document.getElementById("dogSaveStatus").textContent="Saved notes.";
       return;
     }
 
-    // Editable fields (active only)
-    dog.callName = (document.getElementById("dogCallName").value || "").trim() || dog.callName;
-    dog.registeredName = (document.getElementById("dogRegisteredName").value || "").trim();
-    dog.kennelName = (document.getElementById("dogKennelName").value || "").trim();
-    dog.nicknames = (document.getElementById("dogNicknames").value || "").split(",").map(s=>s.trim()).filter(Boolean);
-    dog.breed = (document.getElementById("dogBreed").value || "").trim() || "German Shorthaired Pointer";
-    dog.sex = document.getElementById("dogSex").value || "";
-    dog.dob = (document.getElementById("dogDob").value || "").trim();
-    dog.dobEstimated = !!document.getElementById("dogDobEstimated").checked;
-    dog.microchip = (document.getElementById("dogMicrochip").value || "").trim();
+    d.callName=(document.getElementById("dogCallName").value||"").trim() || d.callName;
+    d.registeredName=(document.getElementById("dogRegisteredName").value||"").trim();
+    d.kennelName=(document.getElementById("dogKennelName").value||"").trim();
+    d.nicknames=(document.getElementById("dogNicknames").value||"").split(",").map(s=>s.trim()).filter(Boolean);
+    d.breed=(document.getElementById("dogBreed").value||"").trim() || "German Shorthaired Pointer";
+    d.sex=document.getElementById("dogSex").value||"";
+    d.dob=(document.getElementById("dogDob").value||"").trim();
+    d.dobEstimated=!!document.getElementById("dogDobEstimated").checked;
+    d.microchip=(document.getElementById("dogMicrochip").value||"").trim();
 
-    const newStatus = document.getElementById("dogStatus").value;
-    const prevStatus = dog.status;
-
-    // If status changes:
-    if(newStatus !== prevStatus){
-      dog.status = newStatus;
-      dog.statusChangedAt = nowISO();
+    const newStatus=document.getElementById("dogStatus").value;
+    if(newStatus !== d.status){
+      d.status=newStatus;
+      d.statusChangedAt=nowISO();
     }
 
-    // Archive logic (Transferred/Deceased only)
-    if(newStatus === "Transferred" || newStatus === "Deceased"){
-      const note = (document.getElementById("dogStatusNote").value || "").trim();
+    if(newStatus==="Transferred" || newStatus==="Deceased"){
+      const note=(document.getElementById("dogStatusNote").value||"").trim();
       if(!note){
-        document.getElementById("dogSaveStatus").textContent = "Status note is required for Transferred/Deceased.";
+        document.getElementById("dogSaveStatus").textContent="Status note required.";
         alert("Status note is required for Transferred/Deceased.");
         return;
       }
-      dog.statusNote = note;
-      dog.archived = true;
-      dog.archivedAt = nowISO();
+      d.statusNote=note;
+      d.archived=true;
+      d.archivedAt=nowISO();
     } else {
-      // Active states never archived
-      dog.archived = false;
-      dog.archivedAt = null;
-      dog.statusNote = (document.getElementById("dogStatusNote").value || "").trim();
+      d.archived=false;
+      d.archivedAt=null;
+      d.statusNote=(document.getElementById("dogStatusNote").value||"").trim();
     }
 
     saveDogs(store);
-    document.getElementById("dogSaveStatus").textContent = "Saved.";
-    renderDogProfile(dog);
+    document.getElementById("dogSaveStatus").textContent="Saved.";
+    renderDogProfile(d);
     renderDogs();
   }
 
-  // ====== PHOTO CAPTURE/GALLERY ======
+  // Photo
   async function compressImageToDataUrl(file){
-    // downscale to max 900px long edge, jpg quality ~0.78
-    const img = new Image();
     const dataUrl = await new Promise((resolve, reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=> resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      const r=new FileReader();
+      r.onload=()=>resolve(r.result);
+      r.onerror=reject;
+      r.readAsDataURL(file);
     });
-    img.src = dataUrl;
+    const img=new Image();
+    img.src=dataUrl;
+    await new Promise(res=>img.onload=res);
 
-    await new Promise((resolve)=>{ img.onload = resolve; });
+    const maxEdge=900;
+    const scale=Math.min(1, maxEdge/Math.max(img.width, img.height));
+    const w=Math.max(1, Math.round(img.width*scale));
+    const h=Math.max(1, Math.round(img.height*scale));
 
-    const maxEdge = 900;
-    let w = img.width, h = img.height;
-    const scale = Math.min(1, maxEdge / Math.max(w, h));
-    const nw = Math.max(1, Math.round(w * scale));
-    const nh = Math.max(1, Math.round(h * scale));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = nw;
-    canvas.height = nh;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, nw, nh);
-
-    return canvas.toDataURL("image/jpeg", 0.78);
+    const c=document.createElement("canvas");
+    c.width=w; c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    return c.toDataURL("image/jpeg",0.78);
   }
 
   async function setDogPhotoFromFile(file){
-    const store = loadDogs();
-    const dog = store.dogs.find(d=>d.dogId===currentDogId);
-    if(!dog) return;
-
-    if(dog.archived){
-      alert("Archived dogs are view-only.");
-      return;
-    }
-
-    const compressed = await compressImageToDataUrl(file);
-    dog.photoDataUrl = compressed;
+    const store=loadDogs();
+    const d=store.dogs.find(x=>x.dogId===currentDogId);
+    if(!d) return;
+    if(d.archived){ alert("Archived dogs are view-only."); return; }
+    d.photoDataUrl=await compressImageToDataUrl(file);
     saveDogs(store);
-    renderDogProfile(dog);
+    renderDogProfile(d);
     renderDogs();
   }
 
   function openPhotoChoice(){
-    const dog = getDogById(currentDogId);
-    if(!dog) return;
-    if(dog.archived){
-      // view-only; do nothing
-      return;
-    }
+    const d=getDogById(currentDogId);
+    if(!d || d.archived) return;
     document.getElementById("dlgPhotoChoice").showModal();
   }
 
-  // ====== SCAN ENGINE (unchanged baseline behavior) ======
+  // ====== SCAN ENGINE (inventory baseline) ======
   let scanStream=null, lastScanValue="", scanContext="transfer";
 
   function stopScanStream(){
@@ -968,22 +903,147 @@
   }
 
   // ====== afterShow hook ======
-  window.__afterShow = function(view){
-    // inventory lists
+  window.__afterShow=function(view){
     if(view==="InventoryAvailable") renderInv();
     if(view==="InventoryAddStock") populateSelect("addStockSelect");
     if(view==="InventoryReduceStock") populateSelect("reduceSelect");
     if(view==="InventoryTransfer") populateSelect("transferSelect");
-    // dogs list refresh
     if(view==="Dogs") renderDogs();
-    if(view==="DogProfile") {
-      const d = getDogById(currentDogId);
-      if(d) renderDogProfile(d);
-    }
   };
+
+  // ====== INVENTORY actions (baseline) ======
+  let addStockItemId=null, reduceItemId=null, transferItemId=null;
+
+  function showAddStockForm(itemId){
+    const it=invActive().find(x=>x.itemId===itemId);
+    if(!it){ setText("addStockStatus","Item not found."); return; }
+    addStockItemId=itemId;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockItemName").textContent=it.name;
+    document.getElementById("addStockItemMeta").textContent=`On hand: ${Number(it.qty||0)}`;
+    document.getElementById("addStockQty").value="1";
+    setText("addStockStatus","");
+  }
+
+  function showReduceForm(itemId){
+    const it=invActive().find(x=>x.itemId===itemId);
+    if(!it){ setText("reduceStatus","Item not found."); return; }
+    reduceItemId=itemId;
+    document.getElementById("reduceForm").classList.remove("hide");
+    document.getElementById("reduceItemName").textContent=it.name;
+    document.getElementById("reduceItemMeta").textContent=`On hand: ${Number(it.qty||0)}`;
+    document.getElementById("reduceQty").value="1";
+    setText("reduceStatus","");
+  }
+
+  function showTransferForm(itemId){
+    const it=invActive().find(x=>x.itemId===itemId);
+    if(!it){ setText("transferStatus","Item not found."); return; }
+    transferItemId=itemId;
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferItemName").textContent=it.name;
+    document.getElementById("transferItemMeta").textContent=`On hand: ${Number(it.qty||0)}`;
+    document.getElementById("transferQty").value="1";
+    setText("transferStatus","");
+  }
+
+  function applyAddStock(){
+    const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
+    if(!addStockItemId || qty<=0){ setText("addStockStatus","Pick item + qty"); return; }
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===addStockItemId);
+    if(!it){ setText("addStockStatus","Item not found."); return; }
+    it.qty=Number(it.qty||0)+qty;
+    saveInv(store);
+    setText("addStockStatus","Added.");
+    renderInv();
+    populateSelect("addStockSelect");
+  }
+
+  function applyReduce(){
+    const qty=Math.abs(Number(document.getElementById("reduceQty").value||"0")||0);
+    if(!reduceItemId || qty<=0){ setText("reduceStatus","Pick item + qty"); return; }
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===reduceItemId);
+    if(!it){ setText("reduceStatus","Item not found."); return; }
+    it.qty=Math.max(0, Number(it.qty||0)-qty);
+    saveInv(store);
+    setText("reduceStatus","Recorded.");
+    renderInv();
+    populateSelect("reduceSelect");
+  }
+
+  function applyTransfer(){
+    const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
+    if(!transferItemId || qty<=0){ setText("transferStatus","Pick item + qty"); return; }
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===transferItemId);
+    if(!it){ setText("transferStatus","Item not found."); return; }
+    it.qty=Math.max(0, Number(it.qty||0)-qty);
+    saveInv(store);
+    setText("transferStatus","Transferred.");
+    renderInv();
+    populateSelect("transferSelect");
+  }
 
   // ====== Bind UI ======
   document.addEventListener("DOMContentLoaded", ()=>{
+    // Dogs
+    document.getElementById("btnAddDog")?.addEventListener("click", ()=>{
+      const name = prompt("Call name (required):");
+      if(!name) return;
+      addDog(name.trim());
+    });
+
+    document.getElementById("btnToggleArchivedDogs")?.addEventListener("click", ()=>{
+      document.getElementById("dogsArchivedWrap").classList.toggle("hide");
+      renderDogs();
+    });
+
+    document.getElementById("dogPhotoTap")?.addEventListener("click", ()=>{
+      const d=getDogById(currentDogId);
+      if(!d) return;
+      if(d.archived){
+        if(d.photoDataUrl) window.open(d.photoDataUrl, "_blank");
+        return;
+      }
+      openPhotoChoice();
+    });
+
+    document.getElementById("btnViewPhoto")?.addEventListener("click", ()=>{
+      const d=getDogById(currentDogId);
+      if(d?.photoDataUrl) window.open(d.photoDataUrl, "_blank");
+    });
+
+    document.getElementById("btnTakePhoto")?.addEventListener("click", ()=> document.getElementById("fileCamera").click());
+    document.getElementById("btnChoosePhoto")?.addEventListener("click", ()=> document.getElementById("fileGallery").click());
+
+    document.getElementById("fileCamera")?.addEventListener("change", async (e)=>{
+      const f=e.target.files?.[0];
+      e.target.value="";
+      if(!f) return;
+      await setDogPhotoFromFile(f);
+      document.getElementById("dlgPhotoChoice").close();
+    });
+
+    document.getElementById("fileGallery")?.addEventListener("change", async (e)=>{
+      const f=e.target.files?.[0];
+      e.target.value="";
+      if(!f) return;
+      await setDogPhotoFromFile(f);
+      document.getElementById("dlgPhotoChoice").close();
+    });
+
+    document.getElementById("dogStatus")?.addEventListener("change", ()=>{
+      const st=document.getElementById("dogStatus").value;
+      const wrap=document.getElementById("statusNoteWrap");
+      if(st==="Transferred"||st==="Deceased") wrap.classList.remove("hide");
+      else wrap.classList.add("hide");
+    });
+
+    document.getElementById("btnSaveDog")?.addEventListener("click", saveDogProfile);
+    document.getElementById("btnCancelDog")?.addEventListener("click", ()=>{ document.getElementById("dogSaveStatus").textContent=""; __back(); });
+
     // Inventory
     document.getElementById("btnInvRefresh")?.addEventListener("click", renderInv);
     document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invArchived").classList.toggle("hide"));
@@ -994,6 +1054,9 @@
 
     document.getElementById("btnScanForAdd")?.addEventListener("click", ()=> __openScanDialog("add"));
     document.getElementById("btnScanInsideAdd")?.addEventListener("click", ()=> __openScanDialog("add"));
+    document.getElementById("btnScanAddStock")?.addEventListener("click", ()=> __openScanDialog("addstock"));
+    document.getElementById("btnScanReduce")?.addEventListener("click", ()=> __openScanDialog("reduce"));
+    document.getElementById("btnScanTransfer")?.addEventListener("click", ()=> __openScanDialog("transfer"));
 
     document.getElementById("btnAddStockRefresh")?.addEventListener("click", ()=> populateSelect("addStockSelect"));
     document.getElementById("btnReduceRefresh")?.addEventListener("click", ()=> populateSelect("reduceSelect"));
@@ -1015,80 +1078,16 @@
     document.getElementById("btnReduceCancel")?.addEventListener("click", ()=>{ document.getElementById("reduceForm").classList.add("hide"); setText("reduceStatus",""); });
     document.getElementById("btnTransferCancel")?.addEventListener("click", ()=>{ document.getElementById("transferForm").classList.add("hide"); setText("transferStatus",""); });
 
-    document.getElementById("btnScanAddStock")?.addEventListener("click", ()=> __openScanDialog("addstock"));
-    document.getElementById("btnScanReduce")?.addEventListener("click", ()=> __openScanDialog("reduce"));
-    document.getElementById("btnScanTransfer")?.addEventListener("click", ()=> __openScanDialog("transfer"));
-
-    // Scan dialog
+    // Scan dialog controls
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
 
-    // Dogs
-    document.getElementById("btnAddDog")?.addEventListener("click", ()=>{
-      const name = prompt("Call name (required):");
-      if(!name) return;
-      addDog(name.trim());
-    });
-
-    document.getElementById("btnToggleArchivedDogs")?.addEventListener("click", ()=>{
-      document.getElementById("dogsArchivedWrap").classList.toggle("hide");
-      renderDogs();
-    });
-
-    document.getElementById("dogPhotoTap")?.addEventListener("click", ()=>{
-      const dog = getDogById(currentDogId);
-      if(!dog) return;
-      if(dog.archived){
-        // view-only
-        if(dog.photoDataUrl){
-          window.open(dog.photoDataUrl, "_blank");
-        }
-        return;
-      }
-      openPhotoChoice();
-    });
-
-    document.getElementById("btnViewPhoto")?.addEventListener("click", ()=>{
-      const dog = getDogById(currentDogId);
-      if(dog && dog.photoDataUrl) window.open(dog.photoDataUrl, "_blank");
-    });
-
-    // Photo choice dialog buttons
-    document.getElementById("btnTakePhoto")?.addEventListener("click", ()=> document.getElementById("fileCamera").click());
-    document.getElementById("btnChoosePhoto")?.addEventListener("click", ()=> document.getElementById("fileGallery").click());
-
-    document.getElementById("fileCamera")?.addEventListener("change", async (e)=>{
-      const file = e.target.files?.[0];
-      e.target.value = "";
-      if(!file) return;
-      await setDogPhotoFromFile(file);
-      document.getElementById("dlgPhotoChoice").close();
-    });
-
-    document.getElementById("fileGallery")?.addEventListener("change", async (e)=>{
-      const file = e.target.files?.[0];
-      e.target.value = "";
-      if(!file) return;
-      await setDogPhotoFromFile(file);
-      document.getElementById("dlgPhotoChoice").close();
-    });
-
-    document.getElementById("dogStatus")?.addEventListener("change", ()=>{
-      const st = document.getElementById("dogStatus").value;
-      const wrap = document.getElementById("statusNoteWrap");
-      if(st==="Transferred" || st==="Deceased") wrap.classList.remove("hide");
-      else wrap.classList.add("hide");
-    });
-
-    document.getElementById("btnSaveDog")?.addEventListener("click", saveDogProfile);
-    document.getElementById("btnCancelDog")?.addEventListener("click", ()=>{ document.getElementById("dogSaveStatus").textContent=""; __back(); });
-
-    // Talk button
+    // Talk
     document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 
-    // Initial renders
+    // Initial
     renderInv();
     populateSelect("addStockSelect");
     populateSelect("reduceSelect");
@@ -1099,4 +1098,4 @@
 </script>
 
 </body>
-  </html>
+</html>
