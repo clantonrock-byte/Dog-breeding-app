@@ -122,7 +122,7 @@
     <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- ✅ REDUCE STOCK -->
+  <!-- REDUCE STOCK -->
   <section id="viewInventoryReduceStock" class="card hide">
     <h2>Reduce stock</h2>
     <div class="row">
@@ -347,21 +347,16 @@
     });
   }
 
-  // Render list (simple)
   function renderInventoryAvailable(){
-    const meta=document.getElementById("invAvailableMeta");
     const list=document.getElementById("invAvailableList");
-    const store=loadStore();
-    const inv=store.inventory||[];
-    const active=inv.filter(i=>!i.archived);
-    if(meta) meta.textContent=`Active: ${active.length}`;
+    const active=getActiveItems();
     if(list){
-      list.innerHTML = active.length ? active.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
+      list.innerHTML = active.length
+        ? active.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
         : `<div class="muted small">No active items.</div>`;
     }
   }
 
-  // Definition save
   function openAddDialog(){
     document.getElementById("invName").value="";
     document.getElementById("invCategory").value="Food";
@@ -378,18 +373,10 @@
     const name=(document.getElementById("invName").value||"").trim();
     if(!name){ alert("Item name required."); return; }
     const store=loadStore();
-    store.inventory.push({
-      itemId:"inv_"+Date.now(),
-      name,
-      category:document.getElementById("invCategory").value,
-      source:document.getElementById("invSource").value,
-      identifierType:document.getElementById("invIdType").value,
-      identifierValue:(document.getElementById("invIdValue").value||"").trim(),
-      unit:document.getElementById("invUnit").value,
-      weightPerUnit:(document.getElementById("invWeightPerUnit").value||"").trim(),
-      notes:(document.getElementById("invNotes").value||"").trim(),
-      qty:0,
-      archived:false
+    store.inventory.push({ itemId:"inv_"+Date.now(), name, category:document.getElementById("invCategory").value, source:document.getElementById("invSource").value,
+      identifierType:document.getElementById("invIdType").value, identifierValue:(document.getElementById("invIdValue").value||"").trim(),
+      unit:document.getElementById("invUnit").value, weightPerUnit:(document.getElementById("invWeightPerUnit").value||"").trim(), notes:(document.getElementById("invNotes").value||"").trim(),
+      qty:0, archived:false
     });
     saveStore(store);
     document.getElementById("dlgInv").close();
@@ -397,34 +384,15 @@
     populateSelect("addStockSelect"); populateSelect("reduceSelect"); populateSelect("transferSelect");
   }
 
-  // Show forms
+  // Simple form actions
   let addStockItemId=null, reduceItemId=null, transferItemId=null;
-
-  function showAddStockForm(id){
-    addStockItemId=id;
-    document.getElementById("addStockForm").classList.remove("hide");
-    document.getElementById("addStockQty").value="1";
-    document.getElementById("addStockStatus").textContent="";
-  }
-  function showReduceForm(id){
-    reduceItemId=id;
-    document.getElementById("reduceForm").classList.remove("hide");
-    document.getElementById("reduceQty").value="1";
-    document.getElementById("reduceStatus").textContent="";
-  }
-  function showTransferForm(id){
-    transferItemId=id;
-    document.getElementById("transferForm").classList.remove("hide");
-    document.getElementById("transferQty").value="1";
-    document.getElementById("transferStatus").textContent="";
-  }
 
   function applyAddStock(){
     const store=loadStore();
     const it=(store.inventory||[]).find(x=>x.itemId===addStockItemId);
     const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
     if(!it || qty<=0){ document.getElementById("addStockStatus").textContent="Pick item + qty"; return; }
-    it.qty = Number(it.qty||0) + qty;
+    it.qty = Number(it.qty||0)+qty;
     saveStore(store);
     document.getElementById("addStockStatus").textContent="Added.";
     renderInventoryAvailable();
@@ -450,6 +418,26 @@
     saveStore(store);
     document.getElementById("transferStatus").textContent="Transferred.";
     renderInventoryAvailable();
+  }
+
+  // Show forms on select change
+  function onAddStockSelectChange(id){
+    addStockItemId=id;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockQty").value="1";
+    document.getElementById("addStockStatus").textContent="";
+  }
+  function onReduceSelectChange(id){
+    reduceItemId=id;
+    document.getElementById("reduceForm").classList.remove("hide");
+    document.getElementById("reduceQty").value="1";
+    document.getElementById("reduceStatus").textContent="";
+  }
+  function onTransferSelectChange(id){
+    transferItemId=id;
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferQty").value="1";
+    document.getElementById("transferStatus").textContent="";
   }
 
   // Scan routing
@@ -532,7 +520,7 @@
   function confirmScan(){
     const manual=(document.getElementById("scanManual").value||"").trim();
     const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
-    if(!code){ document.getElementById("scanHelp").textContent="No code captured. Manual entry available."; return; }
+    if(!code){ document.getElementById("scanHelp").textContent="No code captured."; return; }
 
     if(scanContext==="add"){
       document.getElementById("invIdType").value="Barcode";
@@ -567,21 +555,22 @@
   // Bind
   document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
+
     document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
     document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
 
     document.getElementById("btnAddStockRefreshList")?.addEventListener("click", ()=>{ populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect"); });
-    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showAddStockForm(e.target.value); });
+    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) onAddStockSelectChange(e.target.value); });
     document.getElementById("btnConfirmAddStock")?.addEventListener("click", applyAddStock);
     document.getElementById("addStockSearch")?.addEventListener("input", ()=> filterSelect("addStockSearch","addStockSelect"));
 
     document.getElementById("btnReduceRefreshList")?.addEventListener("click", ()=>{ populateSelect("reduceSelect"); filterSelect("reduceSearch","reduceSelect"); });
-    document.getElementById("reduceSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showReduceForm(e.target.value); });
+    document.getElementById("reduceSelect")?.addEventListener("change", (e)=>{ if(e.target.value) onReduceSelectChange(e.target.value); });
     document.getElementById("btnConfirmReduce")?.addEventListener("click", applyReduce);
     document.getElementById("reduceSearch")?.addEventListener("input", ()=> filterSelect("reduceSearch","reduceSelect"));
 
     document.getElementById("btnTransferRefreshList")?.addEventListener("click", ()=>{ populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect"); });
-    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
+    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) onTransferSelectChange(e.target.value); });
     document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
     document.getElementById("transferSearch")?.addEventListener("input", ()=> filterSelect("transferSearch","transferSelect"));
 
@@ -589,8 +578,6 @@
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
-
-    document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 
     renderInventoryAvailable();
     populateSelect("addStockSelect");
@@ -601,4 +588,4 @@
 </script>
 
 </body>
-  </html>
+</html>
