@@ -7,7 +7,7 @@
     "InventoryAvailable",
     "InventoryAdd",
     "InventoryAddStock",
-    "InventoryReduceStock",   // ✅ REQUIRED for Reduce stock button
+    "InventoryReduceStock", // ✅ REQUIRED
     "InventoryTransfer",
     "Dogs",
     "Care",
