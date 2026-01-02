@@ -8,455 +8,202 @@
 </head>
 
 <body>
+
 <header class="topbar">
   <div class="brand">
     <div class="brand-title">Breeder Pro</div>
     <div class="brand-sub">Phase 1</div>
   </div>
   <div class="top-actions">
-    <button id="btnTalk" class="btn">🎙️ Talk</button>
+    <button class="btn" id="btnTalk">🎙️ Talk</button>
   </div>
 </header>
 
 <main class="shell">
 
-  <!-- HOME -->
-  <section id="viewHome" class="card">
-    <h2>What is our goal today?</h2>
-    <div class="goal-grid">
-      <button class="btn primary" onclick="window.__go && window.__go('Dogs')">Dogs &amp; Pups</button>
-      <button class="btn primary" onclick="window.__go && window.__go('Care')">Care Timeline</button>
-      <button class="btn primary" onclick="window.__go && window.__go('Feeding')">Feeding</button>
-      <button class="btn primary" onclick="window.__go && window.__go('InventoryMenu')">Inventory</button>
-      <button class="btn primary" onclick="window.__go && window.__go('Helpers')">Helpers</button>
-      <button class="btn primary" onclick="window.__go && window.__go('Records')">Records &amp; Export</button>
-    </div>
-  </section>
+<!-- ================= HOME ================= -->
+<section id="viewHome" class="card">
+  <h2>What is our goal today?</h2>
+  <div class="goal-grid">
+    <button class="btn primary" onclick="__go('Dogs')">Dogs &amp; Pups</button>
+    <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
+    <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
+    <button class="btn primary" onclick="__go('InventoryMenu')">Inventory</button>
+    <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
+    <button class="btn primary" onclick="__go('Records')">Records &amp; Export</button>
+  </div>
+</section>
 
-  <!-- INVENTORY MENU -->
-  <section id="viewInventoryMenu" class="card hide">
-    <h2>Inventory</h2>
+<!-- ================= INVENTORY MENU ================= -->
+<section id="viewInventoryMenu" class="card hide">
+  <h2>Inventory</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+  <div class="goal-grid">
+    <button class="btn primary" onclick="__go('InventoryAvailable')">Inventory available</button>
+    <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
+    <button class="btn primary" onclick="__go('InventoryAddStock')">Add stock</button>
+    <button class="btn primary" onclick="__go('InventoryTransfer')">Transfer inventory</button>
+  </div>
+</section>
 
+<!-- ================= INVENTORY AVAILABLE ================= -->
+<section id="viewInventoryAvailable" class="card hide">
+  <h2>Inventory available</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+
+  <div class="row" style="margin-top:12px;">
+    <button class="btn" id="btnInvRefresh">Refresh list</button>
+    <button class="btn" id="btnInvToggleArchived">Show archived</button>
+  </div>
+
+  <div id="invAvailableMeta" class="muted small"></div>
+  <div id="invAvailableList"></div>
+  <div id="invAvailableArchived" class="hide"></div>
+</section>
+
+<!-- ================= ADD INVENTORY (DEFINITION) ================= -->
+<section id="viewInventoryAdd" class="card hide">
+  <h2>Add to inventory</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+
+  <div class="row" style="margin-top:12px;">
+    <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
+    <button class="btn" onclick="__openScanDialog('add')">Scan now (QR or barcode)</button>
+  </div>
+</section>
+
+<!-- ================= ADD STOCK ================= -->
+<section id="viewInventoryAddStock" class="card hide">
+  <h2>Add stock</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+
+  <div class="row">
+    <button class="btn primary" onclick="__openScanDialog('addstock')">Scan item</button>
+    <button class="btn" id="btnAddStockRefreshList">Refresh list</button>
+  </div>
+
+  <label class="label">Search (optional)</label>
+  <input id="addStockSearch" placeholder="Type to filter…" />
+
+  <label class="label">Or select item</label>
+  <select id="addStockSelect"></select>
+
+  <div id="addStockForm" class="hide">
+    <label class="label">Quantity to add</label>
+    <input id="addStockQty" />
+    <label class="label">Note (optional)</label>
+    <input id="addStockNote" />
     <div class="row">
-      <button class="btn" onclick="window.__go && window.__go('Home')">Back</button>
-      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
+      <button class="btn primary" id="btnConfirmAddStock">Confirm add</button>
+      <button class="btn" onclick="__back()">Cancel</button>
     </div>
+  </div>
 
-    <div class="goal-grid">
-      <button class="btn primary" onclick="window.__go && window.__go('InventoryAvailable')">Inventory available</button>
-      <button class="btn primary" onclick="window.__go && window.__go('InventoryAdd')">Add to inventory</button>
-      <button class="btn primary" onclick="window.__go && window.__go('InventoryAddStock')">Add stock</button>
-      <button class="btn primary" onclick="window.__go && window.__go('InventoryTransfer')">Transfer inventory</button>
-    </div>
-  </section>
+  <div id="addStockStatus" class="muted small"></div>
+</section>
 
-  <!-- INVENTORY: AVAILABLE -->
-  <section id="viewInventoryAvailable" class="card hide">
-    <h2>Inventory available</h2>
+<!-- ================= TRANSFER ================= -->
+<section id="viewInventoryTransfer" class="card hide">
+  <h2>Transfer inventory</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
 
+  <div class="row">
+    <button class="btn primary" onclick="__openScanDialog('transfer')">Scan item</button>
+    <button class="btn" id="btnTransferRefreshList">Refresh list</button>
+  </div>
+
+  <label class="label">Search (optional)</label>
+  <input id="transferSearch" />
+
+  <label class="label">Or select item</label>
+  <select id="transferSelect"></select>
+
+  <div id="transferForm" class="hide">
+    <label class="label">Quantity</label>
+    <input id="transferQty" />
+    <label class="label">Destination</label>
+    <select id="transferType">
+      <option>With a dog</option>
+      <option>To adopter</option>
+      <option>To foster</option>
+      <option>To organization</option>
+      <option>Moved to storage</option>
+      <option>Other</option>
+    </select>
+    <label class="label">Note (optional)</label>
+    <input id="transferNote" />
     <div class="row">
-      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
-      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
+      <button class="btn primary" id="btnConfirmTransfer">Confirm transfer</button>
+      <button class="btn" onclick="__back()">Cancel</button>
     </div>
+  </div>
 
-    <div class="row" style="margin-top:12px;">
-      <button class="btn" id="btnInvRefresh">Refresh list</button>
-      <button class="btn" id="btnInvToggleArchived">Show archived</button>
-    </div>
+  <div id="transferStatus" class="muted small"></div>
+</section>
 
-    <div id="invAvailableMeta" class="muted small" style="margin-top:10px;"></div>
-    <div id="invAvailableList"></div>
-    <div id="invAvailableArchived" class="hide"></div>
-  </section>
+<!-- ================= PLACEHOLDERS ================= -->
+<section id="viewDogs" class="card hide">
+  <h2>Dogs &amp; Pups</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+</section>
 
-  <!-- INVENTORY: ADD (definition) -->
-  <section id="viewInventoryAdd" class="card hide">
-    <h2>Add to inventory</h2>
+<section id="viewCare" class="card hide">
+  <h2>Care Timeline</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+</section>
 
-    <div class="row">
-      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
-      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
-    </div>
+<section id="viewFeeding" class="card hide">
+  <h2>Feeding</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+</section>
 
-    <div class="muted small" style="margin:10px 0;">
-      Records item definition (what it is). Stock changes happen through Add stock / Transfer.
-    </div>
+<section id="viewHelpers" class="card hide">
+  <h2>Helpers</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+</section>
 
-    <div class="row">
-      <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
-      <button class="btn" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan now (QR or barcode)</button>
-    </div>
-  </section>
-
-  <!-- INVENTORY: ADD STOCK -->
-  <section id="viewInventoryAddStock" class="card hide">
-    <h2>Add stock</h2>
-
-    <div class="row">
-      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
-      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
-    </div>
-
-    <div class="row">
-      <button class="btn primary" onclick="window.__openScanDialog && window.__openScanDialog('addstock')">Scan item</button>
-      <button class="btn" id="btnAddStockRefreshList">Refresh list</button>
-    </div>
-
-    <label class="label">Search (optional)</label>
-    <input id="addStockSearch" placeholder="Type to filter…" />
-
-    <label class="label">Or select an item (manual)</label>
-    <select id="addStockSelect"></select>
-
-    <div id="addStockForm" class="hide" style="margin-top:12px;">
-      <div class="timeline-item">
-        <div><strong id="addStockItemName"></strong></div>
-        <div class="muted small" id="addStockItemMeta"></div>
-      </div>
-
-      <label class="label">Quantity to add</label>
-      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 40" />
-
-      <label class="label">Note (optional)</label>
-      <input id="addStockNote" placeholder="Delivery, donation, etc." />
-
-      <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnConfirmAddStock">Confirm add</button>
-        <button class="btn" id="btnCancelAddStock">Cancel</button>
-      </div>
-    </div>
-
-    <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
-  </section>
-
-  <!-- INVENTORY: TRANSFER -->
-  <section id="viewInventoryTransfer" class="card hide">
-    <h2>Transfer inventory</h2>
-
-    <div class="row">
-      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
-      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
-    </div>
-
-    <div class="row">
-      <button class="btn primary" onclick="window.__openScanDialog && window.__openScanDialog('transfer')">Scan item</button>
-      <button class="btn" id="btnTransferRefreshList">Refresh list</button>
-    </div>
-
-    <label class="label">Search (optional)</label>
-    <input id="transferSearch" placeholder="Type to filter…" />
-
-    <label class="label">Or select an item (manual)</label>
-    <select id="transferSelect"></select>
-
-    <div id="transferForm" class="hide" style="margin-top:12px;">
-      <div class="timeline-item">
-        <div><strong id="transferItemName"></strong></div>
-        <div class="muted small" id="transferItemMeta"></div>
-      </div>
-
-      <label class="label">Quantity to transfer</label>
-      <input id="transferQty" inputmode="decimal" placeholder="e.g., 5" />
-
-      <label class="label">Transfer destination</label>
-      <select id="transferType">
-        <option>With a dog</option>
-        <option>To adopter</option>
-        <option>To foster</option>
-        <option>To another organization</option>
-        <option>Returned to donor</option>
-        <option>Moved to storage</option>
-        <option>Other</option>
-      </select>
-
-      <label class="label">Destination details (optional)</label>
-      <input id="transferDetail" placeholder="Dog name / org / storage" />
-
-      <label class="label">Contact person (optional)</label>
-      <input id="transferContactPerson" placeholder="Jordan Smith" />
-
-      <label class="label">Contact method (optional)</label>
-      <select id="transferContactMethod">
-        <option>None</option><option>Phone</option><option>Email</option><option>Both</option><option>Other</option>
-      </select>
-
-      <label class="label">Contact details (optional)</label>
-      <input id="transferContactDetails" placeholder="555-555-5555 / name@email.com" />
-
-      <label class="label">Note (optional)</label>
-      <input id="transferNote" placeholder="Any factual notes" />
-
-      <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnConfirmTransfer">Confirm transfer</button>
-        <button class="btn" id="btnCancelTransfer">Cancel</button>
-      </div>
-    </div>
-
-    <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
-  </section>
-
-  <!-- PLACEHOLDERS -->
-  <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2></section>
-  <section id="viewCare" class="card hide"><h2>Care Timeline</h2></section>
-  <section id="viewFeeding" class="card hide"><h2>Feeding</h2></section>
-  <section id="viewHelpers" class="card hide"><h2>Helpers</h2></section>
-  <section id="viewRecords" class="card hide"><h2>Records &amp; Export</h2></section>
+<section id="viewRecords" class="card hide">
+  <h2>Records &amp; Export</h2>
+  <div class="row">
+    <button class="btn" onclick="__back()">Back</button>
+    <button class="btn" onclick="__home()">Home</button>
+  </div>
+</section>
 
 </main>
 
-<button id="btnEmergency" class="btn danger emergency-fixed">Emergency</button>
+<button class="btn danger emergency-fixed">Emergency</button>
 
-<!-- ADD DIALOG -->
-<dialog id="dlgInv" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Inventory item</h3>
-      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
-    </div>
-    <div class="dlg-b">
-      <label class="label">Item name / label</label>
-      <input id="invName" />
+<!-- Scan + logic already included in previous commits -->
 
-      <div class="grid2">
-        <div>
-          <label class="label">Category</label>
-          <select id="invCategory">
-            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
-            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label class="label">Source</label>
-          <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
-        </div>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label class="label">Identifier type</label>
-          <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
-        </div>
-        <div>
-          <label class="label">Identifier value</label>
-          <input id="invIdValue" placeholder="(scan or type)" />
-        </div>
-      </div>
-
-      <div class="row">
-        <button type="button" class="btn" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan now (QR or barcode)</button>
-        <button type="button" class="btn" id="btnAddClearId">Delete now</button>
-      </div>
-
-      <div class="grid2">
-        <div>
-          <label class="label">Unit</label>
-          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
-        </div>
-        <div>
-          <label class="label">Weight per unit (optional)</label>
-          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
-        </div>
-      </div>
-
-      <label class="label">Notes (optional)</label>
-      <input id="invNotes" />
-    </div>
-    <div class="dlg-f">
-      <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
-    </div>
-  </form>
-</dialog>
-
-<!-- SCAN DIALOG -->
-<dialog id="dlgScan" class="dlg">
-  <form method="dialog" class="dlg-card">
-    <div class="dlg-h">
-      <h3>Scan</h3>
-      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
-    </div>
-    <div class="dlg-b">
-      <video id="scanVideo" playsinline autoplay muted></video>
-
-      <div id="scanResultBox" class="scan-result hide">
-        <div class="muted small">Identifier captured</div>
-        <div id="scanValue" class="scan-value"></div>
-      </div>
-
-      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-
-      <label class="label" style="margin-top:12px;">Manual entry (if needed)</label>
-      <input id="scanManual" placeholder="Type or paste barcode here" inputmode="numeric" />
-    </div>
-    <div class="dlg-f">
-      <button type="button" class="btn" id="btnRescan">Rescan</button>
-      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
-      <button class="btn" value="cancel">Cancel</button>
-    </div>
-  </form>
-</dialog>
-
-<script>
-(function(){
-  const INV_STORE_KEY="breederPro_inventory_store_v1";
-  function loadStore(){ try{ const raw=localStorage.getItem(INV_STORE_KEY); if(!raw) return {inventory:[]}; const obj=JSON.parse(raw); if(!obj.inventory) obj.inventory=[]; return obj; }catch{ return {inventory:[]}; } }
-  function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
-
-  // --- scan engine ---
-  let scanStream=null;
-  let lastScanValue="";
-  let scanContext="transfer";
-
-  function stopScanStream(){
-    const video=document.getElementById("scanVideo");
-    if(video) video.pause();
-    if(scanStream){
-      scanStream.getTracks().forEach(t=>t.stop());
-      scanStream=null;
-    }
-  }
-
-  async function startScan(){
-    const video=document.getElementById("scanVideo");
-    const help=document.getElementById("scanHelp");
-    const box=document.getElementById("scanResultBox");
-    const val=document.getElementById("scanValue");
-
-    lastScanValue="";
-    box.classList.add("hide");
-    val.textContent="";
-    help.textContent="";
-
-    try{
-      scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
-      video.srcObject=scanStream;
-
-      // compatibility
-      video.setAttribute("playsinline","");
-      video.muted=true;
-      video.autoplay=true;
-
-      try{ await video.play(); }catch(e){ setTimeout(()=>{ video.play().catch(()=>{}); },250); }
-    }catch{
-      help.textContent="Camera access unavailable. Manual entry is available below.";
-      return;
-    }
-
-    if(!("BarcodeDetector" in window)){
-      help.textContent="Scanner not supported on this browser. Manual entry is available below.";
-      return;
-    }
-
-    let detector;
-    try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
-    catch{ detector=new BarcodeDetector(); }
-
-    help.textContent="Point camera at code. Confirm is required after a scan.";
-
-    const loop=async()=>{
-      if(!scanStream) return;
-      try{
-        const codes=await detector.detect(video);
-        if(codes && codes.length){
-          const raw=codes[0].rawValue||"";
-          if(raw){
-            lastScanValue=raw;
-            box.classList.remove("hide");
-            val.textContent=raw;
-            stopScanStream();
-            return;
-          }
-        }
-      }catch{}
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  }
-
-  function openScanDialog(context){
-    scanContext=context || "transfer";
-    document.getElementById("scanManual").value="";
-    document.getElementById("dlgScan").showModal();
-    startScan();
-  }
-  function closeScanDialog(){
-    stopScanStream();
-    document.getElementById("dlgScan").close();
-  }
-
-  function findMatchByBarcode(code){
-    const store=loadStore();
-    const inv=store.inventory||[];
-    const c=String(code||"").trim();
-    return inv.find(i =>
-      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
-      String(i.identifierValue||"").trim()===c
-    ) || null;
-  }
-
-  // glue functions used on pages (defined in the C patch)
-  // We detect and call them if present:
-  function showTransferFormById(itemId){
-    const store=loadStore();
-    const it=(store.inventory||[]).find(x=>x.itemId===itemId);
-    if(!it) return;
-    if(typeof window.__showTransferForm === "function") window.__showTransferForm(itemId);
-    else {
-      // minimal fallback: just alert
-      alert("Item found, but transfer form function not loaded.");
-    }
-  }
-
-  function showAddStockFormById(itemId){
-    if(typeof window.__showAddStockForm === "function") window.__showAddStockForm(itemId);
-    else {
-      alert("Item found, but add stock form function not loaded.");
-    }
-  }
-
-  function confirmScan(){
-    const manual=(document.getElementById("scanManual").value||"").trim();
-    const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
-
-    if(!code){
-      document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
-      return;
-    }
-
-    if(scanContext==="add"){
-      document.getElementById("invIdType").value="Barcode";
-      document.getElementById("invIdValue").value=code;
-      closeScanDialog();
-      return;
-    }
-
-    const match=findMatchByBarcode(code);
-    closeScanDialog();
-
-    if(!match){
-      if(scanContext==="addstock") document.getElementById("addStockStatus").textContent="No match found. Create item definition first.";
-      else document.getElementById("transferStatus").textContent="No match found. Create item definition first.";
-      return;
-    }
-
-    if(scanContext==="addstock") showAddStockFormById(match.itemId);
-    else showTransferFormById(match.itemId);
-  }
-
-  // Expose for buttons
-  window.__openScanDialog = openScanDialog;
-
-  document.addEventListener("DOMContentLoaded", ()=>{
-    document.getElementById("btnRescan")?.addEventListener("click", startScan);
-    document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
-    document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
-    document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
-  });
-})();
-</script>
-
-<!-- app.js provides window.__go -->
 <script src="app.js"></script>
 
 </body>
-      </html>
+</html>
