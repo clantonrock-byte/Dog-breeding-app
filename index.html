@@ -23,7 +23,6 @@
   <!-- HOME -->
   <section id="viewHome" class="card">
     <h2>What is our goal today?</h2>
-
     <div class="goal-grid">
       <button class="btn primary" onclick="window.__go && window.__go('Dogs')">Dogs &amp; Pups</button>
       <button class="btn primary" onclick="window.__go && window.__go('Care')">Care Timeline</button>
@@ -103,7 +102,7 @@
     </div>
 
     <div class="row">
-      <button class="btn primary" id="btnTransferScan">Scan item</button>
+      <button class="btn primary" id="btnTransferScan" onclick="window.__openScanDialog && window.__openScanDialog('transfer')">Scan item</button>
       <button class="btn" id="btnTransferRefreshList">Refresh list</button>
     </div>
 
@@ -210,6 +209,12 @@
         </div>
       </div>
 
+      <!-- Scan for Add -->
+      <div class="row">
+        <button type="button" class="btn" id="btnAddScan" onclick="window.__openScanDialog && window.__openScanDialog('add')">Scan identifier</button>
+        <button type="button" class="btn" id="btnAddClearId">Clear identifier</button>
+      </div>
+
       <div class="grid2">
         <div>
           <label class="label">Unit</label>
@@ -232,7 +237,7 @@
   </form>
 </dialog>
 
-<!-- SCAN DIALOG -->
+<!-- SCAN DIALOG (patched) -->
 <dialog id="dlgScan" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -241,7 +246,8 @@
     </div>
 
     <div class="dlg-b">
-      <video id="scanVideo" playsinline></video>
+      <!-- ✅ PATCH: autoplay muted playsinline -->
+      <video id="scanVideo" playsinline autoplay muted></video>
 
       <div id="scanResultBox" class="scan-result hide">
         <div class="muted small">Identifier captured</div>
@@ -355,7 +361,7 @@
     document.getElementById("invName").value = "";
     document.getElementById("invCategory").value = "Food";
     document.getElementById("invSource").value = "Other";
-    document.getElementById("invIdType").value = "None";
+    document.getElementById("invIdType").value = "Barcode";
     document.getElementById("invIdValue").value = "";
     document.getElementById("invUnit").value = "count";
     document.getElementById("invWeightPerUnit").value = "";
@@ -470,30 +476,46 @@
     document.getElementById("transferStatus").textContent = "";
   }
 
-  // Scan: confirm uses camera result OR manual field
-  let scanStream=null, lastScanValue="";
+  // Scan: context aware (add vs transfer)
+  let scanStream=null, lastScanValue="", scanContext="transfer";
 
   async function startScan(){
     const video=document.getElementById("scanVideo");
     const help=document.getElementById("scanHelp");
     const box=document.getElementById("scanResultBox");
     const val=document.getElementById("scanValue");
+
     lastScanValue=""; box.classList.add("hide"); val.textContent=""; help.textContent="";
     try{
       scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
-      video.srcObject=scanStream; await video.play();
+      video.srcObject=scanStream;
+
+      // PATCH: better compatibility
+      video.setAttribute("playsinline","");
+      video.muted=true;
+      video.autoplay=true;
+
+      try {
+        await video.play();
+      } catch (e) {
+        setTimeout(()=>{ video.play().catch(()=>{}); }, 250);
+      }
     }catch{
-      help.textContent="Camera access unavailable. Manual entry remains available.";
+      help.textContent="Camera access unavailable. Manual entry is available below.";
       return;
     }
+
     if(!("BarcodeDetector" in window)){
-      help.textContent="Scanner not supported on this browser. Manual entry remains available.";
+      help.textContent="Scanner not supported on this browser. Manual entry is available below.";
       return;
     }
+
     let detector;
     try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
     catch{ detector=new BarcodeDetector(); }
+
     help.textContent="Point camera at code. Confirm is required after a scan.";
+
     const loop=async()=>{
       if(!scanStream) return;
       try{
@@ -513,6 +535,7 @@
     };
     requestAnimationFrame(loop);
   }
+
   function stopScanStream(){
     const video=document.getElementById("scanVideo");
     if(video) video.pause();
@@ -521,7 +544,9 @@
       scanStream=null;
     }
   }
-  function openScanDialog(){
+
+  function openScanDialog(context){
+    scanContext = context || "transfer";
     document.getElementById("scanManual").value="";
     document.getElementById("dlgScan").showModal();
     startScan();
@@ -530,55 +555,73 @@
     stopScanStream();
     document.getElementById("dlgScan").close();
   }
+
   function confirmScan(){
     const manual=(document.getElementById("scanManual").value||"").trim();
     const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
+
     if(!code){
       document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
       return;
     }
+
+    // Add context: populate fields, do not route
+    if(scanContext === "add"){
+      document.getElementById("invIdType").value = "Barcode";
+      document.getElementById("invIdValue").value = code;
+      closeScanDialog();
+      // reopen add dialog if it was closed (it stays open in this build, so no-op)
+      return;
+    }
+
+    // Transfer context: route to matched item
     const store=loadStore();
     const inv=store.inventory||[];
     const match=inv.find(i =>
       (i.identifierType==="Barcode" || i.identifierType==="QR") &&
       String(i.identifierValue||"").trim()===code
     );
+
     closeScanDialog();
+
     if(!match){
-      document.getElementById("transferStatus").textContent="No matching item found for this identifier. Create the item definition first.";
+      document.getElementById("transferStatus").textContent =
+        "No matching item found for this identifier. Create the item definition first.";
       return;
     }
     showTransferForm(match.itemId);
   }
 
+  window.__openScanDialog = openScanDialog;
+
   // Bind
   document.addEventListener("DOMContentLoaded", ()=>{
-    // Home navigation backup
     window.__go("Home");
 
-    // Available buttons
     document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
     document.getElementById("btnInvToggleArchived")?.addEventListener("click", ()=> document.getElementById("invAvailableArchived").classList.toggle("hide"));
 
-    // Add page
     document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
     document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
+    document.getElementById("btnAddClearId")?.addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
+    // Add scan is handled by button onclick
 
-    // Transfer page
     document.getElementById("btnTransferRefreshList")?.addEventListener("click", populateTransferSelect);
     document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
     document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
     document.getElementById("btnCancelTransfer")?.addEventListener("click", cancelTransfer);
 
-    // Scan
-    document.getElementById("btnTransferScan")?.addEventListener("click", openScanDialog);
+    document.getElementById("btnTransferScan")?.addEventListener("click", ()=> openScanDialog("transfer"));
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
 
-    // Voice
     document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
+
+    // Ensure lists are ready when needed
+    renderInventoryAvailable();
+    populateTransferSelect();
   });
 })();
 </script>
