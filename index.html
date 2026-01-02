@@ -45,6 +45,7 @@
     <div class="goal-grid">
       <button class="btn primary" onclick="window.__go && window.__go('InventoryAvailable')">Inventory available</button>
       <button class="btn primary" onclick="window.__go && window.__go('InventoryAdd')">Add to inventory</button>
+      <button class="btn primary" onclick="window.__go && window.__go('InventoryAddStock')">Add stock</button>
       <button class="btn primary" onclick="window.__go && window.__go('InventoryTransfer')">Transfer inventory</button>
     </div>
   </section>
@@ -68,7 +69,7 @@
     <div id="invAvailableArchived" class="hide"></div>
   </section>
 
-  <!-- INVENTORY: ADD -->
+  <!-- INVENTORY: ADD (definition) -->
   <section id="viewInventoryAdd" class="card hide">
     <h2>Add to inventory</h2>
 
@@ -78,7 +79,7 @@
     </div>
 
     <div class="muted small" style="margin:10px 0;">
-      This records item definition (what it is). Stock changes happen through Transfer and future Add-stock tools.
+      This records item definition (what it is). Stock changes happen through Add stock / Transfer.
     </div>
 
     <div class="row">
@@ -89,6 +90,48 @@
     <div class="muted small" style="margin-top:12px;">
       After saving, the item will appear under “Inventory available”.
     </div>
+  </section>
+
+  <!-- INVENTORY: ADD STOCK -->
+  <section id="viewInventoryAddStock" class="card hide">
+    <h2>Add stock</h2>
+
+    <div class="row">
+      <button class="btn" onclick="window.__go && window.__go('InventoryMenu')">Back</button>
+      <button class="btn" onclick="window.__go && window.__go('Home')">Home</button>
+    </div>
+
+    <div class="muted small" style="margin:10px 0;">
+      Scan an identifier or select an item, then record how much was added to on-hand.
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="btnAddStockScan" onclick="window.__openScanDialog && window.__openScanDialog('addstock')">Scan item</button>
+      <button class="btn" id="btnAddStockRefreshList">Refresh list</button>
+    </div>
+
+    <label class="label">Or select an item (manual)</label>
+    <select id="addStockSelect"></select>
+
+    <div id="addStockForm" class="hide" style="margin-top:12px;">
+      <div class="timeline-item">
+        <div><strong id="addStockItemName"></strong></div>
+        <div class="muted small" id="addStockItemMeta"></div>
+      </div>
+
+      <label class="label">Quantity to add</label>
+      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 40" />
+
+      <label class="label">Note (optional)</label>
+      <input id="addStockNote" placeholder="Any factual notes (delivery, donation, etc.)" />
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn primary" id="btnConfirmAddStock">Confirm add</button>
+        <button class="btn" id="btnCancelAddStock">Cancel</button>
+      </div>
+    </div>
+
+    <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
   <!-- INVENTORY: TRANSFER -->
@@ -239,7 +282,7 @@
   </form>
 </dialog>
 
-<!-- SCAN DIALOG (patched) -->
+<!-- SCAN DIALOG -->
 <dialog id="dlgScan" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
@@ -271,7 +314,7 @@
 
 <script>
 (function(){
-  const VIEWS=["Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryTransfer","Dogs","Care","Feeding","Helpers","Records"];
+  const VIEWS=["Home","InventoryMenu","InventoryAvailable","InventoryAdd","InventoryAddStock","InventoryTransfer","Dogs","Care","Feeding","Helpers","Records"];
   window.__go=function(name){
     VIEWS.forEach(v=>{
       const el=document.getElementById("view"+v);
@@ -279,6 +322,7 @@
     });
     if(name==="InventoryAvailable") renderInventoryAvailable();
     if(name==="InventoryTransfer") populateTransferSelect();
+    if(name==="InventoryAddStock") populateAddStockSelect();
   };
 
   const INV_STORE_KEY="breederPro_inventory_store_v1";
@@ -356,6 +400,53 @@
     window.__go("InventoryAvailable");
   }
 
+  // Add stock
+  let addStockItemId=null;
+  function populateAddStockSelect(){
+    const sel=document.getElementById("addStockSelect");
+    const store=loadStore();
+    const active=(store.inventory||[]).filter(i=>!i.archived);
+    sel.innerHTML="";
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    active.forEach(i=>{
+      const opt=document.createElement("option");
+      opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
+      sel.appendChild(opt);
+    });
+  }
+  function showAddStockForm(itemId){
+    const store=loadStore();
+    const it=(store.inventory||[]).find(x=>x.itemId===itemId);
+    if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
+    addStockItemId=itemId;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockItemName").textContent=it.name;
+    const idLine=(it.identifierType && it.identifierType!=="None")?`${it.identifierType}: ${it.identifierValue}`:"Identifier: none";
+    document.getElementById("addStockItemMeta").textContent=`${it.category} • ${it.source} • ${it.unit} • On hand: ${it.qty ?? 0} • ${idLine}`;
+    document.getElementById("addStockQty").value="1";
+    document.getElementById("addStockNote").value="";
+    document.getElementById("addStockStatus").textContent="";
+  }
+  function applyAddStock(){
+    const store=loadStore();
+    const it=(store.inventory||[]).find(x=>x.itemId===addStockItemId);
+    if(!it){ document.getElementById("addStockStatus").textContent="Item not found."; return; }
+    const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
+    if(qty<=0){ document.getElementById("addStockStatus").textContent="Quantity needs to be greater than 0."; return; }
+    it.qty = Number(it.qty||0) + qty;
+    it.history = it.history || [];
+    it.history.push({ ts:new Date().toISOString(), action:"Added", qtyDelta: qty, note:(document.getElementById("addStockNote").value||"").trim() });
+    saveStore(store);
+    document.getElementById("addStockStatus").textContent="Stock added.";
+    renderInventoryAvailable(); populateAddStockSelect();
+  }
+  function cancelAddStock(){
+    addStockItemId=null;
+    document.getElementById("addStockForm").classList.add("hide");
+    document.getElementById("addStockStatus").textContent="";
+  }
+
   // Transfer
   let transferItemId=null;
   function populateTransferSelect(){
@@ -416,7 +507,7 @@
     document.getElementById("transferStatus").textContent="";
   }
 
-  // Scan context-aware
+  // Scan (context-aware)
   let scanStream=null, lastScanValue="", scanContext="transfer";
   async function startScan(){
     const video=document.getElementById("scanVideo");
@@ -484,22 +575,36 @@
       document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
       return;
     }
+    const store=loadStore();
+    const inv=store.inventory||[];
+    const match=inv.find(i =>
+      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
+      String(i.identifierValue||"").trim()===code
+    );
+
     if(scanContext==="add"){
       document.getElementById("invIdType").value="Barcode";
       document.getElementById("invIdValue").value=code;
       closeScanDialog();
       return;
     }
-    const store=loadStore();
-    const match=(store.inventory||[]).find(i =>
-      (i.identifierType==="Barcode" || i.identifierType==="QR") &&
-      String(i.identifierValue||"").trim()===code
-    );
+
     closeScanDialog();
+
     if(!match){
-      document.getElementById("transferStatus").textContent="No matching item found for this identifier. Create the item definition first.";
+      if(scanContext==="addstock"){
+        document.getElementById("addStockStatus").textContent="No matching item found for this identifier. Create the item definition first.";
+      } else {
+        document.getElementById("transferStatus").textContent="No matching item found for this identifier. Create the item definition first.";
+      }
       return;
     }
+
+    if(scanContext==="addstock"){
+      showAddStockForm(match.itemId);
+      return;
+    }
+
     showTransferForm(match.itemId);
   }
 
@@ -515,20 +620,30 @@
     document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
     document.getElementById("btnAddClearId")?.addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
 
+    // Add stock
+    document.getElementById("btnAddStockRefreshList")?.addEventListener("click", populateAddStockSelect);
+    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showAddStockForm(e.target.value); });
+    document.getElementById("btnConfirmAddStock")?.addEventListener("click", applyAddStock);
+    document.getElementById("btnCancelAddStock")?.addEventListener("click", cancelAddStock);
+
+    // Transfer
     document.getElementById("btnTransferRefreshList")?.addEventListener("click", populateTransferSelect);
     document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
     document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
     document.getElementById("btnCancelTransfer")?.addEventListener("click", cancelTransfer);
 
+    // Scan dialog
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
 
+    // Voice
     document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
 
     renderInventoryAvailable();
     populateTransferSelect();
+    populateAddStockSelect();
   });
 })();
 </script>
