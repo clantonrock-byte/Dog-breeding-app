@@ -24,12 +24,12 @@
   <section id="viewHome" class="card">
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
-      <button class="btn primary" onclick="__go('Dogs')">Dogs &amp; Pups</button>
-      <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
-      <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
       <button class="btn primary" onclick="__go('InventoryMenu')">Inventory</button>
+      <button class="btn primary" onclick="__go('Dogs')">Dogs &amp; Pups</button>
+      <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
+      <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
       <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
-      <button class="btn primary" onclick="__go('Records')">Records &amp; Export</button>
+      <button class="btn primary" onclick="__go('Records')">Records</button>
     </div>
   </section>
 
@@ -40,6 +40,7 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
+
     <div class="goal-grid">
       <button class="btn primary" onclick="__go('InventoryAvailable')">Inventory available</button>
       <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
@@ -67,7 +68,7 @@
     <div id="invAvailableArchived" class="hide"></div>
   </section>
 
-  <!-- ADD INVENTORY (definition) -->
+  <!-- ADD INVENTORY -->
   <section id="viewInventoryAdd" class="card hide">
     <h2>Add to inventory</h2>
     <div class="row">
@@ -97,7 +98,7 @@
     <label class="label">Search (optional)</label>
     <input id="addStockSearch" placeholder="Type to filter…" />
 
-    <label class="label">Or select item</label>
+    <label class="label">Select item</label>
     <select id="addStockSelect"></select>
 
     <div id="addStockForm" class="hide" style="margin-top:12px;">
@@ -107,10 +108,10 @@
       </div>
 
       <label class="label">Quantity to add</label>
-      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 40" />
+      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 10" />
 
       <label class="label">Note (optional)</label>
-      <input id="addStockNote" placeholder="Delivery, donation, etc." />
+      <input id="addStockNote" placeholder="delivery / donation" />
 
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnConfirmAddStock">Confirm add</button>
@@ -121,7 +122,7 @@
     <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- REDUCE STOCK (Used / Discarded) -->
+  <!-- ✅ REDUCE STOCK -->
   <section id="viewInventoryReduceStock" class="card hide">
     <h2>Reduce stock</h2>
     <div class="row">
@@ -129,7 +130,6 @@
       <button class="btn" onclick="__home()">Home</button>
     </div>
 
-    <!-- ✅ NEW: Scan item button added here -->
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" onclick="__openScanDialog('reduce')">Scan item</button>
       <button class="btn" id="btnReduceRefreshList">Refresh list</button>
@@ -157,7 +157,7 @@
       <input id="reduceQty" inputmode="decimal" placeholder="e.g., 1" />
 
       <label class="label">Note (optional)</label>
-      <input id="reduceNote" placeholder="fed / spilled / damaged bag / wet blanket" />
+      <input id="reduceNote" placeholder="fed / damaged / spoiled" />
 
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnConfirmReduce">Confirm</button>
@@ -184,7 +184,7 @@
     <label class="label">Search (optional)</label>
     <input id="transferSearch" placeholder="Type to filter…" />
 
-    <label class="label">Or select item</label>
+    <label class="label">Select item</label>
     <select id="transferSelect"></select>
 
     <div id="transferForm" class="hide" style="margin-top:12px;">
@@ -196,30 +196,15 @@
       <label class="label">Quantity to transfer</label>
       <input id="transferQty" inputmode="decimal" placeholder="e.g., 5" />
 
-      <label class="label">Transfer destination</label>
+      <label class="label">Destination</label>
       <select id="transferType">
         <option>With a dog</option>
         <option>To adopter</option>
         <option>To foster</option>
         <option>To another organization</option>
-        <option>Returned to donor</option>
         <option>Moved to storage</option>
         <option>Other</option>
       </select>
-
-      <label class="label">Destination details (optional)</label>
-      <input id="transferDetail" placeholder="Dog name / org / storage" />
-
-      <label class="label">Contact person (optional)</label>
-      <input id="transferContactPerson" placeholder="Jordan Smith" />
-
-      <label class="label">Contact method (optional)</label>
-      <select id="transferContactMethod">
-        <option>None</option><option>Phone</option><option>Email</option><option>Both</option><option>Other</option>
-      </select>
-
-      <label class="label">Contact details (optional)</label>
-      <input id="transferContactDetails" placeholder="555-555-5555 / name@email.com" />
 
       <label class="label">Note (optional)</label>
       <input id="transferNote" placeholder="Any factual notes" />
@@ -233,61 +218,51 @@
     <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- PLACEHOLDERS -->
+  <!-- OTHER PAGES -->
   <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewHelpers" class="card hide"><h2>Helpers</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
-  <section id="viewRecords" class="card hide"><h2>Records &amp; Export</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <section id="viewRecords" class="card hide"><h2>Records</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
 
 </main>
 
-<button class="btn danger emergency-fixed">Emergency</button>
-
-<!-- ADD/EDIT DEFINITION -->
+<!-- ADD DIALOG -->
 <dialog id="dlgInv" class="dlg">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
       <h3>Inventory item</h3>
       <button class="info-btn" value="cancel" aria-label="Close">✕</button>
     </div>
+
     <div class="dlg-b">
       <label class="label">Item name / label</label>
       <input id="invName" />
-      <div class="grid2">
-        <div><label class="label">Category</label>
-          <select id="invCategory">
-            <option>Food</option><option>Treat</option><option>Topper</option><option>Supplement</option>
-            <option>Toy</option><option>Blanket</option><option>Coat</option><option>Equipment</option><option>Other</option>
-          </select>
-        </div>
-        <div><label class="label">Source</label>
-          <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
-        </div>
-      </div>
-      <div class="grid2">
-        <div><label class="label">Identifier type</label>
-          <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
-        </div>
-        <div><label class="label">Identifier value</label>
-          <input id="invIdValue" placeholder="(scan or type)" />
-        </div>
-      </div>
-      <div class="row">
-        <button type="button" class="btn" onclick="__openScanDialog('add')">Scan now (QR or barcode)</button>
-        <button type="button" class="btn" id="btnAddClearId">Delete now</button>
-      </div>
-      <div class="grid2">
-        <div><label class="label">Unit</label>
-          <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
-        </div>
-        <div><label class="label">Weight per unit (optional)</label>
-          <input id="invWeightPerUnit" placeholder="e.g., 40 lb" />
-        </div>
-      </div>
+
+      <label class="label">Category</label>
+      <select id="invCategory">
+        <option>Food</option><option>Treat</option><option>Toy</option><option>Blanket</option><option>Equipment</option><option>Other</option>
+      </select>
+
+      <label class="label">Source</label>
+      <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
+
+      <label class="label">Identifier type</label>
+      <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
+
+      <label class="label">Identifier value</label>
+      <input id="invIdValue" />
+
+      <label class="label">Unit</label>
+      <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
+
+      <label class="label">Weight per unit (optional)</label>
+      <input id="invWeightPerUnit" />
+
       <label class="label">Notes (optional)</label>
       <input id="invNotes" />
     </div>
+
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
       <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
@@ -308,9 +283,9 @@
         <div class="muted small">Identifier captured</div>
         <div id="scanValue" class="scan-value"></div>
       </div>
-      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
-      <label class="label" style="margin-top:12px;">Manual entry (if needed)</label>
-      <input id="scanManual" placeholder="Type or paste barcode here" inputmode="numeric" />
+      <div id="scanHelp" class="muted small"></div>
+      <label class="label">Manual entry</label>
+      <input id="scanManual" />
     </div>
     <div class="dlg-f">
       <button type="button" class="btn" id="btnRescan">Rescan</button>
@@ -325,9 +300,159 @@
 <script>
 (function(){
   const INV_STORE_KEY="breederPro_inventory_store_v1";
-  function loadStore(){ try{ const raw=localStorage.getItem(INV_STORE_KEY); if(!raw) return {inventory:[]}; const obj=JSON.parse(raw); if(!obj.inventory) obj.inventory=[]; return obj; }catch{ return {inventory:[]}; } }
 
-  // Scan engine
+  function loadStore(){
+    try{
+      const raw=localStorage.getItem(INV_STORE_KEY);
+      if(!raw) return {inventory:[]};
+      const obj=JSON.parse(raw);
+      if(!obj.inventory) obj.inventory=[];
+      return obj;
+    }catch{ return {inventory:[]}; }
+  }
+  function saveStore(obj){ localStorage.setItem(INV_STORE_KEY, JSON.stringify(obj)); }
+
+  function getActiveItems(){ return (loadStore().inventory||[]).filter(i=>!i.archived); }
+
+  function populateSelect(selectId){
+    const sel=document.getElementById(selectId);
+    if(!sel) return;
+    const items=getActiveItems();
+    sel.innerHTML="";
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    items.forEach(i=>{
+      const opt=document.createElement("option");
+      opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  function filterSelect(searchId, selectId){
+    const q=(document.getElementById(searchId).value||"").trim().toLowerCase();
+    const sel=document.getElementById(selectId);
+    if(!sel) return;
+    const items=getActiveItems().filter(i=>{
+      if(!q) return true;
+      const hay=`${i.name||""} ${i.category||""} ${i.source||""} ${i.unit||""} ${i.identifierValue||""}`.toLowerCase();
+      return hay.includes(q);
+    });
+    sel.innerHTML="";
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    items.forEach(i=>{
+      const opt=document.createElement("option");
+      opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${i.qty ?? 0})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  // Render list (simple)
+  function renderInventoryAvailable(){
+    const meta=document.getElementById("invAvailableMeta");
+    const list=document.getElementById("invAvailableList");
+    const store=loadStore();
+    const inv=store.inventory||[];
+    const active=inv.filter(i=>!i.archived);
+    if(meta) meta.textContent=`Active: ${active.length}`;
+    if(list){
+      list.innerHTML = active.length ? active.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
+        : `<div class="muted small">No active items.</div>`;
+    }
+  }
+
+  // Definition save
+  function openAddDialog(){
+    document.getElementById("invName").value="";
+    document.getElementById("invCategory").value="Food";
+    document.getElementById("invSource").value="Other";
+    document.getElementById("invIdType").value="Barcode";
+    document.getElementById("invIdValue").value="";
+    document.getElementById("invUnit").value="count";
+    document.getElementById("invWeightPerUnit").value="";
+    document.getElementById("invNotes").value="";
+    document.getElementById("dlgInv").showModal();
+  }
+
+  function saveDefinition(){
+    const name=(document.getElementById("invName").value||"").trim();
+    if(!name){ alert("Item name required."); return; }
+    const store=loadStore();
+    store.inventory.push({
+      itemId:"inv_"+Date.now(),
+      name,
+      category:document.getElementById("invCategory").value,
+      source:document.getElementById("invSource").value,
+      identifierType:document.getElementById("invIdType").value,
+      identifierValue:(document.getElementById("invIdValue").value||"").trim(),
+      unit:document.getElementById("invUnit").value,
+      weightPerUnit:(document.getElementById("invWeightPerUnit").value||"").trim(),
+      notes:(document.getElementById("invNotes").value||"").trim(),
+      qty:0,
+      archived:false
+    });
+    saveStore(store);
+    document.getElementById("dlgInv").close();
+    renderInventoryAvailable();
+    populateSelect("addStockSelect"); populateSelect("reduceSelect"); populateSelect("transferSelect");
+  }
+
+  // Show forms
+  let addStockItemId=null, reduceItemId=null, transferItemId=null;
+
+  function showAddStockForm(id){
+    addStockItemId=id;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockQty").value="1";
+    document.getElementById("addStockStatus").textContent="";
+  }
+  function showReduceForm(id){
+    reduceItemId=id;
+    document.getElementById("reduceForm").classList.remove("hide");
+    document.getElementById("reduceQty").value="1";
+    document.getElementById("reduceStatus").textContent="";
+  }
+  function showTransferForm(id){
+    transferItemId=id;
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferQty").value="1";
+    document.getElementById("transferStatus").textContent="";
+  }
+
+  function applyAddStock(){
+    const store=loadStore();
+    const it=(store.inventory||[]).find(x=>x.itemId===addStockItemId);
+    const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
+    if(!it || qty<=0){ document.getElementById("addStockStatus").textContent="Pick item + qty"; return; }
+    it.qty = Number(it.qty||0) + qty;
+    saveStore(store);
+    document.getElementById("addStockStatus").textContent="Added.";
+    renderInventoryAvailable();
+  }
+
+  function applyReduce(){
+    const store=loadStore();
+    const it=(store.inventory||[]).find(x=>x.itemId===reduceItemId);
+    const qty=Math.abs(Number(document.getElementById("reduceQty").value||"0")||0);
+    if(!it || qty<=0){ document.getElementById("reduceStatus").textContent="Pick item + qty"; return; }
+    it.qty = Math.max(0, Number(it.qty||0)-qty);
+    saveStore(store);
+    document.getElementById("reduceStatus").textContent="Recorded.";
+    renderInventoryAvailable();
+  }
+
+  function applyTransfer(){
+    const store=loadStore();
+    const it=(store.inventory||[]).find(x=>x.itemId===transferItemId);
+    const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
+    if(!it || qty<=0){ document.getElementById("transferStatus").textContent="Pick item + qty"; return; }
+    it.qty = Math.max(0, Number(it.qty||0)-qty);
+    saveStore(store);
+    document.getElementById("transferStatus").textContent="Transferred.";
+    renderInventoryAvailable();
+  }
+
+  // Scan routing
   let scanStream=null, lastScanValue="", scanContext="transfer";
 
   function stopScanStream(){
@@ -341,6 +466,7 @@
     const help=document.getElementById("scanHelp");
     const box=document.getElementById("scanResultBox");
     const val=document.getElementById("scanValue");
+
     lastScanValue=""; box.classList.add("hide"); val.textContent=""; help.textContent="";
     try{
       scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
@@ -349,17 +475,19 @@
       video.muted=true; video.autoplay=true;
       try{ await video.play(); }catch(e){ setTimeout(()=>{ video.play().catch(()=>{}); },250); }
     }catch{
-      help.textContent="Camera access unavailable. Manual entry is available below.";
+      help.textContent="Camera unavailable. Use manual entry.";
       return;
     }
+
     if(!("BarcodeDetector" in window)){
-      help.textContent="Scanner not supported on this browser. Manual entry is available below.";
+      help.textContent="Scanner unsupported. Use manual entry.";
       return;
     }
+
     let detector;
     try{ detector=new BarcodeDetector({formats:["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"]}); }
     catch{ detector=new BarcodeDetector(); }
-    help.textContent="Point camera at code. Confirm is required after a scan.";
+
     const loop=async()=>{
       if(!scanStream) return;
       try{
@@ -404,11 +532,7 @@
   function confirmScan(){
     const manual=(document.getElementById("scanManual").value||"").trim();
     const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
-
-    if(!code){
-      document.getElementById("scanHelp").textContent="No identifier captured. Manual entry is available.";
-      return;
-    }
+    if(!code){ document.getElementById("scanHelp").textContent="No code captured. Manual entry available."; return; }
 
     if(scanContext==="add"){
       document.getElementById("invIdType").value="Barcode";
@@ -419,18 +543,10 @@
 
     const match=findMatch(code);
     closeScanDialog();
-
     if(!match){
-      if(scanContext==="addstock") document.getElementById("addStockStatus").textContent="No match found. Create definition first.";
-      else if(scanContext==="reduce") document.getElementById("reduceStatus").textContent="No match found. Create definition first.";
-      else document.getElementById("transferStatus").textContent="No match found. Create definition first.";
-      return;
-    }
-
-    if(scanContext==="addstock"){
-      // Use existing selection behavior
-      const sel=document.getElementById("addStockSelect");
-      if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
+      if(scanContext==="reduce") document.getElementById("reduceStatus").textContent="No match found.";
+      else if(scanContext==="addstock") document.getElementById("addStockStatus").textContent="No match found.";
+      else document.getElementById("transferStatus").textContent="No match found.";
       return;
     }
 
@@ -439,19 +555,50 @@
       if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
       return;
     }
-
+    if(scanContext==="addstock"){
+      const sel=document.getElementById("addStockSelect");
+      if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
+      return;
+    }
     const sel=document.getElementById("transferSelect");
     if(sel){ sel.value=match.itemId; sel.dispatchEvent(new Event("change")); }
   }
 
+  // Bind
   document.addEventListener("DOMContentLoaded", ()=>{
+    document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
+    document.getElementById("btnOpenAddDialog")?.addEventListener("click", openAddDialog);
+    document.getElementById("btnSaveInv")?.addEventListener("click", (e)=>{ e.preventDefault(); saveDefinition(); });
+
+    document.getElementById("btnAddStockRefreshList")?.addEventListener("click", ()=>{ populateSelect("addStockSelect"); filterSelect("addStockSearch","addStockSelect"); });
+    document.getElementById("addStockSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showAddStockForm(e.target.value); });
+    document.getElementById("btnConfirmAddStock")?.addEventListener("click", applyAddStock);
+    document.getElementById("addStockSearch")?.addEventListener("input", ()=> filterSelect("addStockSearch","addStockSelect"));
+
+    document.getElementById("btnReduceRefreshList")?.addEventListener("click", ()=>{ populateSelect("reduceSelect"); filterSelect("reduceSearch","reduceSelect"); });
+    document.getElementById("reduceSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showReduceForm(e.target.value); });
+    document.getElementById("btnConfirmReduce")?.addEventListener("click", applyReduce);
+    document.getElementById("reduceSearch")?.addEventListener("input", ()=> filterSelect("reduceSearch","reduceSelect"));
+
+    document.getElementById("btnTransferRefreshList")?.addEventListener("click", ()=>{ populateSelect("transferSelect"); filterSelect("transferSearch","transferSelect"); });
+    document.getElementById("transferSelect")?.addEventListener("change", (e)=>{ if(e.target.value) showTransferForm(e.target.value); });
+    document.getElementById("btnConfirmTransfer")?.addEventListener("click", applyTransfer);
+    document.getElementById("transferSearch")?.addEventListener("input", ()=> filterSelect("transferSearch","transferSelect"));
+
     document.getElementById("btnRescan")?.addEventListener("click", startScan);
     document.getElementById("btnConfirmScan")?.addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan")?.addEventListener("click", closeScanDialog);
     document.getElementById("dlgScan")?.addEventListener("close", stopScanStream);
+
+    document.getElementById("btnTalk")?.addEventListener("click", ()=> alert("Voice may be used at any time."));
+
+    renderInventoryAvailable();
+    populateSelect("addStockSelect");
+    populateSelect("reduceSelect");
+    populateSelect("transferSelect");
   });
 })();
 </script>
 
 </body>
-          </html>
+  </html>
