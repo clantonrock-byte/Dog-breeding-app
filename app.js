@@ -26,7 +26,6 @@
     });
     current = name;
 
-    // Let index.html refresh lists whenever a page is shown
     if (typeof window.__afterShow === "function") {
       try { window.__afterShow(name); } catch (e) {}
     }
@@ -39,10 +38,7 @@
   };
 
   window.__back = function () {
-    if (stack.length === 0) {
-      show("Home");
-      return;
-    }
+    if (stack.length === 0) { show("Home"); return; }
     show(stack.pop());
   };
 
@@ -51,7 +47,5 @@
     show("Home");
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
-    show("Home");
-  });
+  document.addEventListener("DOMContentLoaded", () => show("Home"));
 })();
