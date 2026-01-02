@@ -40,6 +40,7 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
+
     <div class="goal-grid">
       <button class="btn primary" onclick="__go('InventoryAvailable')">Inventory available</button>
       <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
@@ -74,9 +75,14 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
+
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnOpenAddDialog">+ Create item definition</button>
       <button class="btn" onclick="__openScanDialog('add')">Scan now (QR or barcode)</button>
+    </div>
+
+    <div class="muted small" style="margin-top:10px;">
+      Create definition first. Stock changes are recorded in Add stock / Reduce / Transfer.
     </div>
   </section>
 
@@ -90,11 +96,8 @@
 
     <div class="row">
       <button class="btn primary" onclick="__openScanDialog('addstock')">Scan item</button>
-      <button class="btn" id="btnAddStockRefreshList">Refresh list</button>
+      <button class="btn" id="btnAddStockRefresh">Refresh list</button>
     </div>
-
-    <label class="label">Search (optional)</label>
-    <input id="addStockSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="addStockSelect"></select>
@@ -106,14 +109,14 @@
       </div>
 
       <label class="label">Quantity to add</label>
-      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 10" />
+      <input id="addStockQty" inputmode="decimal" placeholder="e.g., 5" />
 
       <label class="label">Note (optional)</label>
       <input id="addStockNote" placeholder="delivery / donation" />
 
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnConfirmAddStock">Confirm add</button>
-        <button class="btn" onclick="__back()">Cancel</button>
+        <button class="btn primary" id="btnAddStockConfirm">Confirm add</button>
+        <button class="btn" id="btnAddStockCancel">Cancel</button>
       </div>
     </div>
 
@@ -130,11 +133,8 @@
 
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" onclick="__openScanDialog('reduce')">Scan item</button>
-      <button class="btn" id="btnReduceRefreshList">Refresh list</button>
+      <button class="btn" id="btnReduceRefresh">Refresh list</button>
     </div>
-
-    <label class="label">Search (optional)</label>
-    <input id="reduceSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="reduceSelect"></select>
@@ -152,14 +152,14 @@
       </select>
 
       <label class="label">Quantity</label>
-      <input id="reduceQty" inputmode="decimal" placeholder="e.g., 1" />
+      <input id="reduceQty" inputmode="decimal" placeholder="e.g., 2" />
 
       <label class="label">Note (optional)</label>
       <input id="reduceNote" placeholder="fed / damaged / spoiled" />
 
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnConfirmReduce">Confirm</button>
-        <button class="btn" onclick="__back()">Cancel</button>
+        <button class="btn primary" id="btnReduceConfirm">Confirm</button>
+        <button class="btn" id="btnReduceCancel">Cancel</button>
       </div>
     </div>
 
@@ -174,13 +174,10 @@
       <button class="btn" onclick="__home()">Home</button>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-top:12px;">
       <button class="btn primary" onclick="__openScanDialog('transfer')">Scan item</button>
-      <button class="btn" id="btnTransferRefreshList">Refresh list</button>
+      <button class="btn" id="btnTransferRefresh">Refresh list</button>
     </div>
-
-    <label class="label">Search (optional)</label>
-    <input id="transferSearch" placeholder="Type to filter…" />
 
     <label class="label">Select item</label>
     <select id="transferSelect"></select>
@@ -191,8 +188,8 @@
         <div class="muted small" id="transferItemMeta"></div>
       </div>
 
-      <label class="label">Quantity to transfer</label>
-      <input id="transferQty" inputmode="decimal" placeholder="e.g., 5" />
+      <label class="label">Quantity</label>
+      <input id="transferQty" inputmode="decimal" placeholder="e.g., 1" />
 
       <label class="label">Destination</label>
       <select id="transferType">
@@ -208,15 +205,15 @@
       <input id="transferNote" placeholder="Any factual notes" />
 
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnConfirmTransfer">Confirm transfer</button>
-        <button class="btn" onclick="__back()">Cancel</button>
+        <button class="btn primary" id="btnTransferConfirm">Confirm transfer</button>
+        <button class="btn" id="btnTransferCancel">Cancel</button>
       </div>
     </div>
 
     <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
-  <!-- OTHER PAGES -->
+  <!-- PLACEHOLDERS -->
   <section id="viewDogs" class="card hide"><h2>Dogs &amp; Pups</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
@@ -232,26 +229,35 @@
       <h3>Inventory item</h3>
       <button class="info-btn" value="cancel" aria-label="Close">✕</button>
     </div>
+
     <div class="dlg-b">
       <label class="label">Item name / label</label>
       <input id="invName" />
+
       <label class="label">Category</label>
       <select id="invCategory">
         <option>Food</option><option>Treat</option><option>Toy</option><option>Blanket</option><option>Equipment</option><option>Other</option>
       </select>
+
       <label class="label">Source</label>
       <select id="invSource"><option>Purchased</option><option>Donated</option><option>Other</option></select>
+
       <label class="label">Identifier type</label>
       <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
+
       <label class="label">Identifier value</label>
       <input id="invIdValue" />
+
       <label class="label">Unit</label>
       <select id="invUnit"><option>count</option><option>weight</option><option>volume</option></select>
+
       <label class="label">Weight per unit (optional)</label>
       <input id="invWeightPerUnit" />
+
       <label class="label">Notes (optional)</label>
       <input id="invNotes" />
     </div>
+
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
       <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
@@ -288,44 +294,46 @@
 
 <script>
 (function(){
-  const INV_STORE_KEY="breederPro_inventory_store_v1";
+  const STORE_KEY="breederPro_inventory_store_v1";
 
   function loadStore(){
     try{
-      const raw=localStorage.getItem(INV_STORE_KEY);
+      const raw=localStorage.getItem(STORE_KEY);
       if(!raw) return {inventory:[]};
       const obj=JSON.parse(raw);
       if(!obj.inventory) obj.inventory=[];
       return obj;
     }catch{ return {inventory:[]}; }
   }
+  function saveStore(obj){ localStorage.setItem(STORE_KEY, JSON.stringify(obj)); }
 
-  // ✅ One-time legacy import if current inventory is empty
-  function importLegacyIfEmpty(){
-    try{
-      const current = loadStore();
-      if((current.inventory||[]).length > 0) return;
-
-      let best = null;
-      for(let i=0;i<localStorage.length;i++){
-        const key = localStorage.key(i);
-        if(!key) continue;
-        const raw = localStorage.getItem(key);
-        if(!raw) continue;
-        try{
-          const obj = JSON.parse(raw);
-          if(obj && Array.isArray(obj.inventory) && obj.inventory.length){
-            if(!best || obj.inventory.length > best.inv.length){
-              best = { key, inv: obj.inventory };
-            }
+  function findLegacyInventory(){
+    let best=null;
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      if(!key) continue;
+      const raw=localStorage.getItem(key);
+      if(!raw) continue;
+      try{
+        const obj=JSON.parse(raw);
+        if(obj && Array.isArray(obj.inventory) && obj.inventory.length){
+          if(!best || obj.inventory.length>best.inventory.length){
+            best=obj;
           }
-        }catch(e){}
-      }
+        }
+      }catch(e){}
+    }
+    return best;
+  }
 
-      if(best){
-        localStorage.setItem(INV_STORE_KEY, JSON.stringify({ inventory: best.inv }));
-      }
-    }catch(e){}
+  // One-time import if empty
+  function importIfEmpty(){
+    const cur=loadStore();
+    if((cur.inventory||[]).length>0) return;
+    const legacy=findLegacyInventory();
+    if(legacy && legacy.inventory && legacy.inventory.length){
+      localStorage.setItem(STORE_KEY, JSON.stringify({inventory: legacy.inventory}));
+    }
   }
 
   function getActiveItems(){
@@ -347,46 +355,42 @@
     });
   }
 
-  function renderInventoryAvailable(){
+  function renderAvailable(){
     const list=document.getElementById("invAvailableList");
-    const active=getActiveItems();
+    const meta=document.getElementById("invAvailableMeta");
+    const items=getActiveItems();
+    if(meta) meta.textContent = `Items: ${items.length}`;
     if(list){
-      list.innerHTML = active.length
-        ? active.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
-        : `<div class="muted small">No active items.</div>`;
+      list.innerHTML = items.length
+        ? items.map(i=>`<div class="timeline-item"><strong>${i.name}</strong><div class="muted small">On hand: ${i.qty ?? 0}</div></div>`).join("")
+        : `<div class="muted small">No items found.</div>`;
     }
   }
 
-  // Auto-refresh lists when views open (called by app.js)
+  // afterShow hook from app.js
   window.__afterShow = function(viewName){
-    importLegacyIfEmpty();
-
-    if(viewName === "InventoryAddStock"){
-      populateSelect("addStockSelect");
-    }
-    if(viewName === "InventoryReduceStock"){
-      populateSelect("reduceSelect");
-    }
-    if(viewName === "InventoryTransfer"){
-      populateSelect("transferSelect");
-    }
-    if(viewName === "InventoryAvailable"){
-      renderInventoryAvailable();
-    }
+    importIfEmpty();
+    if(viewName === "InventoryAvailable") renderAvailable();
+    if(viewName === "InventoryAddStock") populateSelect("addStockSelect");
+    if(viewName === "InventoryReduceStock") populateSelect("reduceSelect");
+    if(viewName === "InventoryTransfer") populateSelect("transferSelect");
   };
 
-  // Bind refresh buttons too
+  // Button wiring
   document.addEventListener("DOMContentLoaded", ()=>{
-    importLegacyIfEmpty();
-    renderInventoryAvailable();
+    importIfEmpty();
+    renderAvailable();
 
-    document.getElementById("btnInvRefresh")?.addEventListener("click", renderInventoryAvailable);
-    document.getElementById("btnAddStockRefreshList")?.addEventListener("click", ()=> populateSelect("addStockSelect"));
-    document.getElementById("btnReduceRefreshList")?.addEventListener("click", ()=> populateSelect("reduceSelect"));
-    document.getElementById("btnTransferRefreshList")?.addEventListener("click", ()=> populateSelect("transferSelect"));
+    document.getElementById("btnInvRefresh")?.addEventListener("click", renderAvailable);
+    document.getElementById("btnAddStockRefresh")?.addEventListener("click", ()=> populateSelect("addStockSelect"));
+    document.getElementById("btnReduceRefresh")?.addEventListener("click", ()=> populateSelect("reduceSelect"));
+    document.getElementById("btnTransferRefresh")?.addEventListener("click", ()=> populateSelect("transferSelect"));
   });
 })();
 </script>
+
+<!-- ✅ Keep scan unchanged: existing scan code is already working in your current build.
+     We are not reintroducing another scan engine here. -->
 
 </body>
 </html>
