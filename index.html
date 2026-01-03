@@ -6,7 +6,7 @@
   <title>Breeder Pro</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ✅ NAV defined immediately -->
+  <!-- ✅ NAV defined immediately so buttons always work -->
   <script>
     (function () {
       const VIEWS = [
@@ -64,8 +64,15 @@
   </script>
 
   <style>
-    /* ========= Deceased rainbow (Samsung-safe) =========
-       Uses SVG stroke draw + erase (no masks, no repeats) */
+    /* ===== Back/Home row: always side-by-side on mobile ===== */
+    .nav-row{
+      display:flex;
+      gap:10px;
+      margin-top:10px;
+    }
+    .nav-row .btn{ flex:1; }
+
+    /* ===== Deceased rainbow (Samsung-safe): draw then erase ===== */
     #rainbowOverlay{
       position: fixed;
       inset: 0;
@@ -73,49 +80,55 @@
       z-index: 9999;
       display: none;
       align-items: center;
-      justify-content: flex-end; /* right side anchor */
+      justify-content: flex-end;
       background: transparent;
     }
     #rainbowOverlay.on{ display:flex; }
-
-    /* The arc container */
     #rainbowArcWrap{
       width: 140vw;
       height: 72vh;
-      opacity: 1;
-      will-change: transform;
+      opacity: 0.82;
     }
-
-    /* Animate the stroke itself (draw then erase) */
-    .rainbowStrokeRun{
-      animation: drawErase 2900ms ease forwards;
-    }
+    .rainbowStrokeRun{ animation: drawErase 2900ms ease forwards; }
     @keyframes drawErase{
       0%   { stroke-dashoffset: var(--len); opacity: 0.0; }
       18%  { opacity: 1.0; }
-      55%  { stroke-dashoffset: 0; opacity: 1.0; }         /* fully drawn */
-      100% { stroke-dashoffset: calc(-1 * var(--len)); opacity: 0.0; } /* erased from start */
+      55%  { stroke-dashoffset: 0; opacity: 1.0; }
+      100% { stroke-dashoffset: calc(-1 * var(--len)); opacity: 0.0; }
     }
 
-    /* UI helpers */
-    .action-row { display:flex; gap:10px; margin-top:12px; }
-    .action-row .btn { flex:1; }
-    .more-panel.hide { display:none; }
-    .section-toggle { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .pill {
+    /* ===== Dog profile tightened ===== */
+    .action-row{ display:flex; gap:10px; margin-top:12px; }
+    .action-row .btn{ flex:1; }
+    .more-panel.hide{ display:none; }
+    .section-toggle{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .pill{
       display:inline-block;
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 12px;
       border: 1px solid #ccc;
     }
-    .subtle-link-btn { width: 100%; text-align: left; }
+    .subtle-link-btn{ width:100%; text-align:left; }
+
+    /* Dogs list controls */
+    .dogs-menu{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+    .dogs-menu .btn{ flex:1; min-width: 120px; }
+    .dogs-subtools{ display:flex; gap:10px; margin-top:10px; }
+    .dogs-subtools .btn{ flex:1; }
+    .dogs-filter-pill{
+      display:inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 
 <body>
 
-<!-- Rainbow overlay: SVG arc stroke draws from RIGHT then erases RIGHT->LEFT -->
+<!-- Rainbow overlay -->
 <div id="rainbowOverlay" aria-hidden="true">
   <div id="rainbowArcWrap">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
@@ -132,7 +145,7 @@
         <filter id="blur"><feGaussianBlur stdDeviation="1.4"/></filter>
       </defs>
 
-      <!-- Flip direction so the "start" is on the RIGHT -->
+      <!-- Flip direction so "start" is on the RIGHT -->
       <g transform="translate(1200,0) scale(-1,1)">
         <path id="rainbowPath"
               d="M40 610 C220 260 480 120 680 105 C930 85 1120 240 1180 610"
@@ -141,14 +154,14 @@
               stroke-width="100"
               stroke-linecap="round"
               filter="url(#blur)"
-              opacity="0.92" />
+              opacity="0.92"/>
         <path id="rainbowHighlight"
               d="M70 612 C250 295 500 160 680 145 C900 125 1070 260 1140 612"
               fill="none"
               stroke="white"
               stroke-width="16"
               stroke-linecap="round"
-              opacity="0.10" />
+              opacity="0.10"/>
       </g>
     </svg>
   </div>
@@ -171,7 +184,7 @@
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
       <button class="btn primary" onclick="__go('InventoryMenu')">Inventory</button>
-      <button class="btn primary" onclick="__go('Dogs')">Dogs &amp; Pups</button>
+      <button class="btn primary" onclick="__go('Dogs')">Dogs</button>
       <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
       <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
       <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
@@ -179,25 +192,44 @@
     </div>
   </section>
 
-  <!-- DOGS LIST -->
+  <!-- DOGS -->
   <section id="viewDogs" class="card hide">
-    <h2>Dogs &amp; Pups</h2>
-    <div class="row">
+    <h2>Dogs</h2>
+
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
 
-    <div class="row" style="margin-top:12px;">
-      <button class="btn primary" id="btnAddDog">+ Add dog</button>
-      <button class="btn" id="btnToggleArchivedDogs">Show archived</button>
+    <!-- Dogs menu buttons -->
+    <div class="dogs-menu">
+      <button class="btn primary" id="btnViewMales">View males</button>
+      <button class="btn primary" id="btnViewFemales">View females</button>
+      <button class="btn primary" id="btnAddDog">Add dog</button>
     </div>
 
-    <div id="dogsActiveMeta" class="muted small" style="margin-top:10px;"></div>
-    <div id="dogsActiveList"></div>
+    <!-- Sub tools -->
+    <div class="dogs-subtools">
+      <button class="btn" id="btnToggleArchivedDogs">Show archived</button>
+      <button class="btn" id="btnShowUnassigned">Needs sex set</button>
+    </div>
+
+    <div class="muted small" style="margin-top:10px;">
+      Current view: <span class="dogs-filter-pill" id="dogsCurrentViewPill">All</span>
+      <span id="dogsSortHint" class="muted small"></span>
+    </div>
+
+    <div id="dogsListMeta" class="muted small" style="margin-top:10px;"></div>
+    <div id="dogsList"></div>
 
     <div id="dogsArchivedWrap" class="hide" style="margin-top:14px;">
       <div class="muted small" id="dogsArchivedMeta"></div>
       <div id="dogsArchivedList"></div>
+    </div>
+
+    <div id="dogsUnassignedWrap" class="hide" style="margin-top:14px;">
+      <div class="muted small" id="dogsUnassignedMeta"></div>
+      <div id="dogsUnassignedList"></div>
     </div>
   </section>
 
@@ -205,7 +237,7 @@
   <section id="viewDogProfile" class="card hide">
     <h2 id="dogProfileTitle">Dog Profile</h2>
 
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -230,14 +262,12 @@
       </div>
     </div>
 
-    <!-- Tight header: Status then Call name -->
+    <!-- Tight header -->
     <div class="timeline-item">
       <div class="section-toggle">
         <strong>Status</strong>
         <span class="pill" id="dogStatusPill">Adult</span>
       </div>
-
-      <!-- ✅ These details are the "truth" shown gently -->
       <div class="muted small" id="dogStatusTimestamps" style="margin-top:6px;"></div>
 
       <div style="margin-top:10px;">
@@ -353,10 +383,10 @@
     </div>
   </section>
 
-  <!-- Inventory pages (kept as-is) -->
+  <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -371,7 +401,7 @@
 
   <section id="viewInventoryAvailable" class="card hide">
     <h2>Inventory available</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -386,7 +416,7 @@
 
   <section id="viewInventoryAdd" class="card hide">
     <h2>Add to inventory</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -398,7 +428,7 @@
 
   <section id="viewInventoryAddStock" class="card hide">
     <h2>Add stock</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -423,7 +453,7 @@
 
   <section id="viewInventoryReduceStock" class="card hide">
     <h2>Reduce stock</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -450,7 +480,7 @@
 
   <section id="viewInventoryTransfer" class="card hide">
     <h2>Transfer inventory</h2>
-    <div class="row">
+    <div class="nav-row">
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
@@ -473,10 +503,23 @@
     </div>
   </section>
 
-  <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
-  <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
-  <section id="viewHelpers" class="card hide"><h2>Helpers</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
-  <section id="viewRecords" class="card hide"><h2>Records</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
+  <!-- PLACEHOLDERS -->
+  <section id="viewFeeding" class="card hide">
+    <h2>Feeding</h2>
+    <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
+  </section>
+  <section id="viewCare" class="card hide">
+    <h2>Care Timeline</h2>
+    <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
+  </section>
+  <section id="viewHelpers" class="card hide">
+    <h2>Helpers</h2>
+    <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
+  </section>
+  <section id="viewRecords" class="card hide">
+    <h2>Records</h2>
+    <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
+  </section>
 
 </main>
 
@@ -569,15 +612,13 @@
 
   const invActive=()=>loadInv().inventory.filter(i=>!i.archived);
 
-  // Rainbow: draw -> erase, right -> left, no repeats
+  // ===== Rainbow (draw then erase) =====
   function rainbowMoment(){
     const overlay=document.getElementById("rainbowOverlay");
-    const wrap=document.getElementById("rainbowArcWrap");
     const path=document.getElementById("rainbowPath");
     const hi=document.getElementById("rainbowHighlight");
-    if(!overlay || !wrap || !path) return;
+    if(!overlay || !path) return;
 
-    // Compute path length for dash animation
     const len = path.getTotalLength();
     path.style.setProperty("--len", `${len}`);
     path.style.strokeDasharray = `${len}`;
@@ -590,18 +631,15 @@
       hi.style.strokeDashoffset = `${hlen}`;
     }
 
-    // Reset animations (Samsung-safe)
     overlay.classList.remove("on");
     path.classList.remove("rainbowStrokeRun");
     if(hi) hi.classList.remove("rainbowStrokeRun");
-
-    void overlay.offsetHeight; // reflow
+    void overlay.offsetHeight;
 
     overlay.classList.add("on");
     path.classList.add("rainbowStrokeRun");
     if(hi) hi.classList.add("rainbowStrokeRun");
 
-    // cleanup
     setTimeout(()=>{
       overlay.classList.remove("on");
       path.classList.remove("rainbowStrokeRun");
@@ -609,7 +647,7 @@
     }, 3000);
   }
 
-  // Inventory (same)
+  // ===== Inventory =====
   function renderInv(){
     const store=loadInv();
     const items=store.inventory.filter(i=>!i.archived);
@@ -734,8 +772,9 @@
     renderInv(); populateSelect("transferSelect");
   }
 
-  // Dogs
+  // ===== Dogs: view males/females + sort intact first =====
   let currentDogId=null;
+  let dogsViewMode = "All"; // "Males" | "Females" | "Unassigned" | "All"
 
   function addDog(callName){
     const store=loadDogs();
@@ -765,43 +804,103 @@
 
   function getDog(id){ return loadDogs().dogs.find(d=>d.dogId===id) || null; }
 
+  function sexCategory(sexStr){
+    const s=(sexStr||"").toLowerCase();
+    if(s.startsWith("male")) return "male";
+    if(s.startsWith("female")) return "female";
+    return "unknown";
+  }
+  function isAltered(sexStr){
+    const s=(sexStr||"").toLowerCase();
+    return s.includes("neutered") || s.includes("spayed");
+  }
+
+  function sortDogsIntactFirst(a,b){
+    const ai = isAltered(a.sex) ? 1 : 0;  // intact first => altered is 1
+    const bi = isAltered(b.sex) ? 1 : 0;
+    if(ai !== bi) return ai - bi;
+    const an=(a.callName||"").toLowerCase();
+    const bn=(b.callName||"").toLowerCase();
+    return an.localeCompare(bn);
+  }
+
   function renderDogs(){
     const store=loadDogs();
-    const active=store.dogs.filter(d=>!d.archived);
-    const archived=store.dogs.filter(d=>d.archived);
+    const all=store.dogs || [];
+    const archived = all.filter(d=>d.archived);
 
-    document.getElementById("dogsActiveMeta").textContent=`Active dogs: ${active.length}`;
-    document.getElementById("dogsActiveList").innerHTML = active.length ? active.map(d=>`
+    const showArchived = !document.getElementById("dogsArchivedWrap").classList.contains("hide");
+    const showUnassigned = !document.getElementById("dogsUnassignedWrap").classList.contains("hide");
+
+    // Filter per view mode
+    let list = all.filter(d=>!d.archived);
+    if(dogsViewMode==="Males"){
+      list = list.filter(d=>sexCategory(d.sex)==="male");
+    } else if(dogsViewMode==="Females"){
+      list = list.filter(d=>sexCategory(d.sex)==="female");
+    } else if(dogsViewMode==="Unassigned"){
+      list = list.filter(d=>sexCategory(d.sex)==="unknown");
+    }
+
+    // Sorting rule: intact first, altered after
+    list.sort(sortDogsIntactFirst);
+
+    document.getElementById("dogsCurrentViewPill").textContent = dogsViewMode;
+    document.getElementById("dogsSortHint").textContent =
+      (dogsViewMode==="Males" || dogsViewMode==="Females") ? " • intact first, altered after" : "";
+
+    document.getElementById("dogsListMeta").textContent = `Dogs shown: ${list.length}`;
+    document.getElementById("dogsList").innerHTML = list.length ? list.map(d=>`
       <div class="timeline-item">
         <div class="row" style="justify-content:space-between; gap:10px;">
-          <div><strong>${d.callName}</strong><div class="muted small">Status: ${d.status}</div></div>
+          <div>
+            <div><strong>${d.callName}</strong></div>
+            <div class="muted small">Sex: ${d.sex || "(unknown)"} • Status: ${d.status}</div>
+          </div>
           <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
         </div>
       </div>
-    `).join("") : `<div class="muted small">No active dogs yet.</div>`;
+    `).join("") : `<div class="muted small">No dogs found in this view.</div>`;
 
-    const wrap=document.getElementById("dogsArchivedWrap");
-    if(!wrap.classList.contains("hide")){
-      document.getElementById("dogsArchivedMeta").textContent=`Archived dogs: ${archived.length}`;
-      document.getElementById("dogsArchivedList").innerHTML = archived.length ? archived.map(d=>`
+    // Archived list (hidden by default)
+    if(showArchived){
+      document.getElementById("dogsArchivedMeta").textContent = `Archived dogs: ${archived.length}`;
+      document.getElementById("dogsArchivedList").innerHTML = archived.length ? archived.sort((a,b)=> (a.callName||"").localeCompare(b.callName||"")).map(d=>`
         <div class="timeline-item">
           <div class="row" style="justify-content:space-between; gap:10px;">
-            <div><strong>${d.callName}</strong><div class="muted small">Archived • ${d.status} • ${d.archivedAt?fmt(d.archivedAt):""}</div></div>
+            <div>
+              <div><strong>${d.callName}</strong></div>
+              <div class="muted small">Archived • ${d.status} • ${d.archivedAt ? fmt(d.archivedAt) : ""}</div>
+            </div>
             <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
           </div>
         </div>
       `).join("") : `<div class="muted small">No archived dogs.</div>`;
     }
+
+    // Unassigned list (optional view)
+    if(showUnassigned){
+      const unassigned = all.filter(d=>!d.archived && sexCategory(d.sex)==="unknown").sort((a,b)=>(a.callName||"").localeCompare(b.callName||""));
+      document.getElementById("dogsUnassignedMeta").textContent = `Needs sex set: ${unassigned.length}`;
+      document.getElementById("dogsUnassignedList").innerHTML = unassigned.length ? unassigned.map(d=>`
+        <div class="timeline-item">
+          <div class="row" style="justify-content:space-between; gap:10px;">
+            <div>
+              <div><strong>${d.callName}</strong></div>
+              <div class="muted small">Sex: (unknown) • Status: ${d.status}</div>
+            </div>
+            <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
+          </div>
+        </div>
+      `).join("") : `<div class="muted small">None right now.</div>`;
+    }
   }
 
-  // ✅ FIX #1: pill shows ONLY “Archived” when archived (not “Archived — Deceased”)
+  // Pill rule: show ONLY "Archived" when archived
   function updateStatusPill(d){
     const pill=document.getElementById("dogStatusPill");
-    if(d.archived){
-      pill.textContent = "Archived";
-    } else {
-      pill.textContent = d.status;
-    }
+    if(d.archived) pill.textContent = "Archived";
+    else pill.textContent = d.status;
   }
 
   function renderDogProfile(d){
@@ -816,17 +915,25 @@
       banner.classList.remove("hide");
       document.getElementById("dogArchivedBannerText").textContent="Archived";
       document.getElementById("dogArchivedBannerMeta").textContent = d.archivedAt ? `Archived at: ${fmt(d.archivedAt)}` : "";
-    } else {
-      banner.classList.add("hide");
-    }
+    } else banner.classList.add("hide");
 
-    // ✅ FIX #2: show Status truth gently in the details area (Recorded + Status)
+    // Truth gently in details
     const lines=[];
     if(d.statusChangedAt) lines.push(`Recorded: ${fmt(d.statusChangedAt)}`);
     lines.push(`Status: ${d.status}`);
     document.getElementById("dogStatusTimestamps").textContent = lines.join(" • ");
 
-    // populate fields
+    // Photo
+    const img=document.getElementById("dogPhotoImg");
+    const ph=document.getElementById("dogPhotoPlaceholder");
+    if(d.photoDataUrl){
+      img.src=d.photoDataUrl; img.style.display="block"; ph.style.display="none";
+    } else {
+      img.src=""; img.style.display="none"; ph.style.display="block";
+    }
+    document.getElementById("btnViewPhoto").disabled=!d.photoDataUrl;
+
+    // Fields
     document.getElementById("dogCallName").value=d.callName||"";
     document.getElementById("dogRegisteredName").value=d.registeredName||"";
     document.getElementById("dogKennelName").value=d.kennelName||"";
@@ -941,7 +1048,7 @@
     renderDogProfile(d);
   }
 
-  // Scan (baseline)
+  // Scan
   let scanStream=null, lastScanValue="", scanContext="transfer";
   function stopScan(){
     const video=document.getElementById("scanVideo");
@@ -1042,12 +1149,29 @@
   document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("btnTalk").addEventListener("click", ()=>alert("Voice may be used at any time."));
 
-    // Dogs
+    // Dogs page menu buttons
+    document.getElementById("btnViewMales").addEventListener("click", ()=>{
+      dogsViewMode="Males";
+      document.getElementById("dogsUnassignedWrap").classList.add("hide");
+      renderDogs();
+    });
+    document.getElementById("btnViewFemales").addEventListener("click", ()=>{
+      dogsViewMode="Females";
+      document.getElementById("dogsUnassignedWrap").classList.add("hide");
+      renderDogs();
+    });
+    document.getElementById("btnShowUnassigned").addEventListener("click", ()=>{
+      dogsViewMode="Unassigned";
+      document.getElementById("dogsUnassignedWrap").classList.remove("hide");
+      renderDogs();
+    });
+
     document.getElementById("btnAddDog").addEventListener("click", ()=>{
       const name=prompt("Call name (required):");
       if(!name) return;
       addDog(name.trim());
     });
+
     document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{
       document.getElementById("dogsArchivedWrap").classList.toggle("hide");
       renderDogs();
@@ -1159,4 +1283,4 @@
 </script>
 
 </body>
-  </html>
+</html>
