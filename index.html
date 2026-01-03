@@ -77,26 +77,30 @@
   </script>
 
   <style>
-    /* Soft rainbow overlay (Deceased only) */
+    /* 🌈 More pronounced rainbow overlay (Deceased only) */
     #rainbowOverlay {
       position: fixed;
       inset: 0;
       pointer-events: none;
       opacity: 0;
       transition: opacity 450ms ease;
+      /* Increased alpha + subtle blend for stronger presence */
       background: linear-gradient(
         90deg,
-        rgba(255,0,0,0.18),
-        rgba(255,165,0,0.18),
-        rgba(255,255,0,0.16),
-        rgba(0,128,0,0.16),
-        rgba(0,0,255,0.14),
-        rgba(75,0,130,0.14),
-        rgba(238,130,238,0.14)
+        rgba(255, 0, 0, 0.32),
+        rgba(255, 140, 0, 0.30),
+        rgba(255, 215, 0, 0.28),
+        rgba(0, 160, 80, 0.26),
+        rgba(0, 110, 255, 0.24),
+        rgba(75, 0, 130, 0.22),
+        rgba(238, 130, 238, 0.22)
       );
+      /* Gentle softening without sparkle/flash */
+      backdrop-filter: saturate(1.25) blur(1px);
       z-index: 9999;
     }
     #rainbowOverlay.show { opacity: 1; }
+
     .action-row { display:flex; gap:10px; margin-top:12px; }
     .action-row .btn { flex:1; }
     .more-panel.hide { display:none; }
@@ -108,10 +112,7 @@
       font-size: 12px;
       border: 1px solid #ccc;
     }
-    .subtle-link-btn {
-      width: 100%;
-      text-align: left;
-    }
+    .subtle-link-btn { width: 100%; text-align: left; }
   </style>
 </head>
 
@@ -332,8 +333,7 @@
     </div>
   </section>
 
-  <!-- ===================== INVENTORY (unchanged baseline) ===================== -->
-
+  <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
     <h2>Inventory</h2>
     <div class="row">
@@ -453,7 +453,6 @@
     </div>
   </section>
 
-  <!-- OTHER PAGES -->
   <section id="viewFeeding" class="card hide"><h2>Feeding</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewCare" class="card hide"><h2>Care Timeline</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewHelpers" class="card hide"><h2>Helpers</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
@@ -550,7 +549,6 @@
 
   const invActive=()=>loadInv().inventory.filter(i=>!i.archived);
 
-  // Rainbow moment
   function rainbowMoment(){
     const el=document.getElementById("rainbowOverlay");
     if(!el) return;
@@ -644,24 +642,9 @@
 
   let addStockItemId=null, reduceItemId=null, transferItemId=null;
 
-  function showAddStock(itemId){
-    addStockItemId=itemId;
-    document.getElementById("addStockForm").classList.remove("hide");
-    document.getElementById("addStockQty").value="1";
-    setText("addStockStatus","");
-  }
-  function showReduce(itemId){
-    reduceItemId=itemId;
-    document.getElementById("reduceForm").classList.remove("hide");
-    document.getElementById("reduceQty").value="1";
-    setText("reduceStatus","");
-  }
-  function showTransfer(itemId){
-    transferItemId=itemId;
-    document.getElementById("transferForm").classList.remove("hide");
-    document.getElementById("transferQty").value="1";
-    setText("transferStatus","");
-  }
+  function showAddStock(itemId){ addStockItemId=itemId; document.getElementById("addStockForm").classList.remove("hide"); document.getElementById("addStockQty").value="1"; setText("addStockStatus",""); }
+  function showReduce(itemId){ reduceItemId=itemId; document.getElementById("reduceForm").classList.remove("hide"); document.getElementById("reduceQty").value="1"; setText("reduceStatus",""); }
+  function showTransfer(itemId){ transferItemId=itemId; document.getElementById("transferForm").classList.remove("hide"); document.getElementById("transferQty").value="1"; setText("transferStatus",""); }
 
   function applyAddStock(){
     const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
@@ -728,9 +711,7 @@
     renderDogs();
   }
 
-  function getDog(id){
-    return loadDogs().dogs.find(d=>d.dogId===id) || null;
-  }
+  function getDog(id){ return loadDogs().dogs.find(d=>d.dogId===id) || null; }
 
   function renderDogs(){
     const store=loadDogs();
@@ -771,23 +752,23 @@
       if(el) el.disabled=arch;
     });
     document.getElementById("dogNotes").disabled=false;
+    document.getElementById("btnDoneDog").disabled=false;
+    document.getElementById("btnNotesDog").disabled=false;
+    document.getElementById("btnMoreDog").disabled=false;
   }
 
   function updateStatusPill(d){
     const pill=document.getElementById("dogStatusPill");
-    const st = d.archived ? `Archived — ${d.status}` : d.status;
-    pill.textContent = st;
+    pill.textContent = d.archived ? `Archived — ${d.status}` : d.status;
   }
 
   function renderDogProfile(d){
     currentDogId=d.dogId;
 
-    // Top display
     updateStatusPill(d);
     document.getElementById("dogCallNameDisplay").textContent = d.callName || "(no name)";
     document.getElementById("dogProfileTitle").textContent = d.callName || "Dog Profile";
 
-    // Archived banner
     const banner=document.getElementById("dogArchivedBanner");
     if(d.archived){
       banner.classList.remove("hide");
@@ -795,7 +776,6 @@
       document.getElementById("dogArchivedBannerMeta").textContent=d.archivedAt?`Archived at: ${fmt(d.archivedAt)}`:"";
     } else banner.classList.add("hide");
 
-    // Photo
     const img=document.getElementById("dogPhotoImg");
     const ph=document.getElementById("dogPhotoPlaceholder");
     if(d.photoDataUrl){
@@ -805,7 +785,6 @@
     }
     document.getElementById("btnViewPhoto").disabled=!d.photoDataUrl;
 
-    // Fields
     document.getElementById("dogCallName").value=d.callName||"";
     document.getElementById("dogRegisteredName").value=d.registeredName||"";
     document.getElementById("dogKennelName").value=d.kennelName||"";
@@ -820,21 +799,20 @@
     document.getElementById("dogStatusNote").value=d.statusNote||"";
     document.getElementById("dogNotes").value=d.notes||"";
 
-    // Note requirement UI
     const st=document.getElementById("dogStatus").value;
     const wrap=document.getElementById("statusNoteWrap");
     if(st==="Transferred"||st==="Deceased") wrap.classList.remove("hide"); else wrap.classList.add("hide");
 
-    // timestamps
     const ts=[];
     if(d.statusChangedAt) ts.push(`Status set: ${fmt(d.statusChangedAt)}`);
     if(d.archivedAt) ts.push(`Archived: ${fmt(d.archivedAt)}`);
     document.getElementById("dogStatusTimestamps").textContent=ts.join(" • ");
 
+    document.getElementById("dogMorePanel").classList.add("hide");
+    document.getElementById("btnMoreDog").textContent="More ▾";
+
     setDogReadOnly(!!d.archived);
     setText("dogSaveStatus","");
-    document.getElementById("dogMorePanel").classList.add("hide");
-    document.getElementById("btnMoreDog").textContent = "More ▾";
   }
 
   window.__openDog=function(id){
@@ -851,7 +829,6 @@
 
     const prevStatus = d.status;
 
-    // Notes always editable
     d.notes=(document.getElementById("dogNotes").value||"").trim();
 
     if(!d.archived){
@@ -892,18 +869,14 @@
     renderDogs();
     renderDogProfile(d);
 
-    // Confirmation messaging
-    if(d.status==="Deceased" && prevStatus !== "Deceased"){
+    if(d.status==="Deceased"){
       setText("dogSaveStatus","Recorded with care.\nThank you for taking the time to record this.");
-      rainbowMoment();
-    } else if(d.status==="Deceased") {
-      setText("dogSaveStatus","Recorded with care.\nThank you for taking the time to record this.");
+      if(prevStatus !== "Deceased") rainbowMoment();
     } else {
       setText("dogSaveStatus","Done.");
     }
 
     if(exitAfter){
-      // Give a tiny beat so the message can be read; still no extra taps required.
       setTimeout(()=>{ __go("Dogs"); }, 350);
     }
   }
@@ -934,7 +907,7 @@
     renderDogProfile(d);
   }
 
-  // Scan baseline (minimal, unchanged behavior)
+  // Scan
   let scanStream=null, lastScanValue="", scanContext="transfer";
 
   function stopScan(){
@@ -1043,7 +1016,6 @@
 
   // Bind
   document.addEventListener("DOMContentLoaded", ()=>{
-    // Talk
     document.getElementById("btnTalk").addEventListener("click", ()=>alert("Voice may be used at any time."));
 
     // Dogs
@@ -1057,10 +1029,9 @@
       renderDogs();
     });
 
-    // Profile action row
+    // Profile actions
     document.getElementById("btnDoneDog").addEventListener("click", ()=> saveDogProfileAndMaybeExit(true));
     document.getElementById("btnNotesDog").addEventListener("click", ()=>{
-      // Ensure More open and scroll to Notes
       document.getElementById("dogMorePanel").classList.remove("hide");
       document.getElementById("btnMoreDog").textContent = "More ▴";
       document.getElementById("secNotes").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1072,25 +1043,21 @@
       panel.classList.toggle("hide");
       document.getElementById("btnMoreDog").textContent = isHidden ? "More ▴" : "More ▾";
     });
-
     document.getElementById("btnReviewLifeStatus").addEventListener("click", ()=>{
       const panel=document.getElementById("dogMorePanel");
       panel.classList.remove("hide");
-      document.getElementById("btnMoreDog").textContent = "More ▴";
+      document.getElementById("btnMoreDog").textContent="More ▴";
       document.getElementById("secStatus").scrollIntoView({behavior:"smooth", block:"start"});
       document.getElementById("dogStatus").focus();
     });
 
-    // Inside Notes section Done/Cancel
     document.getElementById("btnSaveDog").addEventListener("click", ()=> saveDogProfileAndMaybeExit(false));
     document.getElementById("btnCancelDog").addEventListener("click", ()=>{ setText("dogSaveStatus",""); __back(); });
 
-    // Status note visibility
     document.getElementById("dogStatus").addEventListener("change", ()=>{
       const st=document.getElementById("dogStatus").value;
       const wrap=document.getElementById("statusNoteWrap");
-      if(st==="Transferred"||st==="Deceased") wrap.classList.remove("hide");
-      else wrap.classList.add("hide");
+      if(st==="Transferred"||st==="Deceased") wrap.classList.remove("hide"); else wrap.classList.add("hide");
     });
 
     // Photo
@@ -1129,14 +1096,12 @@
     document.getElementById("btnSaveInv").addEventListener("click", (e)=>{ e.preventDefault(); saveInvDef(); });
     document.getElementById("btnDeleteId").addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
 
-    // Scan openers
     document.getElementById("btnScanForAdd").addEventListener("click", ()=>openScan("add"));
     document.getElementById("btnScanInsideAdd").addEventListener("click", ()=>openScan("add"));
     document.getElementById("btnScanAddStock").addEventListener("click", ()=>openScan("addstock"));
     document.getElementById("btnScanReduce").addEventListener("click", ()=>openScan("reduce"));
     document.getElementById("btnScanTransfer").addEventListener("click", ()=>openScan("transfer"));
 
-    // Lists
     document.getElementById("btnAddStockRefresh").addEventListener("click", ()=>populateSelect("addStockSelect"));
     document.getElementById("btnReduceRefresh").addEventListener("click", ()=>populateSelect("reduceSelect"));
     document.getElementById("btnTransferRefresh").addEventListener("click", ()=>populateSelect("transferSelect"));
@@ -1157,7 +1122,6 @@
     document.getElementById("btnReduceCancel").addEventListener("click", ()=>{ document.getElementById("reduceForm").classList.add("hide"); });
     document.getElementById("btnTransferCancel").addEventListener("click", ()=>{ document.getElementById("transferForm").classList.add("hide"); });
 
-    // Scan dialog
     document.getElementById("btnRescan").addEventListener("click", startScan);
     document.getElementById("btnConfirmScan").addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan").addEventListener("click", closeScan);
@@ -1172,4 +1136,4 @@
 </script>
 
 </body>
-  </html>
+</html>
