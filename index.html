@@ -5,6 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ NAV is defined immediately so Home buttons always work -->
+  <script>
+    (function () {
+      const VIEWS = [
+        "Home",
+        "InventoryMenu","InventoryAvailable","InventoryAdd","InventoryAddStock","InventoryReduceStock","InventoryTransfer",
+        "Dogs","DogProfile",
+        "Feeding","Care","Helpers","Records"
+      ];
+
+      let current = "Home";
+      const stack = [];
+      const queue = [];
+
+      function show(name){
+        VIEWS.forEach(v=>{
+          const el = document.getElementById("view"+v);
+          if(el) el.classList.toggle("hide", v !== name);
+        });
+        current = name;
+        if(typeof window.__afterShow === "function"){
+          try{ window.__afterShow(name); }catch(_){}
+        }
+      }
+
+      window.__go = function(name){
+        if(!name) return;
+        // If DOM not ready yet, queue it
+        if(!document.getElementById("viewHome")){
+          queue.push({t:"go", name});
+          return;
+        }
+        if(name === current) return;
+        stack.push(current);
+        show(name);
+      };
+
+      window.__back = function(){
+        if(!document.getElementById("viewHome")){
+          queue.push({t:"back"});
+          return;
+        }
+        if(stack.length === 0) return show("Home");
+        show(stack.pop());
+      };
+
+      window.__home = function(){
+        if(!document.getElementById("viewHome")){
+          queue.push({t:"home"});
+          return;
+        }
+        stack.length = 0;
+        show("Home");
+      };
+
+      window.__navReady = function(){
+        // Run queued actions safely
+        while(queue.length){
+          const a = queue.shift();
+          if(a.t==="go") window.__go(a.name);
+          if(a.t==="back") window.__back();
+          if(a.t==="home") window.__home();
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", ()=>{
+        show("Home");
+        window.__navReady();
+      });
+    })();
+  </script>
 </head>
 
 <body>
@@ -71,7 +143,7 @@
 
     <div class="timeline-item" style="margin-top:12px;">
       <div><strong>Photo</strong></div>
-      <div class="muted small">Tap photo/placeholder to add or update (active). Archived is view-only.</div>
+      <div class="muted small">Tap photo/placeholder to add/update (active). Archived is view-only.</div>
 
       <div id="dogPhotoTap" style="margin-top:10px; border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
         <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
@@ -104,7 +176,6 @@
       <div class="grid2">
         <div>
           <label class="label">Sex</label>
-          <!-- ✅ UPDATED OPTIONS -->
           <select id="dogSex">
             <option value="">(unknown)</option>
             <option>Male (intact)</option>
@@ -195,12 +266,10 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
-
     <div class="row" style="margin-top:12px;">
       <button class="btn" id="btnInvRefresh">Refresh list</button>
       <button class="btn" id="btnInvToggleArchived">Show archived</button>
     </div>
-
     <div id="invMeta" class="muted small" style="margin-top:10px;"></div>
     <div id="invList"></div>
     <div id="invArchived" class="hide"></div>
@@ -226,37 +295,23 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
-
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnScanAddStock">Scan item</button>
       <button class="btn" id="btnAddStockRefresh">Refresh list</button>
     </div>
-
     <label class="label">Search (optional)</label>
     <input id="addStockSearch" placeholder="Type to filter…" />
-
     <label class="label">Select item</label>
     <select id="addStockSelect"></select>
-
     <div id="addStockForm" class="hide" style="margin-top:12px;">
-      <div class="timeline-item">
-        <div><strong id="addStockItemName"></strong></div>
-        <div class="muted small" id="addStockItemMeta"></div>
-      </div>
-
       <label class="label">Quantity to add</label>
       <input id="addStockQty" inputmode="decimal" placeholder="e.g., 5" />
-
-      <label class="label">Note (optional)</label>
-      <input id="addStockNote" placeholder="delivery / donation" />
-
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnAddStockConfirm">Confirm add</button>
         <button class="btn" id="btnAddStockCancel">Cancel</button>
       </div>
+      <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
     </div>
-
-    <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
   <!-- REDUCE STOCK -->
@@ -266,43 +321,25 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
-
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnScanReduce">Scan item</button>
       <button class="btn" id="btnReduceRefresh">Refresh list</button>
     </div>
-
     <label class="label">Search (optional)</label>
     <input id="reduceSearch" placeholder="Type to filter…" />
-
     <label class="label">Select item</label>
     <select id="reduceSelect"></select>
-
     <div id="reduceForm" class="hide" style="margin-top:12px;">
-      <div class="timeline-item">
-        <div><strong id="reduceItemName"></strong></div>
-        <div class="muted small" id="reduceItemMeta"></div>
-      </div>
-
       <label class="label">Action</label>
-      <select id="reduceAction">
-        <option>Used</option>
-        <option>Discarded</option>
-      </select>
-
+      <select id="reduceAction"><option>Used</option><option>Discarded</option></select>
       <label class="label">Quantity</label>
       <input id="reduceQty" inputmode="decimal" placeholder="e.g., 2" />
-
-      <label class="label">Note (optional)</label>
-      <input id="reduceNote" placeholder="fed / damaged / spoiled" />
-
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnReduceConfirm">Confirm</button>
         <button class="btn" id="btnReduceCancel">Cancel</button>
       </div>
+      <div id="reduceStatus" class="muted small" style="margin-top:10px;"></div>
     </div>
-
-    <div id="reduceStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
   <!-- TRANSFER -->
@@ -312,47 +349,23 @@
       <button class="btn" onclick="__back()">Back</button>
       <button class="btn" onclick="__home()">Home</button>
     </div>
-
     <div class="row" style="margin-top:12px;">
       <button class="btn primary" id="btnScanTransfer">Scan item</button>
       <button class="btn" id="btnTransferRefresh">Refresh list</button>
     </div>
-
     <label class="label">Search (optional)</label>
     <input id="transferSearch" placeholder="Type to filter…" />
-
     <label class="label">Select item</label>
     <select id="transferSelect"></select>
-
     <div id="transferForm" class="hide" style="margin-top:12px;">
-      <div class="timeline-item">
-        <div><strong id="transferItemName"></strong></div>
-        <div class="muted small" id="transferItemMeta"></div>
-      </div>
-
       <label class="label">Quantity</label>
       <input id="transferQty" inputmode="decimal" placeholder="e.g., 1" />
-
-      <label class="label">Destination</label>
-      <select id="transferType">
-        <option>With a dog</option>
-        <option>To adopter</option>
-        <option>To foster</option>
-        <option>To another organization</option>
-        <option>Moved to storage</option>
-        <option>Other</option>
-      </select>
-
-      <label class="label">Note (optional)</label>
-      <input id="transferNote" placeholder="Any factual notes" />
-
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btnTransferConfirm">Confirm transfer</button>
         <button class="btn" id="btnTransferCancel">Cancel</button>
       </div>
+      <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
     </div>
-
-    <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
   </section>
 
   <!-- OTHER PAGES -->
@@ -361,12 +374,548 @@
   <section id="viewHelpers" class="card hide"><h2>Helpers</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
   <section id="viewRecords" class="card hide"><h2>Records</h2><div class="row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div></section>
 
-<!-- dialogs are already below in DOM -->
-
 </main>
 
+<!-- Photo chooser -->
+<dialog id="dlgPhotoChoice" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Set current photo</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+    <div class="dlg-b">
+      <div class="row" style="margin-top:12px;">
+        <button type="button" class="btn primary" id="btnTakePhoto">Take photo</button>
+        <button type="button" class="btn" id="btnChoosePhoto">Choose from gallery</button>
+      </div>
+    </div>
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<input id="fileCamera" type="file" accept="image/*" capture="environment" style="display:none;" />
+<input id="fileGallery" type="file" accept="image/*" style="display:none;" />
+
+<!-- Add inventory dialog -->
+<dialog id="dlgInv" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Inventory item</h3>
+      <button class="info-btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+    <div class="dlg-b">
+      <label class="label">Item name</label>
+      <input id="invName" />
+      <label class="label">Identifier type</label>
+      <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
+      <label class="label">Identifier value</label>
+      <input id="invIdValue" />
+      <div class="row" style="margin-top:10px;">
+        <button type="button" class="btn" id="btnScanInsideAdd">Scan now (QR or barcode)</button>
+        <button type="button" class="btn" id="btnDeleteId">Delete now</button>
+      </div>
+    </div>
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Cancel</button>
+      <button class="btn primary" id="btnSaveInv" value="ok">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Scan dialog -->
+<dialog id="dlgScan" class="dlg">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h3>Scan</h3>
+      <button class="info-btn" value="cancel" aria-label="Close" id="btnCloseScan">✕</button>
+    </div>
+    <div class="dlg-b">
+      <video id="scanVideo" playsinline autoplay muted></video>
+      <div id="scanResultBox" class="scan-result hide">
+        <div class="muted small">Identifier captured</div>
+        <div id="scanValue" class="scan-value"></div>
+      </div>
+      <div id="scanHelp" class="muted small" style="margin-top:10px;"></div>
+      <label class="label" style="margin-top:12px;">Manual entry</label>
+      <input id="scanManual" />
+    </div>
+    <div class="dlg-f">
+      <button type="button" class="btn" id="btnRescan">Rescan</button>
+      <button type="button" class="btn primary" id="btnConfirmScan">Confirm</button>
+      <button class="btn" value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
-  // The entire logic is already bound above; nothing else needed here.
+(function(){
+  const INV_KEY="breederPro_inventory_store_v1";
+  const DOG_KEY="breederPro_dogs_store_v1";
+
+  const nowISO=()=>new Date().toISOString();
+  const fmt=(ts)=>{ try{return new Date(ts).toLocaleString();}catch{return "";} };
+  const setText=(id,msg)=>{ const el=document.getElementById(id); if(el) el.textContent=msg||""; };
+
+  function loadInv(){ try{ const raw=localStorage.getItem(INV_KEY); if(!raw) return {inventory:[]}; const o=JSON.parse(raw); if(!Array.isArray(o.inventory)) o.inventory=[]; return o; }catch{ return {inventory:[]}; } }
+  function saveInv(o){ localStorage.setItem(INV_KEY, JSON.stringify(o)); }
+  function loadDogs(){ try{ const raw=localStorage.getItem(DOG_KEY); if(!raw) return {dogs:[]}; const o=JSON.parse(raw); if(!Array.isArray(o.dogs)) o.dogs=[]; return o; }catch{ return {dogs:[]}; } }
+  function saveDogs(o){ localStorage.setItem(DOG_KEY, JSON.stringify(o)); }
+
+  const invActive=()=>loadInv().inventory.filter(i=>!i.archived);
+
+  // Inventory list render
+  function renderInv(){
+    const store=loadInv();
+    const items=store.inventory.filter(i=>!i.archived);
+    const archived=store.inventory.filter(i=>i.archived);
+
+    const meta=document.getElementById("invMeta");
+    const list=document.getElementById("invList");
+    const arch=document.getElementById("invArchived");
+
+    if(meta) meta.textContent=`Active: ${items.length}. Archived: ${archived.length}.`;
+    if(list){
+      list.innerHTML = items.length ? items.map(i=>`
+        <div class="timeline-item">
+          <div><strong>${i.name}</strong></div>
+          <div class="muted small">On hand: ${Number(i.qty||0)}</div>
+        </div>
+      `).join("") : `<div class="muted small">No active items.</div>`;
+    }
+    if(arch){
+      arch.innerHTML = archived.length ? archived.map(i=>`
+        <div class="timeline-item">
+          <div><strong>${i.name}</strong></div>
+          <div class="muted small">Archived • On hand: ${Number(i.qty||0)}</div>
+        </div>
+      `).join("") : `<div class="muted small">No archived items.</div>`;
+    }
+  }
+
+  function populateSelect(selectId){
+    const sel=document.getElementById(selectId);
+    if(!sel) return;
+    const items=invActive();
+    sel.innerHTML="";
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    items.forEach(i=>{
+      const opt=document.createElement("option");
+      opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${Number(i.qty||0)})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  function filterSelect(searchId, selectId){
+    const q=(document.getElementById(searchId)?.value||"").trim().toLowerCase();
+    const sel=document.getElementById(selectId);
+    if(!sel) return;
+    const items=invActive().filter(i=>{
+      if(!q) return true;
+      return (`${i.name||""} ${(i.identifierValue||"")}`).toLowerCase().includes(q);
+    });
+    sel.innerHTML="";
+    const o0=document.createElement("option"); o0.value=""; o0.textContent="Select item…"; sel.appendChild(o0);
+    items.forEach(i=>{
+      const opt=document.createElement("option");
+      opt.value=i.itemId;
+      opt.textContent=`${i.name} (on hand: ${Number(i.qty||0)})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  // Inventory definition
+  function openInvDialog(){
+    document.getElementById("invName").value="";
+    document.getElementById("invIdType").value="Barcode";
+    document.getElementById("invIdValue").value="";
+    document.getElementById("dlgInv").showModal();
+  }
+
+  function saveInvDef(){
+    const name=(document.getElementById("invName").value||"").trim();
+    if(!name){ alert("Item name required."); return; }
+    const store=loadInv();
+    store.inventory.push({
+      itemId:"inv_"+Date.now()+"_"+Math.random().toString(16).slice(2),
+      name,
+      identifierType:document.getElementById("invIdType").value,
+      identifierValue:(document.getElementById("invIdValue").value||"").trim(),
+      qty:0,
+      archived:false
+    });
+    saveInv(store);
+    document.getElementById("dlgInv").close();
+    renderInv();
+    populateSelect("addStockSelect"); populateSelect("reduceSelect"); populateSelect("transferSelect");
+  }
+
+  // Inventory actions
+  let addStockItemId=null, reduceItemId=null, transferItemId=null;
+
+  function showAddStock(itemId){
+    addStockItemId=itemId;
+    document.getElementById("addStockForm").classList.remove("hide");
+    document.getElementById("addStockQty").value="1";
+    setText("addStockStatus","");
+  }
+  function showReduce(itemId){
+    reduceItemId=itemId;
+    document.getElementById("reduceForm").classList.remove("hide");
+    document.getElementById("reduceQty").value="1";
+    setText("reduceStatus","");
+  }
+  function showTransfer(itemId){
+    transferItemId=itemId;
+    document.getElementById("transferForm").classList.remove("hide");
+    document.getElementById("transferQty").value="1";
+    setText("transferStatus","");
+  }
+
+  function applyAddStock(){
+    const qty=Math.abs(Number(document.getElementById("addStockQty").value||"0")||0);
+    if(!addStockItemId || qty<=0) return setText("addStockStatus","Pick item + qty");
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===addStockItemId);
+    if(!it) return setText("addStockStatus","Item not found");
+    it.qty=Number(it.qty||0)+qty;
+    saveInv(store);
+    setText("addStockStatus","Added.");
+    renderInv(); populateSelect("addStockSelect");
+  }
+
+  function applyReduce(){
+    const qty=Math.abs(Number(document.getElementById("reduceQty").value||"0")||0);
+    if(!reduceItemId || qty<=0) return setText("reduceStatus","Pick item + qty");
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===reduceItemId);
+    if(!it) return setText("reduceStatus","Item not found");
+    it.qty=Math.max(0, Number(it.qty||0)-qty);
+    saveInv(store);
+    setText("reduceStatus","Recorded.");
+    renderInv(); populateSelect("reduceSelect");
+  }
+
+  function applyTransfer(){
+    const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
+    if(!transferItemId || qty<=0) return setText("transferStatus","Pick item + qty");
+    const store=loadInv();
+    const it=store.inventory.find(x=>x.itemId===transferItemId);
+    if(!it) return setText("transferStatus","Item not found");
+    it.qty=Math.max(0, Number(it.qty||0)-qty);
+    saveInv(store);
+    setText("transferStatus","Transferred.");
+    renderInv(); populateSelect("transferSelect");
+  }
+
+  // Dogs
+  let currentDogId=null;
+
+  function addDog(callName){
+    const store=loadDogs();
+    store.dogs.push({
+      dogId:"dog_"+Date.now()+"_"+Math.random().toString(16).slice(2),
+      callName,
+      breed:"German Shorthaired Pointer",
+      sex:"",
+      status:"Adult",
+      statusChangedAt: nowISO(),
+      archived:false,
+      archivedAt:null,
+      statusNote:"",
+      notes:"",
+      photoDataUrl:""
+    });
+    saveDogs(store);
+    renderDogs();
+  }
+
+  function renderDogs(){
+    const store=loadDogs();
+    const active=store.dogs.filter(d=>!d.archived);
+    const archived=store.dogs.filter(d=>d.archived);
+
+    document.getElementById("dogsActiveMeta").textContent = `Active dogs: ${active.length}`;
+    document.getElementById("dogsActiveList").innerHTML = active.length ? active.map(d=>`
+      <div class="timeline-item">
+        <div class="row" style="justify-content:space-between; gap:10px;">
+          <div><strong>${d.callName}</strong><div class="muted small">Status: ${d.status}</div></div>
+          <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
+        </div>
+      </div>
+    `).join("") : `<div class="muted small">No active dogs yet.</div>`;
+
+    const wrap=document.getElementById("dogsArchivedWrap");
+    if(!wrap.classList.contains("hide")){
+      document.getElementById("dogsArchivedMeta").textContent = `Archived dogs: ${archived.length}`;
+      document.getElementById("dogsArchivedList").innerHTML = archived.length ? archived.map(d=>`
+        <div class="timeline-item">
+          <div class="row" style="justify-content:space-between; gap:10px;">
+            <div><strong>${d.callName}</strong><div class="muted small">Archived — ${d.status} • ${d.archivedAt?fmt(d.archivedAt):""}</div></div>
+            <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
+          </div>
+        </div>
+      `).join("") : `<div class="muted small">No archived dogs.</div>`;
+    }
+  }
+
+  function getDog(id){
+    return loadDogs().dogs.find(d=>d.dogId===id) || null;
+  }
+
+  function renderDogProfile(d){
+    currentDogId=d.dogId;
+    document.getElementById("dogProfileTitle").textContent=d.callName;
+
+    const banner=document.getElementById("dogArchivedBanner");
+    if(d.archived){
+      banner.classList.remove("hide");
+      document.getElementById("dogArchivedBannerText").textContent=`Archived — ${d.status}`;
+      document.getElementById("dogArchivedBannerMeta").textContent=d.archivedAt?`Archived at: ${fmt(d.archivedAt)}`:"";
+    } else banner.classList.add("hide");
+
+    const img=document.getElementById("dogPhotoImg");
+    const ph=document.getElementById("dogPhotoPlaceholder");
+    if(d.photoDataUrl){
+      img.src=d.photoDataUrl; img.style.display="block"; ph.style.display="none";
+    } else {
+      img.src=""; img.style.display="none"; ph.style.display="block";
+    }
+  }
+
+  window.__openDog=function(id){
+    const d=getDog(id);
+    if(!d) return;
+    __go("DogProfile");
+    renderDogProfile(d);
+  };
+
+  // Photo (camera/gallery)
+  async function compressImageToDataUrl(file){
+    const dataUrl = await new Promise((resolve,reject)=>{
+      const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file);
+    });
+    const img=new Image(); img.src=dataUrl; await new Promise(res=>img.onload=res);
+    const maxEdge=900;
+    const scale=Math.min(1, maxEdge/Math.max(img.width,img.height));
+    const w=Math.max(1, Math.round(img.width*scale));
+    const h=Math.max(1, Math.round(img.height*scale));
+    const c=document.createElement("canvas"); c.width=w; c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    return c.toDataURL("image/jpeg",0.78);
+  }
+
+  async function setDogPhoto(file){
+    const store=loadDogs();
+    const d=store.dogs.find(x=>x.dogId===currentDogId);
+    if(!d) return;
+    if(d.archived) return alert("Archived dogs are view-only.");
+    d.photoDataUrl = await compressImageToDataUrl(file);
+    saveDogs(store);
+    renderDogs();
+    renderDogProfile(d);
+  }
+
+  // Scan engine (minimal)
+  let scanStream=null, lastScanValue="", scanContext="transfer";
+
+  function stopScan(){
+    const video=document.getElementById("scanVideo");
+    if(video) video.pause();
+    if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
+  }
+
+  async function startScan(){
+    const video=document.getElementById("scanVideo");
+    const help=document.getElementById("scanHelp");
+    const box=document.getElementById("scanResultBox");
+    const val=document.getElementById("scanValue");
+    lastScanValue=""; box.classList.add("hide"); val.textContent=""; help.textContent="";
+    try{
+      scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});
+      video.srcObject=scanStream; video.muted=true; video.autoplay=true;
+      try{ await video.play(); }catch{ setTimeout(()=>{ video.play().catch(()=>{}); },250); }
+    }catch{
+      help.textContent="Camera unavailable. Manual entry works.";
+      return;
+    }
+    if(!("BarcodeDetector" in window)){
+      help.textContent="Scanner unsupported. Manual entry works.";
+      return;
+    }
+    let detector; try{ detector=new BarcodeDetector(); }catch{ detector=null; }
+    const loop=async()=>{
+      if(!scanStream || !detector) return;
+      try{
+        const codes=await detector.detect(video);
+        if(codes && codes.length){
+          const raw=codes[0].rawValue||"";
+          if(raw){
+            lastScanValue=raw;
+            box.classList.remove("hide");
+            val.textContent=raw;
+            stopScan();
+            return;
+          }
+        }
+      }catch{}
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  function openScan(context){
+    scanContext=context||"transfer";
+    document.getElementById("scanManual").value="";
+    document.getElementById("dlgScan").showModal();
+    startScan();
+  }
+
+  function closeScan(){
+    stopScan();
+    document.getElementById("dlgScan").close();
+  }
+
+  function findMatch(code){
+    const c=String(code||"").trim();
+    const store=loadInv();
+    return store.inventory.find(i =>
+      (i.identifierType==="Barcode"||i.identifierType==="QR") &&
+      String(i.identifierValue||"").trim()===c
+    ) || null;
+  }
+
+  function confirmScan(){
+    const manual=(document.getElementById("scanManual").value||"").trim();
+    const code=(lastScanValue && lastScanValue.trim()) ? lastScanValue.trim() : manual;
+
+    if(!code){
+      document.getElementById("scanHelp").textContent="No code captured. Manual entry works.";
+      return;
+    }
+
+    if(scanContext==="add"){
+      document.getElementById("invIdType").value="Barcode";
+      document.getElementById("invIdValue").value=code;
+      closeScan();
+      return;
+    }
+
+    const match=findMatch(code);
+    closeScan();
+    if(!match) return;
+
+    if(scanContext==="addstock") showAddStock(match.itemId);
+    if(scanContext==="reduce") showReduce(match.itemId);
+    if(scanContext==="transfer") showTransfer(match.itemId);
+  }
+
+  // afterShow: refresh lists
+  window.__afterShow=function(view){
+    if(view==="Dogs") renderDogs();
+    if(view==="InventoryAvailable") renderInv();
+    if(view==="InventoryAddStock") populateSelect("addStockSelect");
+    if(view==="InventoryReduceStock") populateSelect("reduceSelect");
+    if(view==="InventoryTransfer") populateSelect("transferSelect");
+  };
+
+  // Bind
+  document.addEventListener("DOMContentLoaded", ()=>{
+    // Home talk
+    document.getElementById("btnTalk").addEventListener("click", ()=>alert("Voice may be used at any time."));
+
+    // Dogs
+    document.getElementById("btnAddDog").addEventListener("click", ()=>{
+      const name=prompt("Call name (required):");
+      if(!name) return;
+      addDog(name.trim());
+    });
+    document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{
+      document.getElementById("dogsArchivedWrap").classList.toggle("hide");
+      renderDogs();
+    });
+
+    document.getElementById("dogPhotoTap").addEventListener("click", ()=>{
+      const d=getDog(currentDogId);
+      if(!d) return;
+      if(d.archived){
+        if(d.photoDataUrl) window.open(d.photoDataUrl,"_blank");
+        return;
+      }
+      document.getElementById("dlgPhotoChoice").showModal();
+    });
+
+    document.getElementById("btnViewPhoto").addEventListener("click", ()=>{
+      const d=getDog(currentDogId);
+      if(d?.photoDataUrl) window.open(d.photoDataUrl,"_blank");
+    });
+
+    document.getElementById("btnTakePhoto").addEventListener("click", ()=>document.getElementById("fileCamera").click());
+    document.getElementById("btnChoosePhoto").addEventListener("click", ()=>document.getElementById("fileGallery").click());
+
+    document.getElementById("fileCamera").addEventListener("change", async (e)=>{
+      const f=e.target.files?.[0]; e.target.value="";
+      if(!f) return;
+      await setDogPhoto(f);
+      document.getElementById("dlgPhotoChoice").close();
+    });
+
+    document.getElementById("fileGallery").addEventListener("change", async (e)=>{
+      const f=e.target.files?.[0]; e.target.value="";
+      if(!f) return;
+      await setDogPhoto(f);
+      document.getElementById("dlgPhotoChoice").close();
+    });
+
+    // Inventory
+    document.getElementById("btnInvRefresh").addEventListener("click", renderInv);
+    document.getElementById("btnInvToggleArchived").addEventListener("click", ()=>document.getElementById("invArchived").classList.toggle("hide"));
+    document.getElementById("btnOpenAddDialog").addEventListener("click", openInvDialog);
+    document.getElementById("btnSaveInv").addEventListener("click", (e)=>{ e.preventDefault(); saveInvDef(); });
+    document.getElementById("btnDeleteId").addEventListener("click", ()=>{ document.getElementById("invIdValue").value=""; });
+
+    document.getElementById("btnScanForAdd").addEventListener("click", ()=>openScan("add"));
+    document.getElementById("btnScanInsideAdd").addEventListener("click", ()=>openScan("add"));
+    document.getElementById("btnScanAddStock").addEventListener("click", ()=>openScan("addstock"));
+    document.getElementById("btnScanReduce").addEventListener("click", ()=>openScan("reduce"));
+    document.getElementById("btnScanTransfer").addEventListener("click", ()=>openScan("transfer"));
+
+    document.getElementById("btnAddStockRefresh").addEventListener("click", ()=>populateSelect("addStockSelect"));
+    document.getElementById("btnReduceRefresh").addEventListener("click", ()=>populateSelect("reduceSelect"));
+    document.getElementById("btnTransferRefresh").addEventListener("click", ()=>populateSelect("transferSelect"));
+
+    document.getElementById("addStockSelect").addEventListener("change", (e)=>{ if(e.target.value) showAddStock(e.target.value); });
+    document.getElementById("reduceSelect").addEventListener("change", (e)=>{ if(e.target.value) showReduce(e.target.value); });
+    document.getElementById("transferSelect").addEventListener("change", (e)=>{ if(e.target.value) showTransfer(e.target.value); });
+
+    document.getElementById("addStockSearch").addEventListener("input", ()=>filterSelect("addStockSearch","addStockSelect"));
+    document.getElementById("reduceSearch").addEventListener("input", ()=>filterSelect("reduceSearch","reduceSelect"));
+    document.getElementById("transferSearch").addEventListener("input", ()=>filterSelect("transferSearch","transferSelect"));
+
+    document.getElementById("btnAddStockConfirm").addEventListener("click", applyAddStock);
+    document.getElementById("btnReduceConfirm").addEventListener("click", applyReduce);
+    document.getElementById("btnTransferConfirm").addEventListener("click", applyTransfer);
+
+    document.getElementById("btnAddStockCancel").addEventListener("click", ()=>{ document.getElementById("addStockForm").classList.add("hide"); });
+    document.getElementById("btnReduceCancel").addEventListener("click", ()=>{ document.getElementById("reduceForm").classList.add("hide"); });
+    document.getElementById("btnTransferCancel").addEventListener("click", ()=>{ document.getElementById("transferForm").classList.add("hide"); });
+
+    // Scan dialog
+    document.getElementById("btnRescan").addEventListener("click", startScan);
+    document.getElementById("btnConfirmScan").addEventListener("click", confirmScan);
+    document.getElementById("btnCloseScan").addEventListener("click", closeScan);
+    document.getElementById("dlgScan").addEventListener("close", stopScan);
+
+    // Initial
+    renderInv();
+    populateSelect("addStockSelect");
+    populateSelect("reduceSelect");
+    populateSelect("transferSelect");
+    renderDogs();
+  });
+})();
 </script>
 
 </body>
