@@ -20,17 +20,14 @@
     el.style.padding = "12px";
     el.style.fontFamily = "system-ui, -apple-system, Segoe UI, Roboto, Ubuntu";
     el.style.display = "none";
-
     const title = document.createElement("div");
     title.style.fontWeight = "800";
     title.textContent = "New version available";
-
     const msg = document.createElement("div");
     msg.id = "bpUpdateMsg";
     msg.style.marginTop = "6px";
     msg.style.fontSize = "13px";
     msg.style.color = "#444";
-
     el.appendChild(title);
     el.appendChild(msg);
     document.body.appendChild(el);
@@ -60,30 +57,21 @@
       const changed =
         (b.sha && current.sha && b.sha !== current.sha) ||
         (b.build && current.build && String(b.build) !== String(current.build));
-
       if (!changed) return;
 
       const overlay = ensureOverlay();
       const msg = document.getElementById("bpUpdateMsg");
       let remaining = Math.ceil(COUNTDOWN_MS / 1000);
-
       overlay.style.display = "block";
-
       const tick = () => {
-        msg.textContent = `Updating automatically in ${remaining}s...`;
+        msg.textContent = `Updating automatically in ${remaining}s…`;
         remaining -= 1;
-        if (remaining < 0) {
-          window.location.reload();
-        } else {
-          setTimeout(tick, 1000);
-        }
+        if (remaining < 0) window.location.reload();
+        else setTimeout(tick, 1000);
       };
       tick();
-
       if (timer) clearInterval(timer);
-    } catch (e) {
-      // silent
-    }
+    } catch (e) {}
   }
 
   window.addEventListener("DOMContentLoaded", async () => {
