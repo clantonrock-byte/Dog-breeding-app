@@ -7,7 +7,6 @@
   function ensureOverlay() {
     let el = document.getElementById("bpUpdateOverlay");
     if (el) return el;
-
     el = document.createElement("div");
     el.id = "bpUpdateOverlay";
     el.style.position = "fixed";
@@ -52,6 +51,10 @@
       const b = await fetchBuild();
       if (!current) {
         current = b;
+        const buildId = document.getElementById("buildId");
+        if (buildId && (b.build || b.sha)) {
+          buildId.textContent = `• Build ${b.build || ""}`.trim();
+        }
         return;
       }
       const changed =
@@ -67,7 +70,7 @@
       overlay.style.display = "block";
 
       const tick = () => {
-        msg.textContent = `Updating automatically in ${remaining}s…`;
+        msg.textContent = `Updating automatically in ${remaining}s...`;
         remaining -= 1;
         if (remaining < 0) {
           window.location.reload();
@@ -78,7 +81,9 @@
       tick();
 
       if (timer) clearInterval(timer);
-    } catch (e) {}
+    } catch (e) {
+      // silent
+    }
   }
 
   window.addEventListener("DOMContentLoaded", async () => {
