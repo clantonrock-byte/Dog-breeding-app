@@ -193,7 +193,7 @@
     <div class="dogs-menu">
       <button class="btn primary" id="btnViewMales">View males</button>
       <button class="btn primary" id="btnViewFemales">View females</button>
-      <button class="btn primary" id="btnAddDog">Add dog</button>
+      <button class="btn primary" id="btnAddDog" onclick="try{bp_openAddDogSheet();}catch(e){alert('Add Dog not ready: '+(e&&e.message?e.message:'unknown error'));} return false;">Add dog</button>
     </div>
     <div class="dogs-subtools">
       <button class="btn" id="btnToggleArchivedDogs">Show archived</button>
@@ -1532,9 +1532,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   if(btn){
     btn.onclick = (e)=>{ e.preventDefault(); bp_openAddDogSheet(); };
   }
-  document.getElementById("btnAddDogClose")?.addEventListener("click", bp_closeAddDogSheet);
-  document.getElementById("btnAddDogCancel")?.addEventListener("click", bp_closeAddDogSheet);
-  document.getElementById("btnAddDogCreate")?.addEventListener("click", bp_createDogFromSheet);
+  (document.getElementById("btnAddDogClose")||{}).addEventListener("click", bp_closeAddDogSheet);
+  (document.getElementById("btnAddDogCancel")||{}).addEventListener("click", bp_closeAddDogSheet);
+  (document.getElementById("btnAddDogCreate")||{}).addEventListener("click", bp_createDogFromSheet);
 });
 
 
