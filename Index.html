@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breeder Pro</title>
+  <style>
+    :root { --bg:#f6f7f9; --card:#fff; --border:#ddd; --muted:#666; --primary:#2d6cdf; }
+    html,body{ margin:0; padding:0; background:var(--bg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; }
+    .topbar{ position:sticky; top:0; z-index:10; background:var(--card); border-bottom:1px solid var(--border);
+      padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .brand{ line-height:1.15; }
+    .brand b{ font-size:16px; }
+    .small{ font-size:12px; color:var(--muted); }
+    .shell{ padding:12px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; }
+    h2{ margin:0 0 10px 0; font-size:18px; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; }
+    .nav-row{ display:flex; gap:10px; margin-top:10px; }
+    .nav-row button{ flex:1; }
+    .btn{ padding:12px; border-radius:10px; border:1px solid #cfcfcf; background:#fff; font-weight:700; }
+    .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
+    .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
+    .pill{ display:inline-block; padding:4px 10px; border:1px solid #ccc; border-radius:999px; font-size:12px; }
+    .muted{ color:var(--muted); font-size:13px; }
+    .item{ border:1px solid #e6e6e6; border-radius:12px; padding:12px; margin-top:10px; }
+    .item b{ font-size:15px; }
+    input,select{ width:100%; padding:10px; border-radius:10px; border:1px solid #cfcfcf; }
+    .hide{ display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <b>Breeder Pro</b>
+      <div class="small">Phase 1 • Build adddog-03</div>
+    </div>
+    <button class="btn" id="btnTalk">Talk</button>
+  </div>
+
+  <div class="shell">
+    <!-- HOME -->
+    <section class="card" id="viewHome">
+      <h2>What is our goal today?</h2>
+      <div class="grid">
+        <button class="btn primary" onclick="go('Dogs')">Dogs</button>
+      </div>
+      <div class="muted" style="margin-top:10px;">This build focuses on Dogs + Add Dog stability.</div>
+    </section>
+
+    <!-- DOGS -->
+    <section class="card hide" id="viewDogs">
+      <h2>Dogs</h2>
+      <div class="nav-row">
+        <button class="btn" onclick="back()">Back</button>
+        <button class="btn" onclick="home()">Home</button>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="btn primary" id="btnMales">View males</button>
+        <button class="btn primary" id="btnFemales">View females</button>
+        <button class="btn primary" id="btnAddDog">Add dog</button>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" id="btnUnknown">Needs sex set</button>
+        <span class="pill" id="dogsViewPill">All</span>
+      </div>
+
+      <div class="muted" style="margin-top:10px;" id="dogsMeta"></div>
+      <div id="dogsList"></div>
+    </section>
+
+    <!-- DOG PROFILE -->
+    <section class="card hide" id="viewDogProfile">
+      <h2 id="dpTitle">Dog Profile</h2>
+      <div class="nav-row">
+        <button class="btn" onclick="back()">Back</button>
+        <button class="btn" onclick="home()">Home</button>
+      </div>
+
+      <div class="item" style="margin-top:12px;">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <span class="pill" id="dpStatus">Active</span>
+        </div>
+        <div style="margin-top:8px;">
+          <b id="dpName">(no name)</b>
+          <div class="muted" id="dpLine"></div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="muted">Basics</div>
+        <label class="small" style="display:block;margin-top:8px;">Breed</label>
+        <input id="dpBreed" />
+        <label class="small" style="display:block;margin-top:8px;">Sex</label>
+        <select id="dpSex">
+          <option>Unknown</option>
+          <option>Male (intact)</option>
+          <option>Male (neutered)</option>
+          <option>Female (intact)</option>
+          <option>Female (spayed)</option>
+        </select>
+        <label class="small" style="display:block;margin-top:8px;">DOB (optional)</label>
+        <input id="dpDob" placeholder="YYYY-MM-DD" />
+        <div class="row" style="margin-top:12px;">
+          <button class="btn primary" id="dpDone">Done</button>
+        </div>
+        <div class="muted" style="margin-top:10px;" id="dpMsg"></div>
+      </div>
+    </section>
+  </div>
+
+<script>
+(function(){
+  const KEY = "breederpro_dogs_adddog03";
+  const state = { view:"Home", stack:[], dogs:[], filter:"All", currentDogId:null };
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      if(Array.isArray(obj.dogs)) state.dogs = obj.dogs;
+    }catch(e){}
+  }
+  function save(){
+    localStorage.setItem(KEY, JSON.stringify({ dogs: state.dogs }));
+  }
+
+  function show(view){
+    ["Home","Dogs","DogProfile"].forEach(v=>{
+      const el = document.getElementById("view"+v);
+      if(el) el.classList.toggle("hide", v!==view);
+    });
+    state.view = view;
+    if(view==="Dogs") renderDogs();
+    if(view==="DogProfile") renderProfile();
+  }
+
+  window.go = function(view){
+    if(view===state.view) return;
+    state.stack.push(state.view);
+    show(view);
+  }
+  window.back = function(){
+    const prev = state.stack.pop() || "Home";
+    show(prev);
+  }
+  window.home = function(){
+    state.stack.length = 0;
+    show("Home");
+  }
+
+  function sexCategory(sex){
+    sex = (sex||"").toLowerCase();
+    if(sex.startsWith("male")) return "male";
+    if(sex.startsWith("female")) return "female";
+    return "unknown";
+  }
+  function isAltered(sex){
+    sex = (sex||"").toLowerCase();
+    return sex.includes("neutered") || sex.includes("spayed");
+  }
+
+  function sorted(list){
+    return list.slice().sort((a,b)=>{
+      // intact first, altered second
+      const ai = isAltered(a.sex) ? 1 : 0;
+      const bi = isAltered(b.sex) ? 1 : 0;
+      if(ai!==bi) return ai-bi;
+      return (a.callName||"").toLowerCase().localeCompare((b.callName||"").toLowerCase());
+    });
+  }
+
+  function renderDogs(){
+    document.getElementById("dogsViewPill").textContent = state.filter;
+    let list = state.dogs;
+    if(state.filter==="Males") list = list.filter(d=>sexCategory(d.sex)==="male");
+    if(state.filter==="Females") list = list.filter(d=>sexCategory(d.sex)==="female");
+    if(state.filter==="Unknown") list = list.filter(d=>sexCategory(d.sex)==="unknown");
+    list = sorted(list);
+
+    document.getElementById("dogsMeta").textContent = "Dogs shown: " + list.length +
+      (state.filter==="Males"||state.filter==="Females" ? " (intact first, altered after)" : "");
+
+    const wrap = document.getElementById("dogsList");
+    wrap.innerHTML = list.length ? list.map(d=>`
+      <div class="item">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div>
+            <b>${escapeHtml(d.callName)}</b>
+            <div class="muted">Breed: ${escapeHtml(d.breed)} • Sex: ${escapeHtml(d.sex)}</div>
+          </div>
+          <button class="btn" onclick="openDog('${d.id}')">Open</button>
+        </div>
+      </div>
+    `).join("") : "<div class='muted'>No dogs found in this view.</div>";
+  }
+
+  window.openDog = function(id){
+    state.currentDogId = id;
+    go("DogProfile");
+  }
+
+  function renderProfile(){
+    const d = state.dogs.find(x=>x.id===state.currentDogId);
+    if(!d){ home(); return; }
+    document.getElementById("dpTitle").textContent = d.callName + " • Profile";
+    document.getElementById("dpName").textContent = d.callName;
+    document.getElementById("dpLine").textContent = d.breed + " • " + d.sex;
+    document.getElementById("dpBreed").value = d.breed || "German Shorthaired Pointer";
+    document.getElementById("dpSex").value = d.sex || "Unknown";
+    document.getElementById("dpDob").value = d.dob || "";
+    document.getElementById("dpMsg").textContent = "";
+  }
+
+  function addDogFlow(){
+    const callName = (prompt("Call name (required):")||"").trim();
+    if(!callName) return;
+
+    const breed = (prompt("Breed:", "German Shorthaired Pointer")||"").trim() || "German Shorthaired Pointer";
+
+    const sexOptions = [
+      "Male (intact)",
+      "Male (neutered)",
+      "Female (intact)",
+      "Female (spayed)",
+      "Unknown"
+    ];
+    const sexPrompt = "Sex (type one exactly):\n" + sexOptions.join("\n");
+    let sex = (prompt(sexPrompt, "Unknown")||"").trim();
+    if(!sex) sex = "Unknown";
+
+    // Normalize/validate
+    const match = sexOptions.find(o => o.toLowerCase() === sex.toLowerCase());
+    sex = match ? match : "Unknown";
+
+    const dob = (prompt("DOB (optional, YYYY-MM-DD):")||"").trim();
+
+    const id = "dog_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+    state.dogs.push({ id, callName, breed, sex, dob });
+    save();
+
+    state.currentDogId = id;
+    go("DogProfile");
+  }
+
+  document.getElementById("btnAddDog").addEventListener("click", addDogFlow);
+  document.getElementById("btnMales").addEventListener("click", ()=>{ state.filter="Males"; renderDogs(); });
+  document.getElementById("btnFemales").addEventListener("click", ()=>{ state.filter="Females"; renderDogs(); });
+  document.getElementById("btnUnknown").addEventListener("click", ()=>{ state.filter="Unknown"; renderDogs(); });
+
+  document.getElementById("dpDone").addEventListener("click", ()=>{
+    const d = state.dogs.find(x=>x.id===state.currentDogId);
+    if(!d) return;
+    d.breed = (document.getElementById("dpBreed").value||"").trim() || "German Shorthaired Pointer";
+    d.sex = document.getElementById("dpSex").value || "Unknown";
+    d.dob = (document.getElementById("dpDob").value||"").trim();
+    save();
+    document.getElementById("dpMsg").textContent = "Done.";
+    // return to Dogs list for flow
+    setTimeout(()=>show("Dogs"), 250);
+  });
+
+  document.getElementById("btnTalk").addEventListener("click", ()=>{
+    alert("Voice may be used at any time (coming later).");
+  });
+
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  }
+
+  load();
+  show("Home");
+})();
+</script>
+</body>
+</html>
