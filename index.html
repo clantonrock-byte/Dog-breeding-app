@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>window.__BUILD_ID="FIX02-2026-01-05-1132PT";console.log("BreederPro build",window.__BUILD_ID);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
   <link rel="stylesheet" href="style.css" />
   <style>
@@ -1501,7 +1502,6 @@ function bp_closeAddDogSheet(){
 }
 function bp_createDogFromSheet(){
   const msg = document.getElementById("addDogSheetMsg");
-  const btn = document.getElementById("btnAddDogCreate");
   const callName = (document.getElementById("sheetCallName").value || "").trim();
   const breed = (document.getElementById("sheetBreed").value || "").trim() || "German Shorthaired Pointer";
   const sex = document.getElementById("sheetSex").value || "Unknown";
@@ -1511,40 +1511,21 @@ function bp_createDogFromSheet(){
     alert("Call name is required.");
     return;
   }
-
-  // Commit
+  // Use existing helper if present; otherwise fallback to addDog
   let newId = null;
-  try{
-    if(typeof addDogWithDetails === "function"){
-      newId = addDogWithDetails({ callName, breed, sex, dob, dobEstimated:false });
-    } else if(typeof addDog === "function"){
-      addDog(callName);
-      try{
-        const store = loadDogs?.();
-        if(store?.dogs?.length) newId = store.dogs[store.dogs.length-1].dogId;
-      }catch(e){}
-    }
-  }catch(e){
-    alert("Couldn't save dog: " + (e && e.message ? e.message : "unknown error"));
-    return;
+  if(typeof addDogWithDetails === "function"){
+    newId = addDogWithDetails({ callName, breed, sex, dob, dobEstimated:false });
+  } else if(typeof addDog === "function"){
+    addDog(callName);
+    // best-effort: open newest dog if available
+    try{
+      const store = loadDogs?.();
+      if(store?.dogs?.length) newId = store.dogs[store.dogs.length-1].dogId;
+    }catch(e){}
   }
-
-  // UX: show commit feedback before closing
-  if(btn){
-    btn.textContent = "Done";
-    btn.disabled = true;
-  }
-  msg.textContent = "Saved.";
-  setTimeout(()=>{
-    bp_closeAddDogSheet();
-    if(newId && typeof __openDog === "function") __openDog(newId);
-    else if(typeof __go === "function") __go("Dogs");
-    if(btn){
-      // reset for next time
-      btn.textContent = "Save";
-      btn.disabled = false;
-    }
-  }, 350);
+  bp_closeAddDogSheet();
+  if(newId && typeof __openDog === "function") __openDog(newId);
+  else if(typeof __go === "function") __go("Dogs");
 }
 // Bind sheet buttons after DOM load
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -1600,7 +1581,7 @@ function _flashCommitted(btn) {
 
     <div class="row" style="margin-top:12px;">
       <button class="btn" id="btnAddDogCancel" type="button">Cancel</button>
-      <button class="btn primary" id="btnAddDogCreate" type="button">Save</button>
+      <button class="btn primary" id="btnAddDogCreate" type="button">Done</button>
     </div>
 
     <div class="muted small" id="addDogSheetMsg" style="margin-top:10px;"></div>
