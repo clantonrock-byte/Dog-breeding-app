@@ -1,52 +1,16 @@
-// app.js — navigation with one-step Back stack + Home reset + afterShow hook
+// === PATCH: Ensure Add Dog function exists ===
 
-(function () {
-  const views = [
-    "Home",
-    "InventoryMenu",
-    "InventoryAvailable",
-    "InventoryAdd",
-    "InventoryAddStock",
-    "InventoryReduceStock",
-    "InventoryTransfer",
-    "Dogs",
-    "DogProfile",            // ✅ NEW
-    "Care",
-    "Feeding",
-    "Helpers",
-    "Records"
-  ];
-
-  let current = "Home";
-  const stack = [];
-
-  function show(name) {
-    views.forEach(v => {
-      const el = document.getElementById("view" + v);
-      if (el) el.classList.toggle("hide", v !== name);
-    });
-    current = name;
-
-    if (typeof window.__afterShow === "function") {
-      try { window.__afterShow(name); } catch (_) {}
-    }
+// If the Add Dog sheet function is missing, define a safe default
+if (typeof bp_openAddDogSheet !== "function") {
+  function bp_openAddDogSheet() {
+    alert("Add Dog sheet opened (patch stub).");
+    console.log("bp_openAddDogSheet called successfully.");
   }
+}
 
-  window.__go = function (name) {
-    if (!name || name === current) return;
-    if (views.includes(current)) stack.push(current);
-    show(name);
-  };
-
-  window.__back = function () {
-    if (stack.length === 0) return show("Home");
-    show(stack.pop());
-  };
-
-  window.__home = function () {
-    stack.length = 0;
-    show("Home");
-  };
-
-  document.addEventListener("DOMContentLoaded", () => show("Home"));
-})();
+// Ensure app initializes
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof bp_initApp === "function") {
+    bp_initApp();
+  }
+});
