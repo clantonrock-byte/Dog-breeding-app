@@ -1,2 +1,296 @@
-<!-- FIX04 placeholder root build -->
-<!doctype html><html><head><meta charset='utf-8'><title>Rocks Corner FIX04</title></head><body><h1>Rocks Corner · FIX04-2026-01-05</h1><p>If you see this, the root ZIP loaded correctly.</p></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breeder Pro — Rocks Corner</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111111" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div>
+          <div class="brand">Breeder Pro</div>
+          <div class="muted small">Rocks Corner • <span class="pill" id="buildStamp">FIX03-2026-01-05</span></div>
+        </div>
+        <div class="row" style="gap:8px;">
+          <button class="btn" onclick="__back()">Back</button>
+          <button class="btn" onclick="__home()">Home</button>
+        </div>
+      </div>
+      <div class="muted small" style="margin-top:6px;">Current view: <span class="pill" id="currentViewLabel">Home</span></div>
+    </header>
+
+    <section data-view id="Home">
+      <div class="card">
+        <div class="title">Phase 1 • Build</div>
+        <div class="muted small">Dogs + Inventory + Scanner. LocalStorage persistence.</div>
+      </div>
+      <div class="grid">
+        <button class="btn primary" id="goDogs">Dogs</button>
+        <button class="btn primary" id="goInventory">Inventory</button>
+      </div>
+      <div class="muted small" style="margin-top:10px;">
+        Cache-buster tip: if you ever see an old build, add <b>?v=2</b> (any number) to the URL.
+      </div>
+    </section>
+
+    <section data-view id="Dogs" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Dogs</div>
+            <div class="muted small">Count: <span class="pill" id="dogsCount">0</span> • Filter: <span class="pill" id="dogsFilterPill">All</span></div>
+          </div>
+          <button class="btn primary" id="btnAddDog">Add dog</button>
+        </div>
+        <div class="row" style="gap:8px; margin-top:10px; flex-wrap:wrap;">
+          <button class="btn" id="dogsAll">All</button>
+          <button class="btn" id="dogsMales">Males</button>
+          <button class="btn" id="dogsFemales">Females</button>
+        </div>
+      </div>
+      <div id="dogsList" class="stack"></div>
+    </section>
+
+    <section data-view id="Inventory" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Inventory</div>
+            <div class="muted small">Definitions + stock adjustments + basic scan.</div>
+          </div>
+          <button class="btn primary" id="btnAddDef">Add definition</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Scanner</div>
+            <div class="muted small" id="scanStatus">Ready.</div>
+          </div>
+          <button class="btn" id="btnScan">Scan</button>
+        </div>
+        <video id="scanVideo" class="scanVideo" playsinline></video>
+        <input id="scanResult" class="input" placeholder="Scan result will appear here" />
+      </div>
+
+      <div id="invList" class="stack"></div>
+    </section>
+
+
+    <section data-view id="Litters" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Litters</div>
+            <div class="muted small">Track breedings and litter outcomes (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddLitter">Add Litter</button>
+        </div>
+      </div>
+      <div id="litterList" class="stack"></div>
+    </section>
+
+    <section data-view id="Whelping" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Whelping</div>
+            <div class="muted small">Notes tied to a litter (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddWhelpNote">Add Note</button>
+        </div>
+      </div>
+      <div id="whelpList" class="stack"></div>
+    </section>
+
+    <section data-view id="Health" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Health</div>
+            <div class="muted small">Vaccines, deworming, OFA, vet notes (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddHealthLog">Add Entry</button>
+        </div>
+      </div>
+      <div id="healthList" class="stack"></div>
+    </section>
+
+    <section data-view id="Reports" class="hide">
+      <div class="card">
+        <div class="title">Reports (Preview)</div>
+        <div class="muted small">This is a “show what we’re building” screen.</div>
+      </div>
+      <div class="card">
+        <div class="title">Coming soon</div>
+        <ul class="muted small" style="margin:8px 0 0 18px;">
+          <li>Breeding matrix (sire × dam) with outcomes</li>
+          <li>Puppy pipeline: whelping → weaning → placements</li>
+          <li>Health compliance: shots, deworming, microchip, OFA</li>
+          <li>Inventory burn rate + reorder reminders</li>
+        </ul>
+      </div>
+    </section>
+
+    <section data-view id="Settings" class="hide">
+      <div class="card">
+        <div class="title">Settings</div>
+        <div class="muted small">Backup/restore and project info.</div>
+      </div>
+      <div class="grid">
+        <button class="btn" id="btnExportData">Export Backup</button>
+        <button class="btn" id="btnImportData">Import Backup</button>
+      </div>
+      <input id="importFile" type="file" class="hide" accept="application/json" />
+      <div class="card">
+        <div class="title">About</div>
+        <div class="muted small">Rocks Corner Breeder Pro • <span class="pill" id="aboutBuildId"></span></div>
+      </div>
+    </section>
+
+
+
+    <div id="addDogSheet" class="sheet hide">
+      <div class="sheetCard">
+        <div class="title">Add dog</div>
+        <div class="muted small">Call name required. Save changes to Done.</div>
+        <label class="label">Call name</label>
+        <input id="addDogCallName" class="input" placeholder="e.g., Buddha" />
+        <label class="label">Breed</label>
+        <input id="addDogBreed" class="input" />
+        <label class="label">Sex</label>
+        <input id="addDogSex" class="input" placeholder="male / female" />
+        <label class="label">DOB</label>
+        <input id="addDogDob" class="input" placeholder="YYYY-MM-DD" />
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button class="btn" id="addDogCancelBtn">Cancel</button>
+          <button class="btn primary" id="addDogSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="dogEditor" class="sheet hide">
+      <div class="sheetCard">
+        <div class="title">Edit dog</div>
+        <div class="muted small">ID: <span class="pill" id="editDogId"></span></div>
+        <label class="label">Call name</label>
+        <input id="editCallName" class="input" />
+        <label class="label">Breed</label>
+        <input id="editBreed" class="input" />
+        <label class="label">Sex</label>
+        <input id="editSex" class="input" />
+        <label class="label">DOB</label>
+        <input id="editDob" class="input" />
+        <label class="label">Notes</label>
+        <textarea id="editNotes" class="input" rows="3"></textarea>
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button class="btn" id="dogEditorCancelBtn">Cancel</button>
+          <button class="btn primary" id="dogEditorSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="invDefSheet" class="sheet hide">
+      <div class="sheetCard">
+        <div class="title">Add definition</div>
+        <label class="label">SKU (barcode/text)</label>
+        <input id="defSku" class="input" placeholder="e.g., 012345678905" />
+        <label class="label">Name</label>
+        <input id="defName" class="input" placeholder="e.g., Puppy kibble" />
+        <label class="label">Unit</label>
+        <input id="defUnit" class="input" placeholder="e.g., bag, lb, can" />
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button class="btn" id="defCancelBtn">Cancel</button>
+          <button class="btn primary" id="defSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="invAdjSheet" class="sheet hide">
+      <div class="sheetCard">
+        <div class="title"><span id="adjDir">Add</span> stock</div>
+        <div class="muted small">SKU: <span class="pill" id="adjSku"></span></div>
+        <label class="label">Quantity</label>
+        <input id="adjQty" class="input" placeholder="e.g., 1" inputmode="decimal" />
+        <div class="row" style="justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button class="btn" id="adjCancelBtn">Cancel</button>
+          <button class="btn primary" id="adjSaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="addLitterSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Litter</div>
+      <label class="lbl">Dam (call name)</label>
+      <input id="litterDam" class="input" placeholder="e.g., Aina" />
+      <label class="lbl">Sire (call name)</label>
+      <input id="litterSire" class="input" placeholder="e.g., Malama" />
+      <label class="lbl">Whelp date</label>
+      <input id="litterDate" type="date" class="input" />
+      <label class="lbl">Pups (total)</label>
+      <input id="litterCount" type="number" class="input" placeholder="e.g., 8" />
+      <label class="lbl">Notes</label>
+      <textarea id="litterNotes" class="input" rows="3" placeholder="Any notes..."></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="litterCancelBtn">Cancel</button>
+        <button class="btn primary" id="litterSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addWhelpSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Whelping Note</div>
+      <label class="lbl">Litter</label>
+      <select id="whelpLitterId" class="input"></select>
+      <label class="lbl">Date/Time</label>
+      <input id="whelpWhen" type="datetime-local" class="input" />
+      <label class="lbl">Note</label>
+      <textarea id="whelpNote" class="input" rows="4" placeholder="What happened?"></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="whelpCancelBtn">Cancel</button>
+        <button class="btn primary" id="whelpSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addHealthSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Health Entry</div>
+      <label class="lbl">Dog</label>
+      <select id="healthDogId" class="input"></select>
+      <label class="lbl">Type</label>
+      <select id="healthType" class="input">
+        <option value="Vaccine">Vaccine</option>
+        <option value="Deworming">Deworming</option>
+        <option value="Vet Visit">Vet Visit</option>
+        <option value="OFA">OFA</option>
+        <option value="Microchip">Microchip</option>
+        <option value="Other">Other</option>
+      </select>
+      <label class="lbl">Date</label>
+      <input id="healthDate" type="date" class="input" />
+      <label class="lbl">Details</label>
+      <textarea id="healthDetails" class="input" rows="4" placeholder="Details..."></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="healthCancelBtn">Cancel</button>
+        <button class="btn primary" id="healthSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="autoupdate.js"></script>
+  <script src="app.js?v=FIX04-2026-01-05"></script>
+</body>
+</html>
