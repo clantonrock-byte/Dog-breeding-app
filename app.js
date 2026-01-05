@@ -1,29 +1,52 @@
-// ===============================
-// FINAL SAFETY PATCH: Add Dog
-// ===============================
+// app.js — navigation with one-step Back stack + Home reset + afterShow hook
 
-// Force global definition immediately
-window.bp_openAddDogSheet = function () {
-  alert("Add Dog sheet is now wired correctly.");
-  console.log("bp_openAddDogSheet fired (global bind OK)");
-};
+(function () {
+  const views = [
+    "Home",
+    "InventoryMenu",
+    "InventoryAvailable",
+    "InventoryAdd",
+    "InventoryAddStock",
+    "InventoryReduceStock",
+    "InventoryTransfer",
+    "Dogs",
+    "DogProfile",            // ✅ NEW
+    "Care",
+    "Feeding",
+    "Helpers",
+    "Records"
+  ];
 
-// Also expose placeholders in case HTML expects them
-window.bp_closeAddDogSheet = window.bp_closeAddDogSheet || function () {
-  console.log("bp_closeAddDogSheet stub");
-};
+  let current = "Home";
+  const stack = [];
 
-window.bp_createDogFromSheet = window.bp_createDogFromSheet || function () {
-  console.log("bp_createDogFromSheet stub");
-};
+  function show(name) {
+    views.forEach(v => {
+      const el = document.getElementById("view" + v);
+      if (el) el.classList.toggle("hide", v !== name);
+    });
+    current = name;
 
-// Allow normal app init to proceed if present
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof bp_initApp === "function") {
-    try {
-      bp_initApp();
-    } catch (e) {
-      console.error("bp_initApp error:", e);
+    if (typeof window.__afterShow === "function") {
+      try { window.__afterShow(name); } catch (_) {}
     }
   }
-});
+
+  window.__go = function (name) {
+    if (!name || name === current) return;
+    if (views.includes(current)) stack.push(current);
+    show(name);
+  };
+
+  window.__back = function () {
+    if (stack.length === 0) return show("Home");
+    show(stack.pop());
+  };
+
+  window.__home = function () {
+    stack.length = 0;
+    show("Home");
+  };
+
+  document.addEventListener("DOMContentLoaded", () => show("Home"));
+})();
