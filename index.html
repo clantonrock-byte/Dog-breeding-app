@@ -82,6 +82,80 @@
       <div id="invList" class="stack"></div>
     </section>
 
+
+    <section data-view id="Litters" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Litters</div>
+            <div class="muted small">Track breedings and litter outcomes (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddLitter">Add Litter</button>
+        </div>
+      </div>
+      <div id="litterList" class="stack"></div>
+    </section>
+
+    <section data-view id="Whelping" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Whelping</div>
+            <div class="muted small">Notes tied to a litter (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddWhelpNote">Add Note</button>
+        </div>
+      </div>
+      <div id="whelpList" class="stack"></div>
+    </section>
+
+    <section data-view id="Health" class="hide">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div>
+            <div class="title">Health</div>
+            <div class="muted small">Vaccines, deworming, OFA, vet notes (Phase‑1 demo).</div>
+          </div>
+          <button class="btn primary" id="btnAddHealthLog">Add Entry</button>
+        </div>
+      </div>
+      <div id="healthList" class="stack"></div>
+    </section>
+
+    <section data-view id="Reports" class="hide">
+      <div class="card">
+        <div class="title">Reports (Preview)</div>
+        <div class="muted small">This is a “show what we’re building” screen.</div>
+      </div>
+      <div class="card">
+        <div class="title">Coming soon</div>
+        <ul class="muted small" style="margin:8px 0 0 18px;">
+          <li>Breeding matrix (sire × dam) with outcomes</li>
+          <li>Puppy pipeline: whelping → weaning → placements</li>
+          <li>Health compliance: shots, deworming, microchip, OFA</li>
+          <li>Inventory burn rate + reorder reminders</li>
+        </ul>
+      </div>
+    </section>
+
+    <section data-view id="Settings" class="hide">
+      <div class="card">
+        <div class="title">Settings</div>
+        <div class="muted small">Backup/restore and project info.</div>
+      </div>
+      <div class="grid">
+        <button class="btn" id="btnExportData">Export Backup</button>
+        <button class="btn" id="btnImportData">Import Backup</button>
+      </div>
+      <input id="importFile" type="file" class="hide" accept="application/json" />
+      <div class="card">
+        <div class="title">About</div>
+        <div class="muted small">Rocks Corner Breeder Pro • <span class="pill" id="aboutBuildId"></span></div>
+      </div>
+    </section>
+
+
+
     <div id="addDogSheet" class="sheet hide">
       <div class="sheetCard">
         <div class="title">Add dog</div>
@@ -153,7 +227,70 @@
 
   </div>
 
+  <div id="addLitterSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Litter</div>
+      <label class="lbl">Dam (call name)</label>
+      <input id="litterDam" class="input" placeholder="e.g., Aina" />
+      <label class="lbl">Sire (call name)</label>
+      <input id="litterSire" class="input" placeholder="e.g., Malama" />
+      <label class="lbl">Whelp date</label>
+      <input id="litterDate" type="date" class="input" />
+      <label class="lbl">Pups (total)</label>
+      <input id="litterCount" type="number" class="input" placeholder="e.g., 8" />
+      <label class="lbl">Notes</label>
+      <textarea id="litterNotes" class="input" rows="3" placeholder="Any notes..."></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="litterCancelBtn">Cancel</button>
+        <button class="btn primary" id="litterSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addWhelpSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Whelping Note</div>
+      <label class="lbl">Litter</label>
+      <select id="whelpLitterId" class="input"></select>
+      <label class="lbl">Date/Time</label>
+      <input id="whelpWhen" type="datetime-local" class="input" />
+      <label class="lbl">Note</label>
+      <textarea id="whelpNote" class="input" rows="4" placeholder="What happened?"></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="whelpCancelBtn">Cancel</button>
+        <button class="btn primary" id="whelpSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addHealthSheet" class="sheet hide">
+    <div class="card">
+      <div class="title">Add Health Entry</div>
+      <label class="lbl">Dog</label>
+      <select id="healthDogId" class="input"></select>
+      <label class="lbl">Type</label>
+      <select id="healthType" class="input">
+        <option value="Vaccine">Vaccine</option>
+        <option value="Deworming">Deworming</option>
+        <option value="Vet Visit">Vet Visit</option>
+        <option value="OFA">OFA</option>
+        <option value="Microchip">Microchip</option>
+        <option value="Other">Other</option>
+      </select>
+      <label class="lbl">Date</label>
+      <input id="healthDate" type="date" class="input" />
+      <label class="lbl">Details</label>
+      <textarea id="healthDetails" class="input" rows="4" placeholder="Details..."></textarea>
+      <div class="row" style="justify-content:flex-end;gap:10px;margin-top:10px;">
+        <button class="btn" id="healthCancelBtn">Cancel</button>
+        <button class="btn primary" id="healthSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+
+
   <script src="autoupdate.js"></script>
-  <script src="app.js?v=FIX03-2026-01-05"></script>
+  <script src="app.js?v=FIX04-2026-01-05"></script>
 </body>
 </html>
