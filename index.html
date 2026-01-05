@@ -125,6 +125,13 @@
   </script>
 </head>
 <body>
+  <script>
+  // Cache-buster safety: unregister any service workers for this origin
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
+  }
+</script>
+
 
 
 <div id="jsErrorBanner" class="hide" style="position:fixed; left:12px; right:12px; bottom:12px; z-index:9998; background:#fff3cd; border:1px solid #ffeeba; border-radius:12px; padding:10px;">
@@ -1587,5 +1594,6 @@ function _flashCommitted(btn) {
   </div>
 </div>
 
+  <script src="app.js?v=rc20260105"></script>
 </body>
 </html>
