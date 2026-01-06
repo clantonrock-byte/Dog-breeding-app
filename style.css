@@ -1,4 +1,3 @@
-/* Dark theme everywhere */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,27 +5,19 @@ html, body {
   color: #f2f2f2;
   font-family: system-ui, sans-serif;
 }
-header {
-  padding: 10px;
-  border-bottom: 1px solid #333;
-}
-nav button {
-  margin-right: 6px;
-}
+header { padding: 10px; border-bottom: 1px solid #333; }
+nav button { margin-right: 6px; }
 button {
   background: rgba(255,255,255,0.08);
   color: #f2f2f2;
   border: 1px solid rgba(255,255,255,0.2);
   padding: 6px 10px;
 }
-input {
+input, textarea {
   background: rgba(255,255,255,0.06);
   color: #f2f2f2;
   border: 1px solid rgba(255,255,255,0.2);
   padding: 6px;
+  width: 100%;
 }
-.card {
-  border: 1px solid #333;
-  padding: 10px;
-  margin: 10px 0;
-}
+.card { border: 1px solid #333; padding: 10px; margin: 10px 0; }
