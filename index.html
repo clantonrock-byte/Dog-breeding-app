@@ -1592,7 +1592,7 @@ function _flashCommitted(btn) {
 
   
 <script>
-/* FIX07: Ensure Add Dog globals exist even if earlier script throws. */
+/* FIX08: Ensure Add Dog globals exist even if earlier script throws. */
 (function(){
   const DOG_KEY = "breederPro_dogs_store_v3";
   function loadDogsSafe(){
@@ -1674,5 +1674,21 @@ function _flashCommitted(btn) {
 </script>
 
   <script src="autoupdate.js"></script>
+
+<script>
+/* FIX08: safety exports so all UI buttons have targets even if a script scope changes. */
+(function(){
+  function ensureFn(name, fn){
+    if (typeof window[name] !== "function") window[name] = fn;
+  }
+  ensureFn("bp_openAddDogSheet", function(){ alert("Add Dog is loading… if this persists, refresh with ?v=8"); });
+  ensureFn("bp_commitAddDogSheet", function(){ alert("Save is not ready in this build. Please refresh with ?v=8"); });
+  ensureFn("bp_closeAddDogSheet", function(){ 
+    var el = document.getElementById("bpAddDogSheet");
+    if(el) el.classList.add("hide");
+  });
+})();
+</script>
+
 </body>
 </html>
