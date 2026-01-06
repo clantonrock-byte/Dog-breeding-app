@@ -195,7 +195,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
 <header class="topbar">
   <div>
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-04</span></div>
+    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-05</span></div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
@@ -1617,6 +1617,50 @@ function _flashCommitted(btn) {
     <div class="muted small" id="addDogSheetMsg" style="margin-top:10px;"></div>
   </div>
 </div>
+
+
+<script id="rc-adddog-bind">
+/* RC Add Dog Sheet: make Save/Cancel/Close always work */
+(function(){
+  function bind(id, fn){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.onclick = fn;
+  }
+  function closeSheet(){
+    try{
+      var sheet=document.getElementById("addDogSheet");
+      if(sheet) sheet.classList.add("hide");
+    }catch(e){}
+  }
+
+  window.bp_closeAddDogSheet = window.bp_closeAddDogSheet || closeSheet;
+
+  // Export internal create function if it exists in this script scope
+  try{
+    if(typeof window.bp_createDogFromSheet !== "function" && typeof bp_createDogFromSheet === "function"){
+      window.bp_createDogFromSheet = bp_createDogFromSheet;
+    }
+  }catch(e){}
+
+  window.addEventListener("DOMContentLoaded", function(){
+    bind("btnAddDogClose", function(e){ e&&e.preventDefault&&e.preventDefault(); window.bp_closeAddDogSheet(); });
+    bind("btnAddDogCancel", function(e){ e&&e.preventDefault&&e.preventDefault(); window.bp_closeAddDogSheet(); });
+    bind("btnAddDogCreate", function(e){
+      e&&e.preventDefault&&e.preventDefault();
+      try{
+        if(typeof window.bp_createDogFromSheet === "function"){
+          window.bp_createDogFromSheet();
+        }
+      }catch(err){
+        alert("Save error: "+(err && err.message ? err.message : err));
+      }
+      var msg=document.getElementById("addDogSheetMsg");
+      if(!msg || !msg.textContent) window.bp_closeAddDogSheet();
+    });
+  });
+})();
+</script>
 
 </body>
 </html>
