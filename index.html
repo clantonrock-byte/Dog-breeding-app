@@ -1441,5 +1441,119 @@
 })();
 </script>
 
+
+<script id="rc-scan-routing">
+/* RC: Scanner routing for Inventory -> Add Inventory (define) and Inventory -> Add Stock (txn) */
+(function(){
+  function toast(msg){
+    try{
+      var el=document.getElementById("rcToast");
+      if(!el){
+        el=document.createElement("div");
+        el.id="rcToast";
+        el.style.position="fixed";
+        el.style.left="12px";
+        el.style.right="12px";
+        el.style.bottom="18px";
+        el.style.zIndex="99999";
+        el.style.background="rgba(0,0,0,0.75)";
+        el.style.color="#f2f2f2";
+        el.style.border="1px solid rgba(255,255,255,0.2)";
+        el.style.borderRadius="12px";
+        el.style.padding="10px 12px";
+        el.style.fontSize="14px";
+        el.style.display="none";
+        document.body.appendChild(el);
+      }
+      el.textContent=msg;
+      el.style.display="block";
+      clearTimeout(el._t);
+      el._t=setTimeout(()=>{el.style.display="none";},1200);
+    }catch(e){}
+  }
+
+  // Determine context heuristically
+  function getView(){
+    try{ if(typeof window.__curView==="string") return window.__curView; }catch(e){}
+    // fallback: visible section id
+    try{
+      var sec=[...document.querySelectorAll("section")].find(s=>!s.classList.contains("hide"));
+      if(sec) return sec.id || "";
+    }catch(e){}
+    return "";
+  }
+
+  // Hook point: called with scanned code string
+  window.rcHandleScan = function(code){
+    var view=getView();
+    // If we're on "InventoryAddDef"/"InventoryAddItem"/similar, treat scan as defining a new inventory item barcode
+    if(/Inv.*AddDef|Inv.*AddItem|Inventory.*AddDef|Inventory.*AddItem|AddDef|AddItem/i.test(view)){
+      try{
+        if(typeof window.bp_setInvDefBarcode==="function"){
+          window.bp_setInvDefBarcode(code);
+          toast("Barcode set for new item");
+          return true;
+        }
+        // Common field id
+        var f=document.getElementById("invDefBarcode")||document.getElementById("barcode")||document.getElementById("invBarcode");
+        if(f){ f.value=code; toast("Barcode set"); return true; }
+      }catch(e){}
+      toast("Scan captured (add inventory)");
+      return true;
+    }
+
+    // If we're on add stock / reduce / transfer screens, apply transaction
+    if(/Inv.*AddStock|Inventory.*AddStock|AddStock/i.test(view)){
+      try{
+        if(typeof window.applyAddStock==="function"){ window.applyAddStock(code); toast("+1 added"); return true; }
+      }catch(e){ toast("Add stock error"); }
+      return false;
+    }
+    if(/Inv.*Reduce|Inventory.*Reduce|ReduceStock/i.test(view)){
+      try{
+        if(typeof window.applyReduce==="function"){ window.applyReduce(code); toast("-1 reduced"); return true; }
+      }catch(e){ toast("Reduce error"); }
+      return false;
+    }
+    if(/Inv.*Transfer|Inventory.*Transfer|TransferStock/i.test(view)){
+      try{
+        if(typeof window.applyTransfer==="function"){ window.applyTransfer(code); toast("Transferred"); return true; }
+      }catch(e){ toast("Transfer error"); }
+      return false;
+    }
+
+    // Default: just toast and leave code in any "scanResult" field
+    try{
+      var r=document.getElementById("scanResult")||document.getElementById("scanText")||document.getElementById("scannedCode");
+      if(r){ r.value=code; }
+    }catch(e){}
+    toast("Scanned: "+code);
+    return true;
+  };
+
+  // Patch scanner confirm if present
+  window.addEventListener("DOMContentLoaded", function(){
+    try{
+      var btn=document.getElementById("btnConfirmScan");
+      if(btn && !btn._rcBound){
+        btn.addEventListener("click", function(){
+          try{
+            var code = (window.__lastScanValue||"").toString();
+            // try common elements that hold scan value
+            if(!code){
+              var el=document.getElementById("scanValue")||document.getElementById("scanOut")||document.getElementById("scanResult");
+              if(el) code=(el.value||el.textContent||"").trim();
+            }
+            if(code) window.rcHandleScan(code);
+          }catch(e){}
+        });
+        btn._rcBound=true;
+      }
+    }catch(e){}
+  });
+
+})();
+</script>
+
 </body>
 </html>
