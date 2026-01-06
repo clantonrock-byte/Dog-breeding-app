@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
@@ -126,6 +127,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" sizes="192x192" href="icon-192.png">
   <link rel="icon" sizes="512x512" href="icon-512.png">
+<style id="fix09-dark">html,body{background:#0b0b0d !important;color:#f2f2f2 !important;}</style><!-- FIX09-DARK -->
 </head>
 <body>
 
@@ -165,6 +167,7 @@
 </div>
 
 <header class="topbar">
+<meta name="theme-color" content="#0b0b0d">
   <div>
     <div class="brand-title">Breeder Pro</div>
     <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-02</span></div>
@@ -1592,7 +1595,7 @@ function _flashCommitted(btn) {
 
   
 <script>
-/* FIX08: Ensure Add Dog globals exist even if earlier script throws. */
+/* FIX09: Ensure Add Dog globals exist even if earlier script throws. */
 (function(){
   const DOG_KEY = "breederPro_dogs_store_v3";
   function loadDogsSafe(){
@@ -1676,7 +1679,7 @@ function _flashCommitted(btn) {
   <script src="autoupdate.js"></script>
 
 <script>
-/* FIX08: safety exports so all UI buttons have targets even if a script scope changes. */
+/* FIX09: safety exports so all UI buttons have targets even if a script scope changes. */
 (function(){
   function ensureFn(name, fn){
     if (typeof window[name] !== "function") window[name] = fn;
