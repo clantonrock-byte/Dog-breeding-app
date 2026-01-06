@@ -183,3 +183,49 @@ html,body{ background:var(--rcbg)!important; color:var(--rctxt)!important; }
 #addDogSheet > div{ background:#121216!important; border-color:var(--rcbd)!important; color:var(--rctxt)!important; }
 #addDogSheet input,#addDogSheet select,#addDogSheet textarea{ background:rgba(255,255,255,0.06)!important; color:var(--rctxt)!important; border-color:rgba(255,255,255,0.18)!important; }
 #addDogSheet option{ background:var(--rcbg)!important; color:var(--rctxt)!important; }
+
+/* === RC_DARK_DRILLDOWN nav-32: enforce dark theme on all drill-down pages, dialogs, sheets === */
+:root{
+  --rc-bg:#0b0b0d;
+  --rc-panel:#121216;
+  --rc-text:#f2f2f2;
+  --rc-muted:#b0b0b0;
+  --rc-border:#2a2a2f;
+}
+html,body{ background:var(--rc-bg)!important; color:var(--rc-text)!important; }
+section, .card, .timeline-item, .panel, .sheet, .drawer, .page, .view{
+  background:var(--rc-panel)!important; color:var(--rc-text)!important; border-color:var(--rc-border)!important;
+}
+.muted, .small, .label{ color: var(--rc-muted)!important; }
+
+/* Dialogs (native <dialog>) */
+dialog{
+  background: var(--rc-panel)!important;
+  color: var(--rc-text)!important;
+  border: 1px solid var(--rc-border)!important;
+  border-radius: 16px!important;
+}
+dialog::backdrop{ background: rgba(0,0,0,0.55)!important; }
+
+/* Inputs everywhere */
+input, select, textarea{
+  background: rgba(255,255,255,0.06)!important;
+  color: var(--rc-text)!important;
+  border-color: rgba(255,255,255,0.18)!important;
+}
+option{ background: var(--rc-bg)!important; color: var(--rc-text)!important; }
+
+/* Defeat inline whites in drill-down cards */
+[style*="background:#fff"],[style*="background: #fff"],[style*="background:white"],[style*="background: white"]{
+  background: var(--rc-panel)!important;
+  color: var(--rc-text)!important;
+}
+
+/* Common specific overlays */
+#dlgInv, #dlgScan, #dlgDog, #dlgNote{ background: var(--rc-panel)!important; color: var(--rc-text)!important; }
+#addDogSheet{ background: rgba(0,0,0,0.55)!important; }
+#addDogSheet > div{ background: var(--rc-panel)!important; color: var(--rc-text)!important; border-color: var(--rc-border)!important; }
+
+/* Buttons in drill-downs */
+.btn{ color: var(--rc-text)!important; }
+.btn:not(.primary){ background: rgba(255,255,255,0.10)!important; border-color: rgba(255,255,255,0.18)!important; }
