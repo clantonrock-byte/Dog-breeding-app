@@ -26,9 +26,8 @@ function showDogs() {
     html += "<p>No dogs yet.</p>";
   } else {
     dogs.forEach(d => {
-      html += `<div class="card">
-        <strong>${d.callName}</strong><br>
-        <button onclick="showDogDetail(${d.id})">View</button>
+      html += `<div class="card" onclick="showDogDetail(${d.id})">
+        <strong>${d.callName}</strong>
       </div>`;
     });
   }
@@ -91,7 +90,7 @@ function deleteDog() {
   showDogs();
 }
 
-// ===== Inventory (unchanged, audited) =====
+// ===== Inventory (unchanged) =====
 function showInventory() {
   let html = `<h2>Inventory</h2>
     <button onclick="addInventory()">Add Item</button>`;
@@ -108,7 +107,7 @@ function addInventory() {
   showInventory();
 }
 
-// ===== Scanner (safe stub) =====
+// ===== Scanner (stub) =====
 function showScanner() {
   view.innerHTML = `<h2>Scanner</h2><p>Scanner ready (stub).</p>
   <button onclick="showDogs()">Back</button>`;

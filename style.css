@@ -20,4 +20,12 @@ input, textarea {
   padding: 6px;
   width: 100%;
 }
-.card { border: 1px solid #333; padding: 10px; margin: 10px 0; }
+.card {
+  border: 1px solid #333;
+  padding: 12px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.card:hover {
+  background: rgba(255,255,255,0.04);
+}
