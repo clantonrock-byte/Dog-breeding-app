@@ -179,6 +179,7 @@
     <div class="dogs-menu">
       <button class="btn primary" id="btnViewMales">View males</button>
       <button class="btn primary" id="btnViewFemales">View females</button>
+      <button class="btn primary" id="btnViewAllDogs">View all</button>
       <button class="btn primary" id="btnAddDog">Add dog</button>
     </div>
     <div class="dogs-subtools">
@@ -1624,6 +1625,55 @@
     wrapSetter();
     relabel();
     setInterval(relabel, 800);
+  });
+})();
+</script>
+
+
+<script id="rc-bind-allview">
+(function(){
+  function bind(){
+    try{
+      var btn=document.getElementById("btnViewAllDogs");
+      if(btn && !btn._rcBound){
+        btn.addEventListener("click", ()=>{
+          try{ dogsViewMode="All"; }catch(e){}
+          try{ var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); }catch(e){}
+          try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){}
+        });
+        btn._rcBound=true;
+      }
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded", bind);
+  setInterval(bind, 800);
+})();
+</script>
+
+
+<script id="rc-inv-labels-m29">
+(function(){
+  function relabel(){
+    try{
+      var menu=document.getElementById("viewInventoryMenu");
+      if(!menu) return;
+      var btns=[...menu.querySelectorAll(".goal-grid .btn")];
+      if(btns.length<5) return;
+      var kind = (window.rcInvKind==="inedible") ? "inedible" : "edible";
+      var h2=menu.querySelector("h2");
+      if(h2) h2.textContent = (kind==="inedible") ? "Stock" : "Inventory";
+      if(kind==="edible"){
+        btns[0].textContent="Inventory available";
+        btns[1].textContent="Add inventory";
+        btns[2].textContent="Add quantity";
+        btns[3].textContent="Use quantity";
+        btns[4].textContent="Move inventory";
+      }
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded", ()=>{
+    relabel();
+    setInterval(relabel, 900);
   });
 })();
 </script>
