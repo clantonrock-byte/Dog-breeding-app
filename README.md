@@ -1,6 +1,3 @@
+Rocks Corner Breeder Pro - Phase 1 (Compiled)
 
-
-
-## FIX04 Additions
-- Litters, Whelping, Health, Reports, Settings demo screens.
-- Backup export/import (JSON).
+This build combines the full-sheet Phase 1 UI with working Add Dog sheet and supporting assets.

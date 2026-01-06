@@ -1,4 +1,5 @@
 {
-  "build": "FIX04-2026-01-05",
-  "sha": "5d7a4c96fb029fb997ede3adee5e38ce0bb92e219eb42d3024b9e2cc96b6180f"
+  "build": "RC_PHASE1_COMPILED_FIX05_2026-01-05",
+  "date": "2026-01-05",
+  "notes": "Compiled from uploaded ZIPs: breederpro_phase1_full_sheet_adddog_v3_hotfix + FIX03 assets + Dog-breeding-app-main autoupdate/workflow."
 }
