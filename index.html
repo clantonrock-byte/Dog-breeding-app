@@ -1400,5 +1400,139 @@
   });
 })();
 </script>
+
+<script id="rc-lastscan">
+/* RC: Safe Last-Scan capture + "Use Scan" helper (does not alter scanner engine) */
+(function(){
+  const KEY="rc_last_scan_v1";
+
+  function toast(msg){
+    try{
+      let el=document.getElementById("rcToast");
+      if(!el){
+        el=document.createElement("div");
+        el.id="rcToast";
+        el.style.position="fixed";
+        el.style.left="12px";
+        el.style.right="12px";
+        el.style.bottom="18px";
+        el.style.zIndex="99999";
+        el.style.background="rgba(0,0,0,0.78)";
+        el.style.color="#f2f2f2";
+        el.style.border="1px solid rgba(255,255,255,0.18)";
+        el.style.borderRadius="12px";
+        el.style.padding="10px 12px";
+        el.style.fontSize="14px";
+        el.style.display="none";
+        document.body.appendChild(el);
+      }
+      el.textContent=msg;
+      el.style.display="block";
+      clearTimeout(el._t);
+      el._t=setTimeout(()=>{el.style.display="none";},1200);
+    }catch(e){}
+  }
+
+  function saveLast(code){
+    try{
+      if(!code) return;
+      localStorage.setItem(KEY, JSON.stringify({code:String(code), at:new Date().toISOString()}));
+    }catch(e){}
+  }
+  function loadLast(){
+    try{
+      const raw=localStorage.getItem(KEY);
+      return raw?JSON.parse(raw):null;
+    }catch(e){ return null; }
+  }
+
+  // Observe common scan output elements; if they change, store last scan.
+  function attachObservers(){
+    const ids=["scanResult","scanOut","scanValue","scannedCode","scanText"];
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el || el._rcObs) return;
+      const obs=new MutationObserver(()=>{ saveLast(el.value||el.textContent||""); });
+      obs.observe(el, {subtree:true, childList:true, characterData:true});
+      el._rcObs=true;
+    });
+  }
+
+  // Add a small floating "Use Scan" button
+  function ensureUseBtn(){
+    let btn=document.getElementById("rcUseScanBtn");
+    if(btn) return;
+    btn=document.createElement("button");
+    btn.id="rcUseScanBtn";
+    btn.textContent="Use Scan";
+    btn.className="btn";
+    btn.style.position="fixed";
+    btn.style.right="12px";
+    btn.style.bottom="70px";
+    btn.style.zIndex="99998";
+    btn.style.background="rgba(74,144,226,0.25)";
+    btn.style.borderColor="rgba(74,144,226,0.55)";
+    btn.style.color="#f2f2f2";
+    btn.onclick=function(){
+      const last=loadLast();
+      if(!last || !last.code){ toast("No scan saved yet"); return; }
+      const code=last.code;
+
+      // Try to fill barcode-like fields on current view
+      let filled=false;
+
+      // 1) common barcode input ids
+      const idCandidates=["invDefBarcode","barcode","invBarcode","itemBarcode","sheetBarcode","sheetUPC","upc","ean"];
+      idCandidates.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el && !el.disabled){
+          el.value=code;
+          filled=true;
+        }
+      });
+
+      // 2) inputs with placeholder containing 'bar' or 'code'
+      if(!filled){
+        const inputs=[...document.querySelectorAll("input")].filter(i=>!i.disabled);
+        for(const i of inputs){
+          const ph=(i.getAttribute("placeholder")||"").toLowerCase();
+          const nm=(i.getAttribute("name")||"").toLowerCase();
+          const id=(i.id||"").toLowerCase();
+          if(ph.includes("bar")||ph.includes("code")||ph.includes("upc")||ph.includes("ean")||id.includes("barcode")||nm.includes("barcode")){
+            i.value=code;
+            filled=true;
+            break;
+          }
+        }
+      }
+
+      toast(filled ? "Scan applied" : ("Saved scan: "+code));
+    };
+    document.body.appendChild(btn);
+  }
+
+  // Also capture on explicit confirm button if present
+  function bindConfirm(){
+    const btn=document.getElementById("btnConfirmScan");
+    if(btn && !btn._rcBound){
+      btn.addEventListener("click", ()=>{
+        const v=document.getElementById("scanResult")?.value || document.getElementById("scanOut")?.textContent || "";
+        if(v) saveLast(v.trim());
+      });
+      btn._rcBound=true;
+    }
+  }
+
+  function tick(){
+    attachObservers();
+    bindConfirm();
+    ensureUseBtn();
+  }
+
+  document.addEventListener("DOMContentLoaded", tick);
+  setInterval(tick, 800);
+})();
+</script>
+
 </body>
 </html>
