@@ -13,7 +13,7 @@ button {
   border: 1px solid rgba(255,255,255,0.2);
   padding: 8px 12px;
 }
-input, textarea {
+input, textarea, select {
   background: rgba(255,255,255,0.06);
   color: #f2f2f2;
   border: 1px solid rgba(255,255,255,0.2);
@@ -33,3 +33,28 @@ input, textarea {
   gap: 10px;
 }
 .row strong { font-size: 18px; }
+.small { opacity: 0.85; font-size: 14px; }
+hr { border: 0; border-top: 1px solid #333; margin: 14px 0; }
+img.photo {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #333;
+  display: block;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.pill {
+  display:inline-block;
+  padding: 2px 8px;
+  border: 1px solid #333;
+  border-radius: 999px;
+  font-size: 12px;
+  opacity: 0.9;
+  margin-right: 6px;
+}
