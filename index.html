@@ -195,7 +195,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
 <header class="topbar">
   <div>
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-05</span></div>
+    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-06</span></div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
@@ -1659,6 +1659,46 @@ function _flashCommitted(btn) {
       if(!msg || !msg.textContent) window.bp_closeAddDogSheet();
     });
   });
+})();
+</script>
+
+
+<script id="rc-dogs-view-bind">
+/* RC: ensure Dogs view filters work (bind without relying on DOMContentLoaded) */
+(function(){
+  function bindNow(){
+    try{
+      var males=document.getElementById("btnViewMales");
+      var females=document.getElementById("btnViewFemales");
+      var all=document.getElementById("btnViewAllDogs");
+      var unassigned=document.getElementById("btnShowUnassigned");
+      if(males && !males._rcBound){
+        males.onclick=function(){ try{ dogsViewMode="Males"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); renderDogs(); }catch(e){ alert(e.message||e); } };
+        males._rcBound=true;
+      }
+      if(females && !females._rcBound){
+        females.onclick=function(){ try{ dogsViewMode="Females"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); renderDogs(); }catch(e){ alert(e.message||e); } };
+        females._rcBound=true;
+      }
+      if(all && !all._rcBound){
+        all.onclick=function(){ try{ dogsViewMode="All"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); renderDogs(); }catch(e){ alert(e.message||e); } };
+        all._rcBound=true;
+      }
+      if(unassigned && !unassigned._rcBound){
+        unassigned.onclick=function(){ try{ dogsViewMode="Unassigned"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.remove("hide"); renderDogs(); }catch(e){ alert(e.message||e); } };
+        unassigned._rcBound=true;
+      }
+      // stop trying once core buttons bound
+      if((males && males._rcBound) || (females && females._rcBound)) return true;
+    }catch(e){}
+    return false;
+  }
+  // try immediately and then a few times
+  var tries=0;
+  var t=setInterval(function(){
+    tries++;
+    if(bindNow() || tries>40) clearInterval(t);
+  }, 100);
 })();
 </script>
 
