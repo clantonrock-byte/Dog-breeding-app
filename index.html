@@ -374,27 +374,27 @@
 
   <!-- INVENTORY MENU -->
   <section id="viewInventoryMenu" class="card hide">
-    <h2>Inventory</h2>
+    <h2>Inventory (Edible)</h2>
     <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
     <div class="goal-grid">
       <button class="btn primary" onclick="rcSetKind('edible');__go('InventoryAvailable')">Inventory available</button>
-      <button class="btn primary" onclick="__go('InventoryAdd')">Add to inventory</button>
-      <button class="btn primary" onclick="__go('InventoryAddStock')">Add stock</button>
-      <button class="btn primary" onclick="__go('InventoryReduceStock')">Reduce stock</button>
-      <button class="btn primary" onclick="__go('InventoryTransfer')">Transfer inventory</button>
+      <button class="btn primary" onclick="__go('InventoryAdd')">Add inventory</button>
+      <button class="btn primary" onclick="__go('InventoryAddStock')">Add quantity</button>
+      <button class="btn primary" onclick="__go('InventoryReduceStock')">Use quantity</button>
+      <button class="btn primary" onclick="__go('InventoryTransfer')">Move inventory</button>
     </div>
   </section>
 
   <!-- STOCK MENU -->
   <section id="viewStockMenu" class="card hide">
-    <h2>Stock</h2>
+    <h2>Stock (Inedible)</h2>
     <div class="nav-row"><button class="btn" onclick="__back()">Back</button><button class="btn" onclick="__home()">Home</button></div>
     <div class="goal-grid">
       <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryAvailable')">Stock available</button>
-      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryAdd')">Add to stock list</button>
-      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryAddStock')">Add stock</button>
-      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryReduceStock')">Reduce stock</button>
-      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryTransfer')">Transfer stock</button>
+      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryAdd')">Add item</button>
+      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryAddStock')">Add quantity</button>
+      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryReduceStock')">Reduce quantity</button>
+      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryTransfer')">Transfer</button>
     </div>
   </section>
 
@@ -1557,77 +1557,7 @@
 </script>
 
 
-<script id="rc-menu-relabel-m27">
-/* RC: Keep terminology consistent (Inventory=Edible, Stock=Inedible) */
-(function(){
-  function relabel(){
-    try{
-      var menu=document.getElementById("viewInventoryMenu");
-      if(!menu) return;
-      var btns=[...menu.querySelectorAll(".goal-grid .btn")];
-      // Expected order from baseline:
-      // 0 available, 1 add to inventory, 2 add stock, 3 reduce stock, 4 transfer
-      if(btns.length < 5) return;
-      var kind = (window.rcInvKind==="inedible") ? "inedible" : "edible";
 
-      // Title
-      var h2=menu.querySelector("h2");
-      if(h2) h2.textContent = (kind==="inedible") ? "Stock" : "Inventory";
-
-      if(kind==="edible"){
-        btns[0].textContent="Inventory available";
-        btns[1].textContent="Add to inventory";
-        btns[2].textContent="Add stock (edible)";
-        btns[3].textContent="Reduce stock (edible)";
-        btns[4].textContent="Transfer inventory (edible)";
-      } else {
-        btns[0].textContent="Stock available";
-        btns[1].textContent="Add to stock list";
-        btns[2].textContent="Add stock (inedible)";
-        btns[3].textContent="Reduce stock (inedible)";
-        btns[4].textContent="Transfer stock (inedible)";
-      }
-
-      // Also relabel headings on pages already in view (best effort)
-      try{
-        var map = {
-          "viewInventoryAvailable": (kind==="inedible") ? "Stock available" : "Inventory available",
-          "viewInventoryAdd": (kind==="inedible") ? "Add to stock list" : "Add to inventory",
-          "viewInventoryAddStock": (kind==="inedible") ? "Add stock (inedible)" : "Add stock (edible)",
-          "viewInventoryReduceStock": (kind==="inedible") ? "Reduce stock (inedible)" : "Reduce stock (edible)",
-          "viewInventoryTransfer": (kind==="inedible") ? "Transfer stock (inedible)" : "Transfer inventory (edible)"
-        };
-        Object.keys(map).forEach(function(id){
-          var sec=document.getElementById(id);
-          if(sec){
-            var hh=sec.querySelector("h2");
-            if(hh) hh.textContent=map[id];
-          }
-        });
-      }catch(e){}
-    }catch(e){}
-  }
-
-  // Run now and after any kind change
-  function wrapSetter(){
-    if(typeof window.rcSetKind!=="function") return;
-    if(window.rcSetKind._rcWrapped) return;
-    var orig=window.rcSetKind;
-    window.rcSetKind=function(kind){
-      var r=orig(kind);
-      setTimeout(relabel,0);
-      return r;
-    };
-    window.rcSetKind._rcWrapped=true;
-  }
-
-  document.addEventListener("DOMContentLoaded", function(){
-    wrapSetter();
-    relabel();
-    setInterval(relabel, 800);
-  });
-})();
-</script>
 
 
 <script id="rc-bind-allview">
@@ -1651,32 +1581,7 @@
 </script>
 
 
-<script id="rc-inv-labels-m29">
-(function(){
-  function relabel(){
-    try{
-      var menu=document.getElementById("viewInventoryMenu");
-      if(!menu) return;
-      var btns=[...menu.querySelectorAll(".goal-grid .btn")];
-      if(btns.length<5) return;
-      var kind = (window.rcInvKind==="inedible") ? "inedible" : "edible";
-      var h2=menu.querySelector("h2");
-      if(h2) h2.textContent = (kind==="inedible") ? "Stock" : "Inventory";
-      if(kind==="edible"){
-        btns[0].textContent="Inventory available";
-        btns[1].textContent="Add inventory";
-        btns[2].textContent="Add quantity";
-        btns[3].textContent="Use quantity";
-        btns[4].textContent="Move inventory";
-      }
-    }catch(e){}
-  }
-  document.addEventListener("DOMContentLoaded", ()=>{
-    relabel();
-    setInterval(relabel, 900);
-  });
-})();
-</script>
+
 
 </body>
 </html>
