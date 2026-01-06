@@ -180,6 +180,32 @@ option{background:#0b0b0d!important;color:var(--text)!important;}
 }
 </style>
 
+
+<style id="rc-navpin">
+/* RC: Pin Back/Home bar and keep it dark */
+section.card{ overflow: visible !important; }
+.nav-row{
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(11,11,13,0.98) !important;
+  padding: 10px 0 !important;
+  margin: 0 0 10px 0 !important;
+}
+.nav-row .btn{
+  background: rgba(255,255,255,0.10) !important;
+  color: #f2f2f2 !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
+</style>
+
+
+<style id="rc-sheet-dark">
+#addDogSheet > div { background:#121216 !important; border-color:#2a2a2f !important; color:#f2f2f2 !important; }
+#addDogSheet input, #addDogSheet select, #addDogSheet textarea { background: rgba(255,255,255,0.06) !important; color:#f2f2f2 !important; border-color: rgba(255,255,255,0.18) !important; }
+#addDogSheet option { background:#0b0b0d !important; color:#f2f2f2 !important; }
+</style>
+
 </head>
 <body>
 
@@ -242,7 +268,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
 <header class="topbar">
   <div>
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-11</span></div>
+    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-12</span></div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
@@ -2009,6 +2035,46 @@ function _flashCommitted(btn) {
       window.__go._rcWrapped = true;
     }
   }catch(e){}
+})();
+</script>
+
+
+<script id="rc-adddog-profile">
+/* RC: After creating a dog from Add Dog sheet, open Dog Profile */
+(function(){
+  function wrapCreate(){
+    try{
+      if(typeof bp_createDogFromSheet!=="function") return;
+      if(bp_createDogFromSheet._rcWrapped) return;
+      const orig = bp_createDogFromSheet;
+      bp_createDogFromSheet = function(){
+        // capture before
+        let before=null;
+        try{ before = loadDogs(); }catch(e){}
+        const res = orig();
+        try{
+          const after = loadDogs();
+          const b = (before && before.dogs)? before.dogs.length : 0;
+          const a = (after && after.dogs)? after.dogs.length : 0;
+          if(a>b){
+            const last = after.dogs[a-1];
+            if(last && last.dogId && typeof __openDog==="function"){
+              __openDog(last.dogId);
+              return res;
+            }
+          }
+        }catch(e){}
+        return res;
+      };
+      bp_createDogFromSheet._rcWrapped = true;
+      try{ window.bp_createDogFromSheet = bp_createDogFromSheet; }catch(e){}
+    }catch(e){}
+  }
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", wrapCreate);
+  } else {
+    wrapCreate();
+  }
 })();
 </script>
 
