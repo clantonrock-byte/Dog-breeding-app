@@ -1519,10 +1519,14 @@ function bp_openAddDogSheet(){
   sheet.classList.remove("hide");
   setTimeout(()=>document.getElementById("sheetCallName").focus(), 50);
 }
+;try{ window.bp_openAddDogSheet = bp_openAddDogSheet; }catch(_e){}
+
 function bp_closeAddDogSheet(){
   const sheet = document.getElementById("addDogSheet");
   if(sheet) sheet.classList.add("hide");
 }
+;try{ window.bp_closeAddDogSheet = bp_closeAddDogSheet; }catch(_e){}
+
 function bp_createDogFromSheet(){
   const msg = document.getElementById("addDogSheetMsg");
   const callName = (document.getElementById("sheetCallName").value || "").trim();
@@ -1550,6 +1554,8 @@ function bp_createDogFromSheet(){
   if(newId && typeof __openDog === "function") __openDog(newId);
   else if(typeof __go === "function") __go("Dogs");
 }
+;try{ window.bp_createDogFromSheet = bp_createDogFromSheet; }catch(_e){}
+
 // Bind sheet buttons after DOM load
 document.addEventListener("DOMContentLoaded", ()=>{
   const btn = document.getElementById("btnAddDog");
@@ -1610,26 +1616,6 @@ function _flashCommitted(btn) {
     <div class="muted small" id="addDogSheetMsg" style="margin-top:10px;"></div>
   </div>
 </div>
-
-
-<script id="rc-global-shim">
-/* Rocks Corner global safety shim */
-(function(){
-  function noop(){}
-  // Ensure Add Dog entry point always exists
-  if (typeof window.bp_openAddDogSheet !== "function") {
-    window.bp_openAddDogSheet = function(){
-      // Try known implementations if present
-      if (typeof window.bp_addDogSheet === "function") return window.bp_addDogSheet();
-      if (typeof window.showAddDog === "function") return window.showAddDog();
-      alert("Add Dog sheet is not available in this build.");
-    };
-  }
-  // Common aliases to prevent regressions
-  window.bp_closeAddDogSheet = window.bp_closeAddDogSheet || noop;
-  window.bp_commitAddDogSheet = window.bp_commitAddDogSheet || noop;
-})();
-</script>
 
 </body>
 </html>
