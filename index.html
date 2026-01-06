@@ -114,64 +114,6 @@
       });
     })();
   </script>
-
-<style id="rc-dark-m24">
-:root{--rcbg:#0b0b0d;--rcpanel:#121216;--rctxt:#f2f2f2;--rcbd:#2a2a2f;}
-html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
-section, .card, .timeline-item, .panel, .sheet, .modal, .dlg, .drawer, .page, .view{
-  background:var(--rcpanel)!important;color:var(--rctxt)!important;border-color:var(--rcbd)!important;
-}
-input,select,textarea{
-  background:rgba(255,255,255,0.06)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;
-}
-option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
-/* Add inventory / add stock containers sometimes use white inline backgrounds */
-[style*="background:#fff"],[style*="background: #fff"],[style*="background:white"],[style*="background: white"]{
-  background:var(--rcpanel)!important;color:var(--rctxt)!important;
-}
-</style>
-
-
-<style id="rc-emergency-style">
-#rcEmergencyBtn{
-  position:fixed; left:12px; right:12px; bottom:14px; z-index:99999;
-  background:#ff3b30 !important; color:#000 !important;
-  border:1px solid rgba(0,0,0,0.35) !important;
-  border-radius:16px; padding:14px 16px;
-  font-weight:900; font-size:18px;
-}
-</style>
-
-
-<style id="rc-navpin-m25">
-/* RC: nav-row pinned but not "floating" oddly */
-.nav-row{
-  position: sticky !important;
-  top: calc(env(safe-area-inset-top, 0px) + 0px) !important;
-  z-index: 9999 !important;
-  background: rgba(18,18,22,0.98) !important;
-  border-radius: 14px !important;
-  padding: 10px 10px !important;
-  margin: 0 0 12px 0 !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-}
-</style>
-
-
-<style id="rc-bottompad-m25">
-/* RC: reserve space for emergency button so it doesn't block UI */
-body { padding-bottom: 90px !important; }
-</style>
-
-
-<style id="rc-emergency-m25">
-#rcEmergencyBtn{
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-  padding: 12px 14px !important;
-  border-radius: 16px !important;
-}
-</style>
-
 </head>
 <body>
 
@@ -218,10 +160,11 @@ body { padding-bottom: 90px !important; }
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
       <button class="btn primary" onclick="__go('Dogs')">Dogs</button>
-      <button class="btn primary" onclick="__go('InventoryMenu')">Inventory</button>
       <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
       <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
       <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
+      <button class="btn primary" onclick="rcSetKind('edible');__go('InventoryMenu')">Inventory (Edible)</button>
+      <button class="btn primary" onclick="rcSetKind('inedible');__go('InventoryMenu')">Stock (Inedible)</button>
       <button class="btn primary" onclick="__go('Records')">Records</button>
     </div>
   </section>
@@ -670,7 +613,13 @@ body { padding-bottom: 90px !important; }
     <input id="invName" />
     <label class="label">Identifier type</label>
     <select id="invIdType"><option>None</option><option>Barcode</option><option>QR</option></select>
-    <label class="label">Identifier value</label>
+    <label class="label">Kind</label>
+<select id="invKind">
+  <option value="edible">Edible</option>
+  <option value="inedible">Inedible</option>
+</select>
+
+<label class="label">Identifier value</label>
     <input id="invIdValue" />
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
@@ -1223,6 +1172,7 @@ body { padding-bottom: 90px !important; }
     document.getElementById("invName").value="";
     document.getElementById("invIdType").value="Barcode";
     document.getElementById("invIdValue").value="";
+    try{ document.getElementById("invKind").value = (window.rcInvKind==="inedible"?"inedible":"edible"); }catch(e){}
     document.getElementById("dlgInv").showModal();
   }
   function saveInvDef(){
@@ -1232,6 +1182,7 @@ body { padding-bottom: 90px !important; }
     store.inventory.push({ itemId:"inv_"+Date.now()+"_"+Math.random().toString(16).slice(2), name,
       identifierType:document.getElementById("invIdType").value,
       identifierValue:(document.getElementById("invIdValue").value||"").trim(),
+      kind:(function(){ try{ return document.getElementById("invKind").value|| (window.rcInvKind||"edible"); }catch(e){ return (window.rcInvKind||"edible"); } })(),
       qty:0, archived:false });
     saveInv(store);
     document.getElementById("dlgInv").close();
@@ -1459,125 +1410,135 @@ body { padding-bottom: 90px !important; }
 })();
 </script>
 
-<script id="rc-scan-m24">
+<script id="rc-kind-split">
+/* RC: Inventory (Edible) vs Stock (Inedible) split, editable via scan/manual */
 (function(){
-  const KEY="rc_last_scan_v1";
-
-  function saveLast(code){
+  window.rcInvKind = window.rcInvKind || "edible"; // default
+  window.rcSetKind = function(kind){
+    window.rcInvKind = (kind==="inedible") ? "inedible" : "edible";
+    // Update Inventory menu title if present
     try{
-      if(!code) return;
-      localStorage.setItem(KEY, JSON.stringify({code:String(code), at:new Date().toISOString()}));
+      var h=document.querySelector("#viewInventoryMenu h2");
+      if(h) h.textContent = (window.rcInvKind==="inedible") ? "Stock" : "Inventory";
     }catch(e){}
-  }
-  function loadLast(){
-    try{ const raw=localStorage.getItem(KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; }
-  }
-
-  // Hook scanner "Done" / confirm button to store last scan
-  function bindScannerConfirm(){
-    const btn=document.getElementById("btnConfirmScan");
-    if(btn && !btn._rcBound){
-      btn.addEventListener("click", ()=>{
-        let code="";
-        const el=document.getElementById("scanResult")||document.getElementById("scanOut")||document.getElementById("scanValue");
-        if(el) code=(el.value||el.textContent||"").trim();
-        if(code) saveLast(code);
+    // Update other inventory view titles
+    try{
+      var map = {
+        "viewInventoryAvailable": (window.rcInvKind==="inedible") ? "Stock available" : "Inventory available",
+        "viewInventoryAdd": (window.rcInvKind==="inedible") ? "Add to stock list" : "Add to inventory",
+        "viewInventoryAddStock": (window.rcInvKind==="inedible") ? "Add stock (inedible)" : "Add stock (edible)",
+        "viewInventoryReduceStock": (window.rcInvKind==="inedible") ? "Reduce stock (inedible)" : "Reduce stock (edible)",
+        "viewInventoryTransfer": (window.rcInvKind==="inedible") ? "Transfer stock (inedible)" : "Transfer inventory (edible)"
+      };
+      Object.keys(map).forEach(function(id){
+        var sec=document.getElementById(id);
+        if(sec){
+          var h2=sec.querySelector("h2");
+          if(h2) h2.textContent = map[id];
+        }
       });
-      btn._rcBound=true;
-    }
+    }catch(e){}
+    // Re-render lists if functions exist
+    try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
+    try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
+  };
+
+  function kindOf(item){
+    // default old items to edible
+    var k = (item && item.kind) ? String(item.kind) : "";
+    if(!k) return "edible";
+    k = k.toLowerCase();
+    return (k==="inedible") ? "inedible" : "edible";
   }
 
-  // Create inline "Use Scan" button near the current focused barcode/search field
-  function ensureInlineUseButton(targetEl){
-    if(!targetEl) return;
-    let btn=document.getElementById("rcUseScanInline");
-    if(!btn){
-      btn=document.createElement("button");
-      btn.id="rcUseScanInline";
-      btn.className="btn primary";
-      btn.style.marginTop="10px";
-      btn.textContent="Use last scan";
-      btn.onclick=function(){
-        const last=loadLast();
-        if(!last || !last.code){ alert("No scan saved yet"); return; }
-        targetEl.value = last.code;
-        // trigger input event so existing filters react
-        targetEl.dispatchEvent(new Event("input",{bubbles:true}));
-        targetEl.dispatchEvent(new Event("change",{bubbles:true}));
+  // Wrap saveInvDef to stamp kind
+  try{
+    if(typeof saveInvDef==="function" && !saveInvDef._rcWrapped){
+      var _saveInvDef = saveInvDef;
+      saveInvDef = function(){
+        // call original, but ensure last pushed item gets kind
+        // We'll intercept store push by temporarily wrapping loadInv/saveInv not safely; so do after.
+        var beforeLen=0;
+        try{ var s=loadInv(); beforeLen=(s.inventory||[]).length; }catch(e){}
+        var res=_saveInvDef();
+        try{
+          var s2=loadInv();
+          var inv=s2.inventory||[];
+          if(inv.length>beforeLen){
+            inv[inv.length-1].kind = window.rcInvKind || "edible";
+            saveInv(s2);
+          }
+        }catch(e){}
+        return res;
       };
-    } else {
-      // update handler for new target
-      btn.onclick=function(){
-        const last=loadLast();
-        if(!last || !last.code){ alert("No scan saved yet"); return; }
-        targetEl.value = last.code;
-        targetEl.dispatchEvent(new Event("input",{bubbles:true}));
-        targetEl.dispatchEvent(new Event("change",{bubbles:true}));
+      saveInvDef._rcWrapped=true;
+      window.saveInvDef=saveInvDef;
+    }
+  }catch(e){}
+
+  // Wrap renderInv to filter by kind
+  try{
+    if(typeof renderInv==="function" && !renderInv._rcWrapped){
+      var _renderInv = renderInv;
+      renderInv = function(){
+        // temporarily filter store inventory by kind by swapping loadInv output
+        try{
+          var s=loadInv();
+          var inv=s.inventory||[];
+          s._rcAllInventory = inv;
+          s.inventory = inv.filter(function(i){ return !i.archived && kindOf(i)===window.rcInvKind; }).concat(inv.filter(function(i){ return i.archived && kindOf(i)===window.rcInvKind; }));
+          // monkey patch loadInv for inner calls
+          var _loadInv = loadInv;
+          loadInv = function(){ return s; };
+          try{ return _renderInv(); } finally { loadInv=_loadInv; }
+        }catch(e){
+          return _renderInv();
+        }
       };
+      renderInv._rcWrapped=true;
+      window.renderInv=renderInv;
     }
-    // Place right after target field
-    if(btn.parentElement !== targetEl.parentElement){
-      targetEl.parentElement.appendChild(btn);
+  }catch(e){}
+
+  // Wrap populateInvSelects to show only kind items
+  try{
+    if(typeof populateInvSelects==="function" && !populateInvSelects._rcWrapped){
+      var _pop = populateInvSelects;
+      populateInvSelects = function(){
+        try{
+          var s=loadInv();
+          var inv=(s.inventory||[]).filter(function(i){ return !i.archived && kindOf(i)===window.rcInvKind; });
+          // patch loadInv for duration
+          var _loadInv = loadInv;
+          loadInv = function(){ return {inventory: inv}; };
+          try{ return _pop(); } finally { loadInv=_loadInv; }
+        }catch(e){
+          return _pop();
+        }
+      };
+      populateInvSelects._rcWrapped=true;
+      window.populateInvSelects=populateInvSelects;
     }
-  }
+  }catch(e){}
 
-  // Context targeting: Add Inventory definition and Add Stock
-  function bindContext(){
-    // Prefer explicit "Search" input on Add Stock
-    const search = [...document.querySelectorAll("input")].find(i=>{
-      const ph=(i.getAttribute("placeholder")||"").toLowerCase();
-      return ph.includes("filter") || ph.includes("search");
-    });
-    if(search){ ensureInlineUseButton(search); return; }
+  // Filter scanner matches by kind for stock/reduce/transfer contexts
+  try{
+    if(typeof findMatch==="function" && !findMatch._rcWrapped){
+      var _findMatch=findMatch;
+      findMatch = function(code){
+        var m=_findMatch(code);
+        if(!m) return null;
+        // If item is wrong kind, ignore match
+        if(kindOf(m)!==(window.rcInvKind||"edible")) return null;
+        return m;
+      };
+      findMatch._rcWrapped=true;
+      window.findMatch=findMatch;
+    }
+  }catch(e){}
 
-    // For Add Inventory definition, look for barcode-like placeholder
-    const barcode = [...document.querySelectorAll("input")].find(i=>{
-      const ph=(i.getAttribute("placeholder")||"").toLowerCase();
-      const id=(i.id||"").toLowerCase();
-      return ph.includes("barcode")||ph.includes("upc")||ph.includes("ean")||id.includes("barcode");
-    });
-    if(barcode){ ensureInlineUseButton(barcode); return; }
-  }
-
-  // Emergency button add (once)
-  function ensureEmergency(){
-    if(document.getElementById("rcEmergencyBtn")) return;
-    const b=document.createElement("button");
-    b.id="rcEmergencyBtn";
-    b.textContent="EMERGENCY";
-    b.onclick=function(){
-      alert("EMERGENCY: call 911 or your emergency contact now.");
-    };
-    document.body.appendChild(b);
-  }
-
-  function tick(){
-    bindScannerConfirm();
-    bindContext();
-    ensureEmergency();
-  }
-
-  document.addEventListener("DOMContentLoaded", tick);
-  setInterval(tick, 600);
-})();
-</script>
-
-
-<script id="rc-emergency-hide-m25">
-(function(){
-  function isSheetOpen(){
-    var s=document.getElementById("addDogSheet");
-    return !!(s && !s.classList.contains("hide"));
-  }
-  function tick(){
-    var b=document.getElementById("rcEmergencyBtn");
-    if(!b) return;
-    b.style.display = isSheetOpen() ? "none" : "block";
-  }
-  document.addEventListener("DOMContentLoaded", ()=>{
-    tick();
-    setInterval(tick, 250);
-  });
+  // Initialize titles based on default kind
+  try{ window.rcSetKind(window.rcInvKind); }catch(e){}
 })();
 </script>
 
