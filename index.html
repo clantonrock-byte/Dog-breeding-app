@@ -1552,6 +1552,13 @@ function _flashCommitted(btn) {
   }, 900);
 }
 
+
+// ===== Global exports for inline onclick handlers (Android-safe) =====
+window.bp_openAddDogSheet = bp_openAddDogSheet;
+window.bp_closeAddDogSheet = bp_closeAddDogSheet;
+window.bp_createDogFromSheet = bp_createDogFromSheet;
+window.bp_addDogSheet = (typeof bp_addDogSheet==='function') ? bp_addDogSheet : undefined;
+window.bp_addDog = (typeof addDog==='function') ? addDog : undefined;
 </script>
 
 
