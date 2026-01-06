@@ -127,7 +127,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" sizes="192x192" href="icon-192.png">
   <link rel="icon" sizes="512x512" href="icon-512.png">
-<style id="fix09-dark">html,body{background:#0b0b0d !important;color:#f2f2f2 !important;}</style><!-- FIX09-DARK -->
+<style id="fix09-dark">html,body{background:#0b0b0d !important;color:#f2f2f2 !important;}</style><!-- FIX10-DARK -->
 </head>
 <body>
 
@@ -1595,7 +1595,7 @@ function _flashCommitted(btn) {
 
   
 <script>
-/* FIX09: Ensure Add Dog globals exist even if earlier script throws. */
+/* FIX10: Ensure Add Dog globals exist even if earlier script throws. */
 (function(){
   const DOG_KEY = "breederPro_dogs_store_v3";
   function loadDogsSafe(){
@@ -1679,7 +1679,7 @@ function _flashCommitted(btn) {
   <script src="autoupdate.js"></script>
 
 <script>
-/* FIX09: safety exports so all UI buttons have targets even if a script scope changes. */
+/* FIX10: safety exports so all UI buttons have targets even if a script scope changes. */
 (function(){
   function ensureFn(name, fn){
     if (typeof window[name] !== "function") window[name] = fn;
@@ -1690,6 +1690,61 @@ function _flashCommitted(btn) {
     var el = document.getElementById("bpAddDogSheet");
     if(el) el.classList.add("hide");
   });
+})();
+</script>
+
+
+<script id="fix10-bind">
+/* FIX10: ensure buttons always work (fallback bindings + global exports) */
+(function(){
+  try{
+    // Export any important functions if they exist in scope
+    var exportNames = [
+      "bp_openAddDogSheet","bp_closeAddDogSheet","bp_createDogFromSheet",
+      "startScan","closeScan","confirmScan",
+      "renderDogs","renderInv","populateInvSelects",
+      "showAddStock","showReduce","showTransfer",
+      "applyAddStock","applyReduce","applyTransfer",
+      "saveInv","saveInvDef","saveDogsSafe"
+    ];
+    exportNames.forEach(function(n){
+      try{ if(typeof window[n] === "undefined" && typeof self[n] === "function"){ window[n]=self[n]; } }catch(_){}
+    });
+
+    // Fallback click binding helper
+    function on(id, fnName){
+      var el=document.getElementById(id);
+      if(!el) return;
+      if(el.getAttribute("data-bound")==="1") return;
+      el.addEventListener("click", function(ev){
+        try{
+          var fn=window[fnName];
+          if(typeof fn==="function"){ fn(ev); }
+          else { console.warn("Missing handler:", fnName); }
+        }catch(e){ console.error(e); alert("Button error: "+(e && e.message ? e.message : e)); }
+      });
+      el.setAttribute("data-bound","1");
+    }
+
+    // Add Dog (belt + suspenders)
+    on("btnAddDog","bp_openAddDogSheet");
+
+    // Inventory buttons (common pain points)
+    on("btnAddDef","show");
+    on("btnAddStock","showAddStock");
+    on("btnReduceStock","showReduce");
+    on("btnTransferStock","showTransfer");
+    on("btnStartScan","startScan");
+    on("btnCloseScan","closeScan");
+    on("btnConfirmScan","confirmScan");
+
+    // Add/Reduce/Transfer confirm/cancel
+    on("btnAddConfirm","applyAddStock");
+    on("btnReduceConfirm","applyReduce");
+    on("btnTransferConfirm","applyTransfer");
+  }catch(e){
+    console.error(e);
+  }
 })();
 </script>
 

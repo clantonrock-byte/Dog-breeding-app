@@ -215,3 +215,42 @@ button:active, .btn:active, .button:active {
   background: rgba(255,255,255,0.14) !important;
 }
 
+
+/* FIX10: force dark everywhere */
+:root { color-scheme: dark; }
+html, body {
+  background: #0b0b0d !important;
+  color: #f2f2f2 !important;
+}
+* { scrollbar-color: rgba(255,255,255,0.25) rgba(255,255,255,0.05); }
+section, header, footer, main, nav, article, aside,
+.panel, .card, .sheet, .modal, .dialog, .surface,
+#app, #root, #main, .view, [id^="view"] {
+  background: #0b0b0d !important;
+  color: #f2f2f2 !important;
+}
+dialog, dialog::backdrop {
+  background: #0b0b0d !important;
+  color: #f2f2f2 !important;
+}
+input, select, textarea {
+  background: rgba(255,255,255,0.06) !important;
+  color: #f2f2f2 !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+option { background: #0b0b0d !important; color: #f2f2f2 !important; }
+table, th, td {
+  background: transparent !important;
+  color: inherit !important;
+  border-color: rgba(255,255,255,0.14) !important;
+}
+button, .btn, .button, [role="button"] {
+  background: rgba(255,255,255,0.08) !important;
+  color: #f2f2f2 !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+button.primary, .btn.primary {
+  background: rgba(74,144,226,0.25) !important;
+  border-color: rgba(74,144,226,0.55) !important;
+}
+
