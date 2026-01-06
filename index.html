@@ -1592,7 +1592,7 @@ function _flashCommitted(btn) {
 
   
 <script>
-/* FIX08: Ensure Add Dog globals exist even if earlier script throws. */
+/* FIX11: Ensure Add Dog globals exist even if earlier script throws. */
 (function(){
   const DOG_KEY = "breederPro_dogs_store_v3";
   function loadDogsSafe(){
@@ -1676,7 +1676,7 @@ function _flashCommitted(btn) {
   <script src="autoupdate.js"></script>
 
 <script>
-/* FIX08: safety exports so all UI buttons have targets even if a script scope changes. */
+/* FIX11: safety exports so all UI buttons have targets even if a script scope changes. */
 (function(){
   function ensureFn(name, fn){
     if (typeof window[name] !== "function") window[name] = fn;
@@ -1687,6 +1687,82 @@ function _flashCommitted(btn) {
     var el = document.getElementById("bpAddDogSheet");
     if(el) el.classList.add("hide");
   });
+})();
+</script>
+
+
+<script id="fix11-adddog-save">
+/* FIX11: ensure Add Dog actually saves & appears in Dogs + opens details */
+(function(){
+  try{
+    // Wrap addDogWithDetails to always return the created dogId
+    if(typeof window.addDogWithDetails === "function" && !window.__addDogWithDetails_wrapped){
+      const orig = window.addDogWithDetails;
+      window.addDogWithDetails = function(args){
+        const res = orig(args);
+        if(res) return res;
+        try{
+          if(typeof window.loadDogs === "function"){
+            const s = window.loadDogs();
+            const last = s?.dogs?.[s.dogs.length-1];
+            return last?.dogId || last?.id || null;
+          }
+        }catch(e){}
+        return null;
+      };
+      window.__addDogWithDetails_wrapped = true;
+    }
+
+    // Override sheet "Save" behavior to guarantee persistence + navigation refresh
+    window.bp_createDogFromSheet = function(){
+      const getVal=(id)=>{ const el=document.getElementById(id); return el? String(el.value||"").trim() : ""; };
+      const callName=getVal("sheetCallName");
+      const breed=getVal("sheetBreed") || "German Shorthaired Pointer";
+      const sex=getVal("sheetSex") || "Unknown";
+      const dob=getVal("sheetDob");
+      if(!callName){
+        const msg=document.getElementById("addDogSheetMsg");
+        if(msg) msg.textContent="Call name is required.";
+        alert("Call name is required.");
+        return;
+      }
+
+      let newId=null;
+      if(typeof window.addDogWithDetails === "function"){
+        newId = window.addDogWithDetails({ callName, breed, sex, dob, dobEstimated:false });
+      } else if(typeof window.bp_commitAddDogSheet === "function"){
+        // fallback: commit safe dog (may not have full fields, but will persist)
+        window.bp_commitAddDogSheet();
+        try{
+          const s = (typeof window.loadDogsSafe==="function") ? window.loadDogsSafe() : null;
+          const last = s?.dogs?.[0];
+          newId = last?.dogId || last?.id || null;
+        }catch(e){}
+      }
+
+      try{ window.bp_closeAddDogSheet && window.bp_closeAddDogSheet(); }catch(e){}
+      try{ if(typeof window.__go==="function") window.__go("Dogs"); }catch(e){}
+      // force re-render after nav
+      setTimeout(function(){
+        try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
+        try{ if(newId && typeof window.__openDog==="function") window.__openDog(newId); }catch(e){}
+      }, 60);
+    };
+
+    // Also map the "Create" button to our save handler if present
+    try{
+      const btn = document.getElementById("btnAddDogCreate");
+      if(btn && !btn.__fix11Bound){
+        btn.addEventListener("click", function(ev){
+          ev.preventDefault();
+          window.bp_createDogFromSheet();
+        });
+        btn.__fix11Bound = true;
+      }
+    }catch(e){}
+  }catch(e){
+    console.error(e);
+  }
 })();
 </script>
 
