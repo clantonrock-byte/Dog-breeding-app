@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
@@ -127,19 +126,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" sizes="192x192" href="icon-192.png">
   <link rel="icon" sizes="512x512" href="icon-512.png">
-
-<style id="fix10-dark">
-:root { color-scheme: dark; }
-html, body { background:#0b0b0d !important; color:#f2f2f2 !important; }
-section, header, footer, main, nav, article, aside,
-.panel, .card, .sheet, .modal, .dialog, .surface,
-#app, #root, #main, .view, [id^="view"] { background:#0b0b0d !important; color:#f2f2f2 !important; }
-dialog, dialog::backdrop { background:#0b0b0d !important; color:#f2f2f2 !important; }
-input, select, textarea { background:rgba(255,255,255,0.06) !important; color:#f2f2f2 !important; border:1px solid rgba(255,255,255,0.18) !important; }
-option { background:#0b0b0d !important; color:#f2f2f2 !important; }
-button, .btn, .button, [role="button"] { background:rgba(255,255,255,0.08) !important; color:#f2f2f2 !important; border:1px solid rgba(255,255,255,0.18) !important; }
-</style>
-
 </head>
 <body>
 
@@ -179,7 +165,6 @@ button, .btn, .button, [role="button"] { background:rgba(255,255,255,0.08) !impo
 </div>
 
 <header class="topbar">
-<meta name="theme-color" content="#0b0b0d">
   <div>
     <div class="brand-title">Breeder Pro</div>
     <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-02</span></div>
@@ -1607,7 +1592,7 @@ function _flashCommitted(btn) {
 
   
 <script>
-/* FIX10: Ensure Add Dog globals exist even if earlier script throws. */
+/* FIX08: Ensure Add Dog globals exist even if earlier script throws. */
 (function(){
   const DOG_KEY = "breederPro_dogs_store_v3";
   function loadDogsSafe(){
@@ -1691,7 +1676,7 @@ function _flashCommitted(btn) {
   <script src="autoupdate.js"></script>
 
 <script>
-/* FIX10: safety exports so all UI buttons have targets even if a script scope changes. */
+/* FIX08: safety exports so all UI buttons have targets even if a script scope changes. */
 (function(){
   function ensureFn(name, fn){
     if (typeof window[name] !== "function") window[name] = fn;
@@ -1702,49 +1687,6 @@ function _flashCommitted(btn) {
     var el = document.getElementById("bpAddDogSheet");
     if(el) el.classList.add("hide");
   });
-})();
-</script>
-
-
-<script id="fix10-bind">
-(function(){
-  function exportIfPresent(names){
-    names.forEach(function(n){
-      try{
-        if(typeof window[n]==="undefined" && typeof self[n]==="function"){ window[n]=self[n]; }
-      }catch(_){}
-    });
-  }
-  exportIfPresent([
-    "bp_openAddDogSheet","bp_closeAddDogSheet","bp_createDogFromSheet","bp_commitAddDogSheet",
-    "startScan","closeScan","confirmScan",
-    "showAddStock","showReduce","showTransfer",
-    "applyAddStock","applyReduce","applyTransfer",
-    "renderDogs","renderInv","populateInvSelects"
-  ]);
-
-  function bind(id, fnName){
-    var el=document.getElementById(id);
-    if(!el) return;
-    if(el.getAttribute("data-bound")==="1") return;
-    el.addEventListener("click", function(ev){
-      var fn=window[fnName];
-      if(typeof fn==="function"){ fn(ev); }
-      else { alert(fnName + " not ready"); }
-    });
-    el.setAttribute("data-bound","1");
-  }
-
-  bind("btnAddDog","bp_openAddDogSheet");
-  bind("btnStartScan","startScan");
-  bind("btnCloseScan","closeScan");
-  bind("btnConfirmScan","confirmScan");
-  bind("btnAddStock","showAddStock");
-  bind("btnReduceStock","showReduce");
-  bind("btnTransferStock","showTransfer");
-  bind("btnAddConfirm","applyAddStock");
-  bind("btnReduceConfirm","applyReduce");
-  bind("btnTransferConfirm","applyTransfer");
 })();
 </script>
 
