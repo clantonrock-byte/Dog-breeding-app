@@ -419,7 +419,7 @@
       <label class="label">Quantity to add</label>
       <input id="addStockQty" inputmode="decimal" placeholder="e.g., 5" />
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnAddStockConfirm (auto-save)">Done</button>
+        <button class="btn primary" id="btnAddStockConfirm">Done</button>
         <button class="btn" id="btnAddStockCancel">Cancel</button>
       </div>
       <div id="addStockStatus" class="muted small" style="margin-top:10px;"></div>
@@ -443,7 +443,7 @@
       <label class="label">Quantity</label>
       <input id="reduceQty" inputmode="decimal" placeholder="e.g., 2" />
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnReduceConfirm (auto-save)">Done</button>
+        <button class="btn primary" id="btnReduceConfirm">Done</button>
         <button class="btn" id="btnReduceCancel">Cancel</button>
       </div>
       <div id="reduceStatus" class="muted small" style="margin-top:10px;"></div>
@@ -465,7 +465,7 @@
       <label class="label">Quantity</label>
       <input id="transferQty" inputmode="decimal" placeholder="e.g., 1" />
       <div class="row" style="margin-top:12px;">
-        <button class="btn primary" id="btnTransferConfirm (auto-save)">Done</button>
+        <button class="btn primary" id="btnTransferConfirm">Done</button>
         <button class="btn" id="btnTransferCancel">Cancel</button>
       </div>
       <div id="transferStatus" class="muted small" style="margin-top:10px;"></div>
@@ -511,7 +511,7 @@
   </form>
 </dialog>
 
-<dialog id="dlgMicrochipConfirm (auto-save)">
+<dialog id="dlgMicrochipConfirm">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
       <h3>Are you sure?</h3>
@@ -519,11 +519,11 @@
     </div>
     <div class="muted small" style="margin-top:6px;">This number can only be entered once.</div>
     <div class="timeline-item" style="margin-top:10px;">
-      <div class="big-code" id="microchipConfirm (auto-save)Big"></div>
+      <div class="big-code" id="microchipConfirmBig"></div>
     </div>
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnMicrochipLock" value="ok">Confirm (auto-save) &amp; lock</button>
+      <button class="btn primary" id="btnMicrochipLock" value="ok">Confirm &amp; lock</button>
     </div>
   </form>
 </dialog>
@@ -583,7 +583,7 @@
   </form>
 </dialog>
 
-<dialog id="dlgImmunConfirm (auto-save)">
+<dialog id="dlgImmunConfirm">
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
       <h3>Are you sure?</h3>
@@ -591,12 +591,12 @@
     </div>
     <div class="muted small" style="margin-top:6px;">This entry will be locked after confirmation.</div>
     <div class="timeline-item" style="margin-top:10px;">
-      <div id="immConfirm (auto-save)Big" class="big-code"></div>
-      <div id="immConfirm (auto-save)Small" class="muted small" style="margin-top:8px;"></div>
+      <div id="immConfirmBig" class="big-code"></div>
+      <div id="immConfirmSmall" class="muted small" style="margin-top:8px;"></div>
     </div>
     <div class="dlg-f">
       <button class="btn" value="cancel">Cancel</button>
-      <button class="btn primary" id="btnImmLock" value="ok">Confirm (auto-save) &amp; lock</button>
+      <button class="btn primary" id="btnImmLock" value="ok">Confirm &amp; lock</button>
     </div>
   </form>
 </dialog>
@@ -637,7 +637,7 @@
     <input id="scanManual" />
     <div class="dlg-f">
       <button type="button" class="btn" id="btnRescan">Rescan</button>
-      <button type="button" class="btn primary" id="btnConfirm (auto-save)Scan">Done</button>
+      <button type="button" class="btn primary" id="btnConfirmScan">Done</button>
     </div>
   </form>
 </dialog>
@@ -984,13 +984,13 @@
     document.getElementById("microchipInput").value="";
     document.getElementById("dlgMicrochipEntry").showModal();
   }
-  function proceedMicrochipConfirm (auto-save)(){
+  function proceedMicrochipConfirm(){
     const val=(document.getElementById("microchipInput").value||"").trim();
     if(!val){ alert("Enter a microchip number."); return; }
     microchipPending=val;
-    document.getElementById("microchipConfirm (auto-save)Big").textContent=val;
+    document.getElementById("microchipConfirmBig").textContent=val;
     document.getElementById("dlgMicrochipEntry").close();
-    document.getElementById("dlgMicrochipConfirm (auto-save)").showModal();
+    document.getElementById("dlgMicrochipConfirm").showModal();
   }
   function lockMicrochip(){
     updateDog(currentDogId, dog=>{
@@ -999,7 +999,7 @@
       dog.microchip.lockedAt=nowISO();
     });
     microchipPending="";
-    document.getElementById("dlgMicrochipConfirm (auto-save)").close();
+    document.getElementById("dlgMicrochipConfirm").close();
     renderDogProfile(getDog(currentDogId));
     renderDogs();
   }
@@ -1084,10 +1084,10 @@
       lockedAt:nowISO()
     };
 
-    document.getElementById("immConfirm (auto-save)Big").textContent=fmt(immunDraft.dateTime);
-    document.getElementById("immConfirm (auto-save)Small").textContent=`Administered by: ${immunDraft.administeredByLabel} • Vaccines: ${items.map(i=>i.vaccine).join(", ")}`;
+    document.getElementById("immConfirmBig").textContent=fmt(immunDraft.dateTime);
+    document.getElementById("immConfirmSmall").textContent=`Administered by: ${immunDraft.administeredByLabel} • Vaccines: ${items.map(i=>i.vaccine).join(", ")}`;
     document.getElementById("dlgImmunNew").close();
-    document.getElementById("dlgImmunConfirm (auto-save)").showModal();
+    document.getElementById("dlgImmunConfirm").showModal();
   }
   function lockImmun(){
     if(!immunDraft) return;
@@ -1095,7 +1095,7 @@
       dog.immunizationEvents.push(immunDraft);
     });
     immunDraft=null;
-    document.getElementById("dlgImmunConfirm (auto-save)").close();
+    document.getElementById("dlgImmunConfirm").close();
     renderImmunizations();
     // update profile summary if user returns
   }
@@ -1334,7 +1334,7 @@
 
     // Microchip
     document.getElementById("btnAddMicrochip").addEventListener("click", openMicrochipEntry);
-    document.getElementById("btnMicrochipNext").addEventListener("click", (e)=>{ e.preventDefault(); proceedMicrochipConfirm (auto-save)(); });
+    document.getElementById("btnMicrochipNext").addEventListener("click", (e)=>{ e.preventDefault(); proceedMicrochipConfirm(); });
     document.getElementById("btnMicrochipLock").addEventListener("click", (e)=>{ e.preventDefault(); lockMicrochip(); });
 
     // Rabies tap -> health immunizations
@@ -1382,14 +1382,14 @@
     document.getElementById("addStockSelect").addEventListener("change", e=>{ if(e.target.value) showAddStock(e.target.value); });
     document.getElementById("reduceSelect").addEventListener("change", e=>{ if(e.target.value) showReduce(e.target.value); });
     document.getElementById("transferSelect").addEventListener("change", e=>{ if(e.target.value) showTransfer(e.target.value); });
-    document.getElementById("btnAddStockConfirm (auto-save)").addEventListener("click", applyAddStock);
-    document.getElementById("btnReduceConfirm (auto-save)").addEventListener("click", applyReduce);
-    document.getElementById("btnTransferConfirm (auto-save)").addEventListener("click", applyTransfer);
+    document.getElementById("btnAddStockConfirm").addEventListener("click", applyAddStock);
+    document.getElementById("btnReduceConfirm").addEventListener("click", applyReduce);
+    document.getElementById("btnTransferConfirm").addEventListener("click", applyTransfer);
     document.getElementById("btnAddStockCancel").addEventListener("click", ()=>document.getElementById("addStockForm").classList.add("hide"));
     document.getElementById("btnReduceCancel").addEventListener("click", ()=>document.getElementById("reduceForm").classList.add("hide"));
     document.getElementById("btnTransferCancel").addEventListener("click", ()=>document.getElementById("transferForm").classList.add("hide"));
     document.getElementById("btnRescan").addEventListener("click", startScan);
-    document.getElementById("btnConfirm (auto-save)Scan").addEventListener("click", confirmScan);
+    document.getElementById("btnConfirmScan").addEventListener("click", confirmScan);
     document.getElementById("btnCloseScan").addEventListener("click", closeScan);
     document.getElementById("dlgScan").addEventListener("close", stopScan);
 
@@ -1400,160 +1400,5 @@
   });
 })();
 </script>
-
-<script id="rc-scan-apply">
-/* RC: Scanner should save immediately to Inventory for addstock/reduce/transfer */
-(function(){
-  function wrap(){
-    try{
-      var orig = (typeof confirmScan === "function") ? confirmScan : (typeof window.confirmScan==="function" ? window.confirmScan : null);
-      if(!orig || orig._rcWrapped) return;
-
-      function wrappedConfirm (auto-save)Scan(){
-        // call original confirmScan first; it already routes to forms.
-        try{
-          // Peek code and match BEFORE original closes dialog
-          var manual=(document.getElementById("scanManual")?.value||"").trim();
-          var code=(window.lastScanValue && String(window.lastScanValue).trim()) ? String(window.lastScanValue).trim() : manual;
-          // let original do its normal routing
-          var r = orig();
-          // If context is addstock/reduce/transfer and we have a match, auto-apply qty=1
-          try{
-            var ctx = (typeof window.scanContext==="string") ? window.scanContext : (typeof scanContext==="string" ? scanContext : "");
-            if(ctx==="addstock" && typeof window.applyAddStock==="function"){ setTimeout(()=>{ try{ window.applyAddStock(); }catch(e){} }, 0); }
-            if(ctx==="reduce" && typeof window.applyReduce==="function"){ setTimeout(()=>{ try{ window.applyReduce(); }catch(e){} }, 0); }
-            if(ctx==="transfer" && typeof window.applyTransfer==="function"){ setTimeout(()=>{ try{ window.applyTransfer(); }catch(e){} }, 0); }
-          }catch(e){}
-          return r;
-        }catch(e){
-          try{ alert("Scan save error: "+(e.message||e)); }catch(_){}
-        }
-      }
-      wrappedConfirm (auto-save)Scan._rcWrapped = true;
-
-      // export globally for inline onclick
-      window.confirmScan = wrappedConfirm (auto-save)Scan;
-      try{ confirmScan = wrappedConfirm (auto-save)Scan; }catch(e){}
-    }catch(e){}
-  }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", wrap);
-  else wrap();
-})();
-</script>
-
-
-<script id="rc-scan-routing">
-/* RC: Scanner routing for Inventory -> Add Inventory (define) and Inventory -> Add Stock (txn) */
-(function(){
-  function toast(msg){
-    try{
-      var el=document.getElementById("rcToast");
-      if(!el){
-        el=document.createElement("div");
-        el.id="rcToast";
-        el.style.position="fixed";
-        el.style.left="12px";
-        el.style.right="12px";
-        el.style.bottom="18px";
-        el.style.zIndex="99999";
-        el.style.background="rgba(0,0,0,0.75)";
-        el.style.color="#f2f2f2";
-        el.style.border="1px solid rgba(255,255,255,0.2)";
-        el.style.borderRadius="12px";
-        el.style.padding="10px 12px";
-        el.style.fontSize="14px";
-        el.style.display="none";
-        document.body.appendChild(el);
-      }
-      el.textContent=msg;
-      el.style.display="block";
-      clearTimeout(el._t);
-      el._t=setTimeout(()=>{el.style.display="none";},1200);
-    }catch(e){}
-  }
-
-  // Determine context heuristically
-  function getView(){
-    try{ if(typeof window.__curView==="string") return window.__curView; }catch(e){}
-    // fallback: visible section id
-    try{
-      var sec=[...document.querySelectorAll("section")].find(s=>!s.classList.contains("hide"));
-      if(sec) return sec.id || "";
-    }catch(e){}
-    return "";
-  }
-
-  // Hook point: called with scanned code string
-  window.rcHandleScan = function(code){
-    var view=getView();
-    // If we're on "InventoryAddDef"/"InventoryAddItem"/similar, treat scan as defining a new inventory item barcode
-    if(/Inv.*AddDef|Inv.*AddItem|Inventory.*AddDef|Inventory.*AddItem|AddDef|AddItem/i.test(view)){
-      try{
-        if(typeof window.bp_setInvDefBarcode==="function"){
-          window.bp_setInvDefBarcode(code);
-          toast("Barcode set for new item");
-          return true;
-        }
-        // Common field id
-        var f=document.getElementById("invDefBarcode")||document.getElementById("barcode")||document.getElementById("invBarcode");
-        if(f){ f.value=code; toast("Barcode set"); return true; }
-      }catch(e){}
-      toast("Scan captured (add inventory)");
-      return true;
-    }
-
-    // If we're on add stock / reduce / transfer screens, apply transaction
-    if(/Inv.*AddStock|Inventory.*AddStock|AddStock/i.test(view)){
-      try{
-        if(typeof window.applyAddStock==="function"){ window.applyAddStock(code); toast("+1 added"); return true; }
-      }catch(e){ toast("Add stock error"); }
-      return false;
-    }
-    if(/Inv.*Reduce|Inventory.*Reduce|ReduceStock/i.test(view)){
-      try{
-        if(typeof window.applyReduce==="function"){ window.applyReduce(code); toast("-1 reduced"); return true; }
-      }catch(e){ toast("Reduce error"); }
-      return false;
-    }
-    if(/Inv.*Transfer|Inventory.*Transfer|TransferStock/i.test(view)){
-      try{
-        if(typeof window.applyTransfer==="function"){ window.applyTransfer(code); toast("Transferred"); return true; }
-      }catch(e){ toast("Transfer error"); }
-      return false;
-    }
-
-    // Default: just toast and leave code in any "scanResult" field
-    try{
-      var r=document.getElementById("scanResult")||document.getElementById("scanText")||document.getElementById("scannedCode");
-      if(r){ r.value=code; }
-    }catch(e){}
-    toast("Scanned: "+code);
-    return true;
-  };
-
-  // Patch scanner confirm if present
-  window.addEventListener("DOMContentLoaded", function(){
-    try{
-      var btn=document.getElementById("btnConfirmScan");
-      if(btn && !btn._rcBound){
-        btn.addEventListener("click", function(){
-          try{
-            var code = (window.__lastScanValue||"").toString();
-            // try common elements that hold scan value
-            if(!code){
-              var el=document.getElementById("scanValue")||document.getElementById("scanOut")||document.getElementById("scanResult");
-              if(el) code=(el.value||el.textContent||"").trim();
-            }
-            if(code) window.rcHandleScan(code);
-          }catch(e){}
-        });
-        btn._rcBound=true;
-      }
-    }catch(e){}
-  });
-
-})();
-</script>
-
 </body>
 </html>
