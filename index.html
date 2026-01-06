@@ -114,6 +114,34 @@
       });
     })();
   </script>
+
+<style id="rc-dark-m24">
+:root{--rcbg:#0b0b0d;--rcpanel:#121216;--rctxt:#f2f2f2;--rcbd:#2a2a2f;}
+html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
+section, .card, .timeline-item, .panel, .sheet, .modal, .dlg, .drawer, .page, .view{
+  background:var(--rcpanel)!important;color:var(--rctxt)!important;border-color:var(--rcbd)!important;
+}
+input,select,textarea{
+  background:rgba(255,255,255,0.06)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;
+}
+option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
+/* Add inventory / add stock containers sometimes use white inline backgrounds */
+[style*="background:#fff"],[style*="background: #fff"],[style*="background:white"],[style*="background: white"]{
+  background:var(--rcpanel)!important;color:var(--rctxt)!important;
+}
+</style>
+
+
+<style id="rc-emergency-style">
+#rcEmergencyBtn{
+  position:fixed; left:12px; right:12px; bottom:14px; z-index:99999;
+  background:#ff3b30 !important; color:#000 !important;
+  border:1px solid rgba(0,0,0,0.35) !important;
+  border-radius:16px; padding:14px 16px;
+  font-weight:900; font-size:18px;
+}
+</style>
+
 </head>
 <body>
 
@@ -1401,37 +1429,9 @@
 })();
 </script>
 
-<script id="rc-lastscan">
-/* RC: Safe Last-Scan capture + "Use Scan" helper (does not alter scanner engine) */
+<script id="rc-scan-m24">
 (function(){
   const KEY="rc_last_scan_v1";
-
-  function toast(msg){
-    try{
-      let el=document.getElementById("rcToast");
-      if(!el){
-        el=document.createElement("div");
-        el.id="rcToast";
-        el.style.position="fixed";
-        el.style.left="12px";
-        el.style.right="12px";
-        el.style.bottom="18px";
-        el.style.zIndex="99999";
-        el.style.background="rgba(0,0,0,0.78)";
-        el.style.color="#f2f2f2";
-        el.style.border="1px solid rgba(255,255,255,0.18)";
-        el.style.borderRadius="12px";
-        el.style.padding="10px 12px";
-        el.style.fontSize="14px";
-        el.style.display="none";
-        document.body.appendChild(el);
-      }
-      el.textContent=msg;
-      el.style.display="block";
-      clearTimeout(el._t);
-      el._t=setTimeout(()=>{el.style.display="none";},1200);
-    }catch(e){}
-  }
 
   function saveLast(code){
     try{
@@ -1440,97 +1440,95 @@
     }catch(e){}
   }
   function loadLast(){
-    try{
-      const raw=localStorage.getItem(KEY);
-      return raw?JSON.parse(raw):null;
-    }catch(e){ return null; }
+    try{ const raw=localStorage.getItem(KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; }
   }
 
-  // Observe common scan output elements; if they change, store last scan.
-  function attachObservers(){
-    const ids=["scanResult","scanOut","scanValue","scannedCode","scanText"];
-    ids.forEach(id=>{
-      const el=document.getElementById(id);
-      if(!el || el._rcObs) return;
-      const obs=new MutationObserver(()=>{ saveLast(el.value||el.textContent||""); });
-      obs.observe(el, {subtree:true, childList:true, characterData:true});
-      el._rcObs=true;
-    });
-  }
-
-  // Add a small floating "Use Scan" button
-  function ensureUseBtn(){
-    let btn=document.getElementById("rcUseScanBtn");
-    if(btn) return;
-    btn=document.createElement("button");
-    btn.id="rcUseScanBtn";
-    btn.textContent="Use Scan";
-    btn.className="btn";
-    btn.style.position="fixed";
-    btn.style.right="12px";
-    btn.style.bottom="70px";
-    btn.style.zIndex="99998";
-    btn.style.background="rgba(74,144,226,0.25)";
-    btn.style.borderColor="rgba(74,144,226,0.55)";
-    btn.style.color="#f2f2f2";
-    btn.onclick=function(){
-      const last=loadLast();
-      if(!last || !last.code){ toast("No scan saved yet"); return; }
-      const code=last.code;
-
-      // Try to fill barcode-like fields on current view
-      let filled=false;
-
-      // 1) common barcode input ids
-      const idCandidates=["invDefBarcode","barcode","invBarcode","itemBarcode","sheetBarcode","sheetUPC","upc","ean"];
-      idCandidates.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el && !el.disabled){
-          el.value=code;
-          filled=true;
-        }
-      });
-
-      // 2) inputs with placeholder containing 'bar' or 'code'
-      if(!filled){
-        const inputs=[...document.querySelectorAll("input")].filter(i=>!i.disabled);
-        for(const i of inputs){
-          const ph=(i.getAttribute("placeholder")||"").toLowerCase();
-          const nm=(i.getAttribute("name")||"").toLowerCase();
-          const id=(i.id||"").toLowerCase();
-          if(ph.includes("bar")||ph.includes("code")||ph.includes("upc")||ph.includes("ean")||id.includes("barcode")||nm.includes("barcode")){
-            i.value=code;
-            filled=true;
-            break;
-          }
-        }
-      }
-
-      toast(filled ? "Scan applied" : ("Saved scan: "+code));
-    };
-    document.body.appendChild(btn);
-  }
-
-  // Also capture on explicit confirm button if present
-  function bindConfirm(){
+  // Hook scanner "Done" / confirm button to store last scan
+  function bindScannerConfirm(){
     const btn=document.getElementById("btnConfirmScan");
     if(btn && !btn._rcBound){
       btn.addEventListener("click", ()=>{
-        const v=document.getElementById("scanResult")?.value || document.getElementById("scanOut")?.textContent || "";
-        if(v) saveLast(v.trim());
+        let code="";
+        const el=document.getElementById("scanResult")||document.getElementById("scanOut")||document.getElementById("scanValue");
+        if(el) code=(el.value||el.textContent||"").trim();
+        if(code) saveLast(code);
       });
       btn._rcBound=true;
     }
   }
 
+  // Create inline "Use Scan" button near the current focused barcode/search field
+  function ensureInlineUseButton(targetEl){
+    if(!targetEl) return;
+    let btn=document.getElementById("rcUseScanInline");
+    if(!btn){
+      btn=document.createElement("button");
+      btn.id="rcUseScanInline";
+      btn.className="btn primary";
+      btn.style.marginTop="10px";
+      btn.textContent="Use last scan";
+      btn.onclick=function(){
+        const last=loadLast();
+        if(!last || !last.code){ alert("No scan saved yet"); return; }
+        targetEl.value = last.code;
+        // trigger input event so existing filters react
+        targetEl.dispatchEvent(new Event("input",{bubbles:true}));
+        targetEl.dispatchEvent(new Event("change",{bubbles:true}));
+      };
+    } else {
+      // update handler for new target
+      btn.onclick=function(){
+        const last=loadLast();
+        if(!last || !last.code){ alert("No scan saved yet"); return; }
+        targetEl.value = last.code;
+        targetEl.dispatchEvent(new Event("input",{bubbles:true}));
+        targetEl.dispatchEvent(new Event("change",{bubbles:true}));
+      };
+    }
+    // Place right after target field
+    if(btn.parentElement !== targetEl.parentElement){
+      targetEl.parentElement.appendChild(btn);
+    }
+  }
+
+  // Context targeting: Add Inventory definition and Add Stock
+  function bindContext(){
+    // Prefer explicit "Search" input on Add Stock
+    const search = [...document.querySelectorAll("input")].find(i=>{
+      const ph=(i.getAttribute("placeholder")||"").toLowerCase();
+      return ph.includes("filter") || ph.includes("search");
+    });
+    if(search){ ensureInlineUseButton(search); return; }
+
+    // For Add Inventory definition, look for barcode-like placeholder
+    const barcode = [...document.querySelectorAll("input")].find(i=>{
+      const ph=(i.getAttribute("placeholder")||"").toLowerCase();
+      const id=(i.id||"").toLowerCase();
+      return ph.includes("barcode")||ph.includes("upc")||ph.includes("ean")||id.includes("barcode");
+    });
+    if(barcode){ ensureInlineUseButton(barcode); return; }
+  }
+
+  // Emergency button add (once)
+  function ensureEmergency(){
+    if(document.getElementById("rcEmergencyBtn")) return;
+    const b=document.createElement("button");
+    b.id="rcEmergencyBtn";
+    b.textContent="EMERGENCY";
+    b.onclick=function(){
+      alert("EMERGENCY: call 911 or your emergency contact now.");
+    };
+    document.body.appendChild(b);
+  }
+
   function tick(){
-    attachObservers();
-    bindConfirm();
-    ensureUseBtn();
+    bindScannerConfirm();
+    bindContext();
+    ensureEmergency();
   }
 
   document.addEventListener("DOMContentLoaded", tick);
-  setInterval(tick, 800);
+  setInterval(tick, 600);
 })();
 </script>
 
