@@ -1611,5 +1611,25 @@ function _flashCommitted(btn) {
   </div>
 </div>
 
+
+<script id="rc-global-shim">
+/* Rocks Corner global safety shim */
+(function(){
+  function noop(){}
+  // Ensure Add Dog entry point always exists
+  if (typeof window.bp_openAddDogSheet !== "function") {
+    window.bp_openAddDogSheet = function(){
+      // Try known implementations if present
+      if (typeof window.bp_addDogSheet === "function") return window.bp_addDogSheet();
+      if (typeof window.showAddDog === "function") return window.showAddDog();
+      alert("Add Dog sheet is not available in this build.");
+    };
+  }
+  // Common aliases to prevent regressions
+  window.bp_closeAddDogSheet = window.bp_closeAddDogSheet || noop;
+  window.bp_commitAddDogSheet = window.bp_commitAddDogSheet || noop;
+})();
+</script>
+
 </body>
 </html>
