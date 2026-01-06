@@ -265,3 +265,26 @@ header .brand-sub .muted,
 #btnTalk:hover, .talk-btn:hover{
   background: rgba(74,144,226,0.28) !important;
 }
+
+/* === RC_TOPBAR_DARK35 nav-35: override base theme vars used by the app === */
+:root{
+  --bg:#0b0b0d !important;
+  --card:#121216 !important;
+  --border:#2a2a2f !important;
+  --text:#f2f2f2 !important;
+  --muted:#b0b0b0 !important;
+}
+body{ background:var(--bg) !important; color:var(--text) !important; }
+header.topbar{
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+header.topbar .brand-title,
+header.topbar .brand-sub{
+  color: var(--text) !important;
+}
+#btnTalk{
+  background: rgba(74,144,226,0.22) !important;
+  border: 1px solid rgba(74,144,226,0.55) !important;
+  color: #eaf2ff !important;
+}
