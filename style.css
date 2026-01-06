@@ -229,3 +229,13 @@ option{ background: var(--rc-bg)!important; color: var(--rc-text)!important; }
 /* Buttons in drill-downs */
 .btn{ color: var(--rc-text)!important; }
 .btn:not(.primary){ background: rgba(255,255,255,0.10)!important; border-color: rgba(255,255,255,0.18)!important; }
+
+/* === RC_TALK_DARK nav-33: improve Talk button visibility === */
+#btnTalk, .talk-btn, button[aria-label="Talk"]{
+  background: rgba(255,255,255,0.12) !important;
+  color: #f2f2f2 !important;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+}
+#btnTalk:hover, .talk-btn:hover{
+  background: rgba(255,255,255,0.18) !important;
+}
