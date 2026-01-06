@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Breeder Pro</title>
+  <title>BP</title>
   <link rel="stylesheet" href="style.css" />
   <style>
     :root { --border:#e2e2e2; --muted:#666; --bg:#f6f7f9; --card:#fff; --primary:#2d6cdf; --danger:#b42318; }
@@ -125,110 +125,23 @@
     })();
   </script>
 
-<style id="rc-dark-override">
-:root{--bg:#0b0b0d!important;--text:#f2f2f2!important;--border:#2a2a2f!important;}
-html,body{background:var(--bg)!important;color:var(--text)!important;}
-.card,.panel,.sheet,.modal,.dlg,[class*="card"],[class*="panel"]{background:rgba(255,255,255,0.04)!important;color:var(--text)!important;border-color:var(--border)!important;}
-input,select,textarea{background:rgba(255,255,255,0.06)!important;color:var(--text)!important;border-color:var(--border)!important;}
-option{background:#0b0b0d!important;color:var(--text)!important;}
-</style>
-
-
-<style id="rc-adddog-dark">
-/* RC: Force Add Dog sheet dark (overrides inline white styles) */
-#addDogSheet { background: rgba(0,0,0,0.55) !important; }
-#addDogSheet > div { background: #121216 !important; border-color: #2a2a2f !important; color: #f2f2f2 !important; }
-#addDogSheet .label, #addDogSheet label { color: #f2f2f2 !important; }
-#addDogSheet input, #addDogSheet select, #addDogSheet textarea {
-  background: rgba(255,255,255,0.06) !important;
-  color: #f2f2f2 !important;
-  border-color: rgba(255,255,255,0.18) !important;
-}
-#addDogSheet option { background: #0b0b0d !important; color: #f2f2f2 !important; }
-</style>
-
-
-<style id="rc-adddog-dark2">
-#addDogSheet, #addDogSheet * { color: #f2f2f2 !important; }
-#addDogSheet [style*="background:#fff"], #addDogSheet [style*="background: #fff"],
-#addDogSheet [style*="background:white"], #addDogSheet [style*="background: white"]{
-  background:#121216 !important;
-}
-#addDogSheet [style*="border:1px solid #ddd"], #addDogSheet [style*="border: 1px solid #ddd"]{
-  border-color:#2a2a2f !important;
-}
-</style>
-
-
-<style id="rc-sticky-nav">
-/* RC: keep Back/Home at top of each view */
-.nav-row{
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 9999 !important;
-  background: rgba(11,11,13,0.96) !important;
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-  margin-top: 0 !important;
-}
-.nav-row::after{
-  content:"";
-  display:block;
-  height:1px;
-  background: rgba(255,255,255,0.10);
-  margin-top:8px;
-}
-</style>
-
-
-<style id="rc-navpin">
-/* RC: Pin Back/Home bar and keep it dark */
-section.card{ overflow: visible !important; }
-.nav-row{
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 99999 !important;
-  background: rgba(11,11,13,0.98) !important;
-  padding: 10px 0 !important;
-  margin: 0 0 10px 0 !important;
-}
-.nav-row .btn{
-  background: rgba(255,255,255,0.10) !important;
-  color: #f2f2f2 !important;
-  border-color: rgba(255,255,255,0.18) !important;
-}
-</style>
-
-
-<style id="rc-sheet-dark">
-#addDogSheet > div { background:#121216 !important; border-color:#2a2a2f !important; color:#f2f2f2 !important; }
-#addDogSheet input, #addDogSheet select, #addDogSheet textarea { background: rgba(255,255,255,0.06) !important; color:#f2f2f2 !important; border-color: rgba(255,255,255,0.18) !important; }
-#addDogSheet option { background:#0b0b0d !important; color:#f2f2f2 !important; }
+<style id="rc-dark-pack">
+:root{--rcbg:#0b0b0d;--rctxt:#f2f2f2;--rcbd:#2a2a2f;}
+html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
+/* Make Back/Home bars stick and stay dark */
+.nav-row{position:sticky!important;top:0!important;z-index:99999!important;background:rgba(11,11,13,0.98)!important;padding:10px 0!important;margin:0 0 10px 0!important;}
+.nav-row .btn{background:rgba(255,255,255,0.10)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;}
+/* Force Add Dog sheet dark even if inline white */
+#addDogSheet{background:rgba(0,0,0,0.55)!important;}
+#addDogSheet > div{background:#121216!important;border-color:var(--rcbd)!important;color:var(--rctxt)!important;}
+#addDogSheet input,#addDogSheet select,#addDogSheet textarea{background:rgba(255,255,255,0.06)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;}
+#addDogSheet option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
+/* Generic white inline backgrounds inside any sheet/modal */
+.sheet [style*="background:#fff"], .sheet [style*="background: #fff"], .modal [style*="background:#fff"], .dlg [style*="background:#fff"]{background:#121216!important;}
 </style>
 
 </head>
 <body>
-
-<script id="bp-global-adddog">
-/* Ensure Add Dog entry is global for inline onclick */
-window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
-  try{
-    // If implementation exists in current scope but not global, try to call by id-based sheet
-    const sheet = document.getElementById("addDogSheet");
-    if(sheet){
-      sheet.classList.remove("hide");
-      return;
-    }
-    // If there is a global add dog opener, use it
-    if(typeof window.bp_addDogSheet==="function") return window.bp_addDogSheet();
-    if(typeof window.showAddDog==="function") return window.showAddDog();
-    alert("Add Dog is unavailable.");
-  }catch(e){
-    alert("Add Dog error: "+(e && e.message ? e.message : e));
-  }
-};
-</script>
-
 
 
 <div id="jsErrorBanner" class="hide" style="position:fixed; left:12px; right:12px; bottom:12px; z-index:9998; background:#fff3cd; border:1px solid #ffeeba; border-radius:12px; padding:10px;">
@@ -267,15 +180,14 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
 
 <header class="topbar">
   <div>
-    <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-12</span></div>
+    <div class="brand-title">BP</div>
+    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-13</span></div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
 
 <main class="shell">
   <!-- HOME -->
-<!-- RC: History button is available via rcShowHistory() -->
   <section id="viewHome" class="card">
     <h2>What is our goal today?</h2>
     <div class="goal-grid">
@@ -901,12 +813,12 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
     }));
 
     saveDogs(store);
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
     return dogId;
   }
 ));
     saveDogs(store);
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
   }
   function getDog(id){
     const store=loadDogs();
@@ -1131,7 +1043,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
       }
     });
 
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
     renderDogProfile(updated);
 
     if(updated.status==="Deceased"){
@@ -1170,7 +1082,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
     microchipPending="";
     document.getElementById("dlgMicrochipConfirm").close();
     renderDogProfile(getDog(currentDogId));
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
   }
 
   // Immunizations
@@ -1289,7 +1201,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
     const data=await compressImageToDataUrl(file);
     updateDog(currentDogId, dog=>{ dog.photoDataUrl=data; });
     renderDogProfile(getDog(currentDogId));
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
   }
 
   // Inventory minimal
@@ -1462,7 +1374,7 @@ renderInv(); populateInvSelects();
 
   // afterShow
   window.__afterShow=function(view){
-    if(view==="Dogs") if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    if(view==="Dogs") renderDogs();
     if(view==="DogProfile"){ const d=getDog(currentDogId); if(d) renderDogProfile(d); }
     if(view==="HealthImmunizations") renderImmunizations();
     if(view==="InventoryAvailable") renderInv();
@@ -1474,9 +1386,9 @@ renderInv(); populateInvSelects();
     document.getElementById("btnTalk").addEventListener("click", ()=>alert("Voice may be used at any time."));
 
     // Dogs page
-    document.getElementById("btnViewMales").addEventListener("click", ()=>{ dogsViewMode="Males"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } });
-    document.getElementById("btnViewFemales").addEventListener("click", ()=>{ dogsViewMode="Females"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } });
-    document.getElementById("btnShowUnassigned").addEventListener("click", ()=>{ dogsViewMode="Unassigned"; document.getElementById("dogsUnassignedWrap").classList.remove("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } });
+    document.getElementById("btnViewMales").addEventListener("click", ()=>{ dogsViewMode="Males"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); renderDogs(); });
+    document.getElementById("btnViewFemales").addEventListener("click", ()=>{ dogsViewMode="Females"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); renderDogs(); });
+    document.getElementById("btnShowUnassigned").addEventListener("click", ()=>{ dogsViewMode="Unassigned"; document.getElementById("dogsUnassignedWrap").classList.remove("hide"); renderDogs(); });
     setTimeout(()=>document.getElementById("wizCallName").focus(), 50);
     });
 
@@ -1494,7 +1406,7 @@ renderInv(); populateInvSelects();
       document.getElementById("dlgAddDogWizard").close();
       __openDog(newId);
     });
-document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{ document.getElementById("dogsArchivedWrap").classList.toggle("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } });
+document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{ document.getElementById("dogsArchivedWrap").classList.toggle("hide"); renderDogs(); });
 
     // Dog profile actions
     document.getElementById("btnDoneDog").addEventListener("click", ()=>saveDog(true));
@@ -1584,7 +1496,7 @@ document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{
     // Seed renders
     renderInv();
     populateInvSelects();
-    if(typeof window.renderDogs==='function'){ window.renderDogs(); }
+    renderDogs();
   });
 })();
 
@@ -1693,388 +1605,116 @@ function _flashCommitted(btn) {
 </div>
 
 
-<script id="rc-adddog-bind">
-/* RC Add Dog Sheet: make Save/Cancel/Close always work */
+<script id="rc-core">
 (function(){
-  function bind(id, fn){
-    var el=document.getElementById(id);
-    if(!el) return;
-    el.onclick = fn;
-  }
-  function closeSheet(){
+  const rcTZ = (Intl && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown") : "Unknown";
+  function rcNowUtc(){ return new Date().toISOString(); }
+  function rcLocal(iso){ try { return new Date(iso).toLocaleString(); } catch { return String(iso||""); } }
+  window.rcTZ=rcTZ; window.rcNowUtc=rcNowUtc; window.rcLocal=rcLocal;
+
+  const RC_KEYS={events:"rc_events_v1"};
+  function load(key, fb){ try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fb;}catch{return fb;} }
+  function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+  window.rcLog=function(type, entityType, entityId, note, data){
+    const atUtc=rcNowUtc();
+    const ev={id:Date.now(),atUtc,atLocal:rcLocal(atUtc),tz:rcTZ,type:String(type||"event"),
+              entityType:String(entityType||""),entityId:(entityId===undefined?null:entityId),
+              view:(typeof window.__curView==="string"?window.__curView:""),note:note?String(note):"",data:data||{}};
+    const list=load(RC_KEYS.events,[]); list.push(ev); save(RC_KEYS.events,list); return ev;
+  };
+
+  // Wrap existing nav (do not replace)
+  window.rcGo=function(v){ try{ if(typeof window.__go==="function") return window.__go(v);}catch(e){} };
+  window.rcBack=function(){ try{ if(typeof window.__back==="function") return window.__back();}catch(e){} };
+  window.rcHome=function(){ try{ if(typeof window.__home==="function") return window.__home();}catch(e){} };
+
+  window.rcShowHistory=function(){
+    const list=load(RC_KEYS.events,[]); const last=list.slice(-60).reverse();
+    alert(last.map(ev=>`${ev.atLocal} • ${ev.type} • ${ev.entityType||""} ${ev.note||""}`).join("\n") || "No history yet.");
+  };
+})();
+</script>
+
+
+<script id="rc-adddog-pack">
+(function(){
+  function closeSheet(){ try{ var s=document.getElementById("addDogSheet"); if(s) s.classList.add("hide"); }catch(e){} }
+  function bind(id, fn){ var el=document.getElementById(id); if(!el) return; el.onclick=fn; }
+  function wrapCreate(){
     try{
-      var sheet=document.getElementById("addDogSheet");
-      if(sheet) sheet.classList.add("hide");
+      if(typeof bp_createDogFromSheet!=="function") return;
+      if(bp_createDogFromSheet._rcWrapped) return;
+      var orig=bp_createDogFromSheet;
+      bp_createDogFromSheet=function(){
+        var before=null; try{ before=loadDogs(); }catch(e){}
+        var res=orig();
+        try{
+          var after=loadDogs();
+          var b=(before&&before.dogs)?before.dogs.length:0;
+          var a=(after&&after.dogs)?after.dogs.length:0;
+          if(a>b){
+            var last=after.dogs[a-1];
+            try{ window.rcLog && window.rcLog("dog_created","dog",last&&last.dogId,(last&&last.callName)||"",{sex:last&&last.sex}); }catch(e){}
+            if(last && last.dogId && typeof __openDog==="function"){ __openDog(last.dogId); }
+          }
+        }catch(e){}
+        try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){}
+        return res;
+      };
+      bp_createDogFromSheet._rcWrapped=true;
+      try{ window.bp_createDogFromSheet=bp_createDogFromSheet; }catch(e){}
     }catch(e){}
   }
 
-  window.bp_closeAddDogSheet = window.bp_closeAddDogSheet || closeSheet;
-
-  // Export internal create function if it exists in this script scope
-  try{
-    if(typeof window.bp_createDogFromSheet !== "function" && typeof bp_createDogFromSheet === "function"){
-      window.bp_createDogFromSheet = bp_createDogFromSheet;
-    }
-  }catch(e){}
-
-  window.addEventListener("DOMContentLoaded", function(){
-    bind("btnAddDogClose", function(e){ e&&e.preventDefault&&e.preventDefault(); window.bp_closeAddDogSheet(); });
-    bind("btnAddDogCancel", function(e){ e&&e.preventDefault&&e.preventDefault(); window.bp_closeAddDogSheet(); });
+  function bindSheetButtons(){
+    bind("btnAddDogClose", function(e){ e&&e.preventDefault&&e.preventDefault(); closeSheet(); });
+    bind("btnAddDogCancel", function(e){ e&&e.preventDefault&&e.preventDefault(); closeSheet(); });
     bind("btnAddDogCreate", function(e){
       e&&e.preventDefault&&e.preventDefault();
       try{
-        if(typeof window.bp_createDogFromSheet === "function"){
-          window.bp_createDogFromSheet();
-        }
+        if(typeof bp_createDogFromSheet==="function") bp_createDogFromSheet();
       }catch(err){
         alert("Save error: "+(err && err.message ? err.message : err));
+        return;
       }
       var msg=document.getElementById("addDogSheetMsg");
-      if(!msg || !msg.textContent) window.bp_closeAddDogSheet();
+      if(!msg || !msg.textContent) closeSheet();
     });
-  });
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", function(){ wrapCreate(); bindSheetButtons(); });
+  }else{
+    wrapCreate(); bindSheetButtons();
+  }
 })();
 </script>
 
 
-<script id="rc-dogs-view-bind">
-/* RC: ensure Dogs view filters work (bind without relying on DOMContentLoaded) */
+<script id="rc-dogs-filters">
 (function(){
-  function bindNow(){
-    try{
-      var males=document.getElementById("btnViewMales");
-      var females=document.getElementById("btnViewFemales");
-      var all=document.getElementById("btnViewAllDogs");
-      var unassigned=document.getElementById("btnShowUnassigned");
-      if(males && !males._rcBound){
-        males.onclick=function(){ try{ dogsViewMode="Males"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } }catch(e){ alert(e.message||e); } };
-        males._rcBound=true;
-      }
-      if(females && !females._rcBound){
-        females.onclick=function(){ try{ dogsViewMode="Females"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } }catch(e){ alert(e.message||e); } };
-        females._rcBound=true;
-      }
-      if(all && !all._rcBound){
-        all.onclick=function(){ try{ dogsViewMode="All"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.add("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } }catch(e){ alert(e.message||e); } };
-        all._rcBound=true;
-      }
-      if(unassigned && !unassigned._rcBound){
-        unassigned.onclick=function(){ try{ dogsViewMode="Unassigned"; var w=document.getElementById("dogsUnassignedWrap"); if(w) w.classList.remove("hide"); if(typeof window.renderDogs==='function'){ window.renderDogs(); } }catch(e){ alert(e.message||e); } };
-        unassigned._rcBound=true;
-      }
-      // stop trying once core buttons bound
-      if((males && males._rcBound) || (females && females._rcBound)) return true;
-    }catch(e){}
-    return false;
-  }
-  // try immediately and then a few times
-  var tries=0;
-  var t=setInterval(function(){
-    tries++;
-    if(bindNow() || tries>40) clearInterval(t);
-  }, 100);
-})();
-</script>
-
-
-<script id="rc-export-dogs">
-/* RC: export Dogs render + state so button bindings can call it */
-(function(){
-  try{
-    if(typeof window.renderDogs!=="function" && typeof renderDogs==="function") window.renderDogs = renderDogs;
-  }catch(e){}
-  try{
-    if(typeof window.sexCategory!=="function" && typeof sexCategory==="function") window.sexCategory = sexCategory;
-  }catch(e){}
-})();
-</script>
-
-
-<script id="rc-export-more">
-/* RC: export key functions/state to window (legacy inline + mobile-safe) */
-(function(){
-  try{ if(typeof window.renderDogs!=="function" && typeof renderDogs==="function") window.renderDogs=renderDogs; }catch(e){}
-  try{ if(typeof window.loadDogs!=="function" && typeof loadDogs==="function") window.loadDogs=loadDogs; }catch(e){}
-  try{ if(typeof window.saveDogs!=="function" && typeof saveDogs==="function") window.saveDogs=saveDogs; }catch(e){}
-  try{ if(typeof window.sexCategory!=="function" && typeof sexCategory==="function") window.sexCategory=sexCategory; }catch(e){}
-  try{ if(typeof window.sortDogsIntactFirst!=="function" && typeof sortDogsIntactFirst==="function") window.sortDogsIntactFirst=sortDogsIntactFirst; }catch(e){}
-  // Ensure view mode variable exists globally
-  try{ if(typeof window.dogsViewMode==="undefined" && typeof dogsViewMode!=="undefined") window.dogsViewMode=dogsViewMode; }catch(e){}
-})();
-</script>
-
-
-<script id="rc-core">
-/* ===========================
-   ROCKS CORNER APP CORE (NAV + HISTORY)
-   "We are the historians."
-   - Do not delete dogs: archive/transfer/deceased only.
-   - Store timestamps in UTC, display in local time.
-   =========================== */
-(function(){
-  // ---- Time / TZ ----
-  const rcTZ = (Intl && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown") : "Unknown";
-  function rcNowUtc(){ return new Date().toISOString(); }
-  function rcLocal(iso){
-    try { return new Date(iso).toLocaleString(); } catch { return String(iso||""); }
-  }
-  window.rcTZ = rcTZ;
-  window.rcNowUtc = rcNowUtc;
-  window.rcLocal = rcLocal;
-
-  // ---- Storage keys ----
-  const RC_KEYS = {
-    dogs: "breederPro_dogs_store_v3",
-    inv:  "breederPro_inventory_store_v3",
-    events: "rc_events_v1"
-  };
-  window.RC_KEYS = RC_KEYS;
-
-  function rcLoad(key, fallback){
-    try{ const raw=localStorage.getItem(key); return raw?JSON.parse(raw):fallback; }catch{ return fallback; }
-  }
-  function rcSave(key, val){
-    localStorage.setItem(key, JSON.stringify(val));
-  }
-
-  // ---- Event schema ----
-  // { id, atUtc, atLocal, tz, type, entityType, entityId, view, note, data }
-  function rcLog(type, entityType, entityId, note, data){
-    const atUtc = rcNowUtc();
-    const ev = {
-      id: Date.now(),
-      atUtc,
-      atLocal: rcLocal(atUtc),
-      tz: rcTZ,
-      type: String(type||"event"),
-      entityType: String(entityType||""),
-      entityId: (entityId===undefined?null:entityId),
-      view: (typeof window.__curView==="string"?window.__curView:""),
-      note: note ? String(note) : "",
-      data: data || {}
-    };
-    const list = rcLoad(RC_KEYS.events, []);
-    list.push(ev);
-    rcSave(RC_KEYS.events, list);
-    return ev;
-  }
-  window.rcLog = rcLog;
-
-  // ---- Navigation contract (wrap existing nav if present) ----
-  // We do not reinvent the wheel: we wrap it.
-  function rcGo(view){
-    try{
-      if(typeof window.__go==="function") return window.__go(view);
-      if(typeof window.showView==="function") return window.showView(view);
-    }catch(e){}
-  }
-  function rcBack(){
-    try{
-      if(typeof window.__back==="function") return window.__back();
-    }catch(e){}
-  }
-  function rcHome(){
-    try{
-      if(typeof window.__home==="function") return window.__home();
-    }catch(e){}
-  }
-  window.rcGo = rcGo; window.rcBack = rcBack; window.rcHome = rcHome;
-
-  // ---- "Done" contract (save + log + navigate) ----
-  // Call: rcDone({type, entityType, entityId, note, data, nextView})
-  function rcDone(o){
-    try{
-      const ev = rcLog(o.type, o.entityType, o.entityId, o.note, o.data);
-      if(o.nextView) rcGo(o.nextView);
-      return ev;
-    }catch(e){
-      try{ alert("rcDone error: "+(e.message||e)); }catch(_){}
-    }
-  }
-  window.rcDone = rcDone;
-
-  // ---- Safe patch hooks (if functions exist, we wrap them) ----
-  // Dogs: when a dog is created from sheet, log it and refresh list.
-  function wrap(name, wrapper){
-    try{
-      const fn = window[name];
-      if(typeof fn !== "function") return;
-      if(fn._rcWrapped) return;
-      const wrapped = wrapper(fn);
-      wrapped._rcWrapped = true;
-      window[name] = wrapped;
-    }catch(e){}
-  }
-
-  wrap("bp_createDogFromSheet", (orig)=>function(){
-    const before = (typeof window.loadDogs==="function") ? window.loadDogs() : null;
-    const res = orig();
-    try{
-      // attempt to log last dog by diff if possible
-      if(before && typeof window.loadDogs==="function"){
-        const after = window.loadDogs();
-        const b = (before.dogs||[]).length;
-        const a = (after.dogs||[]).length;
-        if(a>b){
-          const last = (after.dogs||[])[a-1];
-          rcDone({type:"dog_created", entityType:"dog", entityId:last && last.id, note:(last && last.callName)||"", data:{sex:last && last.sex}, nextView:"Dogs"});
-        } else {
-          rcLog("dog_saved","dog",null,"", {});
-        }
-      } else {
-        rcLog("dog_saved","dog",null,"", {});
-      }
-    }catch(e){}
-    try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
-    return res;
-  });
-
-  // Inventory: if these exist, log transactions
-  ["applyAddStock","applyReduce","applyTransfer"].forEach((fnName)=>{
-    wrap(fnName, (orig)=>function(){
-      const res = orig();
-      try{ rcLog("inventory_txn","inventory",null,fnName,{}); }catch(e){}
-      return res;
-    });
-  });
-
-  // ---- Events viewer (minimal) ----
-  window.rcShowHistory = function(){
-    const list = rcLoad(RC_KEYS.events, []);
-    const last = list.slice(-60).reverse();
-    const lines = last.map(ev => `${ev.atLocal} • ${ev.type} • ${ev.entityType||""} ${ev.note||""}` ).join("\n");
-    alert(lines || "No history yet.");
-  };
-
-})();
-</script>
-
-
-<script id="rc-dogs-filters-fix">
-/* RC: Fix Dogs filter buttons reliably on mobile */
-(function(){
-  function rerender(){
-    try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){}
-    try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
-  }
+  function rerender(){ try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){} }
   function setMode(mode){
-    // try to set the real mode variable (may be global var in this build)
-    try{ dogsViewMode = mode; }catch(e){}
-    try{ window.dogsViewMode = mode; }catch(e){}
-    // update pill if present
-    try{
-      var pill=document.getElementById("dogsCurrentViewPill");
-      if(pill) pill.textContent = mode;
-    }catch(e){}
-    // hide/show unassigned wrap if present
-    try{
-      var w=document.getElementById("dogsUnassignedWrap");
-      if(w){
-        if(mode==="Unassigned") w.classList.remove("hide");
-        else w.classList.add("hide");
-      }
-    }catch(e){}
+    try{ dogsViewMode=mode; }catch(e){}
+    try{ var pill=document.getElementById("dogsCurrentViewPill"); if(pill) pill.textContent=mode; }catch(e){}
+    try{ var w=document.getElementById("dogsUnassignedWrap"); if(w){ if(mode==="Unassigned") w.classList.remove("hide"); else w.classList.add("hide"); } }catch(e){}
     rerender();
   }
-
   function bindBtn(id, mode){
     var el=document.getElementById(id);
-    if(!el) return;
-    if(el._rcBound) return;
-    el.onclick=function(ev){
-      ev && ev.preventDefault && ev.preventDefault();
-      setMode(mode);
-    };
+    if(!el || el._rcBound) return;
+    el.onclick=function(ev){ ev&&ev.preventDefault&&ev.preventDefault(); setMode(mode); };
     el._rcBound=true;
   }
-
   function bindAll(){
     bindBtn("btnViewMales","Males");
     bindBtn("btnViewFemales","Females");
     bindBtn("btnViewAllDogs","All");
     bindBtn("btnShowUnassigned","Unassigned");
   }
-
-  // bind now + a few retries because views can be hidden initially
-  var tries=0;
-  var t=setInterval(function(){
-    tries++;
-    bindAll();
-    if(tries>50) clearInterval(t);
-  }, 100);
+  var tries=0; var t=setInterval(function(){ tries++; bindAll(); if(tries>50) clearInterval(t); }, 100);
   document.addEventListener("DOMContentLoaded", bindAll);
-})();
-</script>
-
-
-<script id="rc-move-navrow">
-(function(){
-  function move(){
-    try{
-      document.querySelectorAll("section.card, section").forEach(function(sec){
-        var nav = sec.querySelector(".nav-row");
-        if(!nav) return;
-        // if nav isn't the first element child, move it
-        var first = sec.firstElementChild;
-        if(first !== nav){
-          sec.insertBefore(nav, first);
-        }
-      });
-    }catch(e){}
-  }
-  document.addEventListener("DOMContentLoaded", move);
-  // also run after navigation changes (views are hidden/shown)
-  try{
-    var oldGo = window.__go;
-    if(typeof oldGo==="function" && !oldGo._rcWrapped){
-      window.__go = function(view){
-        var r = oldGo(view);
-        setTimeout(move, 0);
-        return r;
-      };
-      window.__go._rcWrapped = true;
-    }
-  }catch(e){}
-})();
-</script>
-
-
-<script id="rc-adddog-profile">
-/* RC: After creating a dog from Add Dog sheet, open Dog Profile */
-(function(){
-  function wrapCreate(){
-    try{
-      if(typeof bp_createDogFromSheet!=="function") return;
-      if(bp_createDogFromSheet._rcWrapped) return;
-      const orig = bp_createDogFromSheet;
-      bp_createDogFromSheet = function(){
-        // capture before
-        let before=null;
-        try{ before = loadDogs(); }catch(e){}
-        const res = orig();
-        try{
-          const after = loadDogs();
-          const b = (before && before.dogs)? before.dogs.length : 0;
-          const a = (after && after.dogs)? after.dogs.length : 0;
-          if(a>b){
-            const last = after.dogs[a-1];
-            if(last && last.dogId && typeof __openDog==="function"){
-              __openDog(last.dogId);
-              return res;
-            }
-          }
-        }catch(e){}
-        return res;
-      };
-      bp_createDogFromSheet._rcWrapped = true;
-      try{ window.bp_createDogFromSheet = bp_createDogFromSheet; }catch(e){}
-    }catch(e){}
-  }
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded", wrapCreate);
-  } else {
-    wrapCreate();
-  }
 })();
 </script>
 
