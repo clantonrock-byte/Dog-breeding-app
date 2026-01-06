@@ -142,6 +142,36 @@ option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
 }
 </style>
 
+
+<style id="rc-navpin-m25">
+/* RC: nav-row pinned but not "floating" oddly */
+.nav-row{
+  position: sticky !important;
+  top: calc(env(safe-area-inset-top, 0px) + 0px) !important;
+  z-index: 9999 !important;
+  background: rgba(18,18,22,0.98) !important;
+  border-radius: 14px !important;
+  padding: 10px 10px !important;
+  margin: 0 0 12px 0 !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+</style>
+
+
+<style id="rc-bottompad-m25">
+/* RC: reserve space for emergency button so it doesn't block UI */
+body { padding-bottom: 90px !important; }
+</style>
+
+
+<style id="rc-emergency-m25">
+#rcEmergencyBtn{
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+  padding: 12px 14px !important;
+  border-radius: 16px !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -1529,6 +1559,25 @@ option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
 
   document.addEventListener("DOMContentLoaded", tick);
   setInterval(tick, 600);
+})();
+</script>
+
+
+<script id="rc-emergency-hide-m25">
+(function(){
+  function isSheetOpen(){
+    var s=document.getElementById("addDogSheet");
+    return !!(s && !s.classList.contains("hide"));
+  }
+  function tick(){
+    var b=document.getElementById("rcEmergencyBtn");
+    if(!b) return;
+    b.style.display = isSheetOpen() ? "none" : "block";
+  }
+  document.addEventListener("DOMContentLoaded", ()=>{
+    tick();
+    setInterval(tick, 250);
+  });
 })();
 </script>
 
