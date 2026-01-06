@@ -1,0 +1,28 @@
+IMPORTANT NOTE – GitHub Pages Cache / FIX10
+
+This repository DOES contain FIX10 in index.html.
+If the live site still shows FIX08, the cause is GitHub Pages caching or delayed redeploy.
+
+WHAT TO DO:
+1) Verify FIX10 is present:
+   - Open index.html in the repo
+   - Tap “Raw”
+   - You should see FIX10 in the file
+
+2) Force GitHub Pages redeploy:
+   - Edit build.json (or any small file)
+   - Change a value slightly (example: fix10 → fix10b)
+   - Commit the change
+
+3) Open the site with a hard cache buster:
+   https://clantonrock-byte.github.io/Dog-breeding-app/?v=10&cb=12345
+
+NOTES:
+- Incognito mode may hide browser options; this is expected.
+- GitHub Pages sometimes lags after updates.
+- This is a deployment issue, not an app logic issue.
+
+STATUS:
+- Add Dog works
+- Buttons are wired
+- Dark mode implemented in FIX10
