@@ -159,6 +159,27 @@ option{background:#0b0b0d!important;color:var(--text)!important;}
 }
 </style>
 
+
+<style id="rc-sticky-nav">
+/* RC: keep Back/Home at top of each view */
+.nav-row{
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(11,11,13,0.96) !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  margin-top: 0 !important;
+}
+.nav-row::after{
+  content:"";
+  display:block;
+  height:1px;
+  background: rgba(255,255,255,0.10);
+  margin-top:8px;
+}
+</style>
+
 </head>
 <body>
 
@@ -221,7 +242,7 @@ window.bp_openAddDogSheet = window.bp_openAddDogSheet || function(){
 <header class="topbar">
   <div>
     <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-09</span></div>
+    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-11</span></div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
@@ -1899,6 +1920,95 @@ function _flashCommitted(btn) {
     alert(lines || "No history yet.");
   };
 
+})();
+</script>
+
+
+<script id="rc-dogs-filters-fix">
+/* RC: Fix Dogs filter buttons reliably on mobile */
+(function(){
+  function rerender(){
+    try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){}
+    try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
+  }
+  function setMode(mode){
+    // try to set the real mode variable (may be global var in this build)
+    try{ dogsViewMode = mode; }catch(e){}
+    try{ window.dogsViewMode = mode; }catch(e){}
+    // update pill if present
+    try{
+      var pill=document.getElementById("dogsCurrentViewPill");
+      if(pill) pill.textContent = mode;
+    }catch(e){}
+    // hide/show unassigned wrap if present
+    try{
+      var w=document.getElementById("dogsUnassignedWrap");
+      if(w){
+        if(mode==="Unassigned") w.classList.remove("hide");
+        else w.classList.add("hide");
+      }
+    }catch(e){}
+    rerender();
+  }
+
+  function bindBtn(id, mode){
+    var el=document.getElementById(id);
+    if(!el) return;
+    if(el._rcBound) return;
+    el.onclick=function(ev){
+      ev && ev.preventDefault && ev.preventDefault();
+      setMode(mode);
+    };
+    el._rcBound=true;
+  }
+
+  function bindAll(){
+    bindBtn("btnViewMales","Males");
+    bindBtn("btnViewFemales","Females");
+    bindBtn("btnViewAllDogs","All");
+    bindBtn("btnShowUnassigned","Unassigned");
+  }
+
+  // bind now + a few retries because views can be hidden initially
+  var tries=0;
+  var t=setInterval(function(){
+    tries++;
+    bindAll();
+    if(tries>50) clearInterval(t);
+  }, 100);
+  document.addEventListener("DOMContentLoaded", bindAll);
+})();
+</script>
+
+
+<script id="rc-move-navrow">
+(function(){
+  function move(){
+    try{
+      document.querySelectorAll("section.card, section").forEach(function(sec){
+        var nav = sec.querySelector(".nav-row");
+        if(!nav) return;
+        // if nav isn't the first element child, move it
+        var first = sec.firstElementChild;
+        if(first !== nav){
+          sec.insertBefore(nav, first);
+        }
+      });
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded", move);
+  // also run after navigation changes (views are hidden/shown)
+  try{
+    var oldGo = window.__go;
+    if(typeof oldGo==="function" && !oldGo._rcWrapped){
+      window.__go = function(view){
+        var r = oldGo(view);
+        setTimeout(move, 0);
+        return r;
+      };
+      window.__go._rcWrapped = true;
+    }
+  }catch(e){}
 })();
 </script>
 
