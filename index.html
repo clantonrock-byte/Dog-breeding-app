@@ -1,10 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BP</title>
+  <title>BP · Rocks Corner</title>
   <link rel="stylesheet" href="style.css" />
   <style>
     :root { --border:#e2e2e2; --muted:#666; --bg:#f6f7f9; --card:#fff; --primary:#2d6cdf; --danger:#b42318; }
@@ -66,8 +65,6 @@
     }
     /* Scan video */
     #scanVideo{ width:100%; border-radius:12px; border:1px solid var(--border); }
-  
-    .dob-est-wrap{ margin-top:8px; }
   </style>
 
   <!-- NAV defined immediately -->
@@ -96,13 +93,6 @@
         if(name===current) return;
         stack.push(current); show(name);
       };
-      // __jump: change views WITHOUT adding to Back stack (for "Done" flows)
-      window.__jump = function(name){
-        if(!name) return;
-        if(!document.getElementById("viewHome")) return queue.push({t:"jump", name});
-        show(name);
-      };
-
       window.__back=function(){
         if(!document.getElementById("viewHome")) return queue.push({t:"back"});
         if(!stack.length) return show("Home");
@@ -119,35 +109,19 @@
           if(a.t==="go") window.__go(a.name);
           if(a.t==="back") window.__back();
           if(a.t==="home") window.__home();
-          if(a.t==="jump") window.__jump(a.name);
         }
       });
     })();
   </script>
 
-<style id="rc-dark-pack">
-:root{--rcbg:#0b0b0d;--rctxt:#f2f2f2;--rcbd:#2a2a2f;}
-html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
-/* Make Back/Home bars stick and stay dark */
+<style id="rc-master-lock">
+/* MASTER: pin Back/Home and keep dark */
 .nav-row{position:sticky!important;top:0!important;z-index:99999!important;background:rgba(11,11,13,0.98)!important;padding:10px 0!important;margin:0 0 10px 0!important;}
-.nav-row .btn{background:rgba(255,255,255,0.10)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;}
-/* Force Add Dog sheet dark even if inline white */
-#addDogSheet{background:rgba(0,0,0,0.55)!important;}
-#addDogSheet > div{background:#121216!important;border-color:var(--rcbd)!important;color:var(--rctxt)!important;}
-#addDogSheet input,#addDogSheet select,#addDogSheet textarea{background:rgba(255,255,255,0.06)!important;color:var(--rctxt)!important;border-color:rgba(255,255,255,0.18)!important;}
-#addDogSheet option{background:var(--rcbg)!important;color:var(--rctxt)!important;}
-/* Generic white inline backgrounds inside any sheet/modal */
-.sheet [style*="background:#fff"], .sheet [style*="background: #fff"], .modal [style*="background:#fff"], .dlg [style*="background:#fff"]{background:#121216!important;}
+.nav-row .btn{background:rgba(255,255,255,0.10)!important;color:#f2f2f2!important;border-color:rgba(255,255,255,0.18)!important;}
 </style>
 
 </head>
 <body>
-
-
-<div id="jsErrorBanner" class="hide" style="position:fixed; left:12px; right:12px; bottom:12px; z-index:9998; background:#fff3cd; border:1px solid #ffeeba; border-radius:12px; padding:10px;">
-  <div style="font-weight:800;">Something didn’t load correctly.</div>
-  <div class="muted small" id="jsErrorText" style="margin-top:4px;"></div>
-</div>
 
 <!-- Rainbow overlay -->
 <div id="rainbowOverlay" aria-hidden="true">
@@ -180,8 +154,8 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
 
 <header class="topbar">
   <div>
-    <div class="brand-title">BP</div>
-    <div class="brand-sub">Phase 1 <span class="small muted" id="buildId">• Build phase1-full-sheet-01 nav-13</span></div>
+    <div class="brand-title">BP · Rocks Corner</div>
+    <div class="brand-sub">Phase 1</div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
 </header>
@@ -210,7 +184,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
     <div class="dogs-menu">
       <button class="btn primary" id="btnViewMales">View males</button>
       <button class="btn primary" id="btnViewFemales">View females</button>
-      <button class="btn primary" id="btnAddDog" onclick="try{bp_openAddDogSheet();}catch(e){alert('Add Dog not ready: '+(e&&e.message?e.message:'unknown error'));} return false;">Add dog</button>
+      <button class="btn primary" id="btnAddDog">Add dog</button>
     </div>
     <div class="dogs-subtools">
       <button class="btn" id="btnToggleArchivedDogs">Show archived</button>
@@ -292,14 +266,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
         <div>
           <label class="label">DOB (optional)</label>
           <input id="dogDobInline" placeholder="YYYY-MM-DD" />
-        
-<div class="dob-est-wrap">
-  <label style="display:flex; gap:10px; align-items:center;">
-    <input type="checkbox" id="addDogDobEstimated" />
-    Estimated DOB
-  </label>
-</div>
-</div>
+        </div>
         <div style="align-self:end;">
           <label class="label">&nbsp;</label>
           <label class="muted small" style="display:flex; gap:10px; align-items:center;">
@@ -310,7 +277,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
       </div>
 
       <div class="action-row">
-        <button class="btn primary" id="btnDoneDog">Save</button>
+        <button class="btn primary" id="btnDoneDog">Done</button>
         <button class="btn" id="btnNotesDog">Notes</button>
         <button class="btn" id="btnMoreDog">More ▾</button>
       </div>
@@ -683,15 +650,6 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
 
 <script>
 (() => {
-  // Surface JS errors on-screen (helps on mobile)
-  window.addEventListener("error", (e)=>{
-    const b=document.getElementById("jsErrorBanner");
-    const t=document.getElementById("jsErrorText");
-    if(b && t){
-      t.textContent = (e && e.message) ? e.message : "Unknown error";
-      b.classList.remove("hide");
-    }
-  });
   const INV_KEY="breederPro_inventory_store_v1";
   const DOG_KEY="breederPro_dogs_store_v3";
 
@@ -784,39 +742,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
       photoDataUrl:"",
       immunizationEvents:[],
       microchip:{ value:"", locked:false, lockedAt:null }
-    }
-
-
-  function addDogWithDetails({ callName, breed, sex, dob, dobEstimated }){
-    const store = loadDogs();
-    const dogId = "dog_" + Date.now() + "_" + Math.random().toString(16).slice(2);
-
-    store.dogs.push(ensureDog({
-      dogId,
-      callName,
-      registeredName:"",
-      kennelName:"",
-      nicknames:[],
-      breed: (breed || "").trim() || "German Shorthaired Pointer",
-      sex: sex || "",
-      dob: (dob || "").trim(),
-      dobEstimated: !!dobEstimated,
-      status:"Adult",
-      statusChangedAt: nowISO(),
-      archived:false,
-      archivedAt:null,
-      statusNote:"",
-      notes:"",
-      photoDataUrl:"",
-      immunizationEvents:[],
-      microchip:{ value:"", locked:false, lockedAt:null }
     }));
-
-    saveDogs(store);
-    renderDogs();
-    return dogId;
-  }
-));
     saveDogs(store);
     renderDogs();
   }
@@ -862,8 +788,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
             <div><strong>${esc(d.callName)}</strong></div>
             <div class="muted small">Breed: ${esc(d.breed||"")} • Sex: ${esc(d.sex||"(unknown)")} • Status: ${esc(d.status||"")}</div>
           </div>
-          <button class="btn" onclick="_flashCommitted(__btn);
-    __openDog('${d.dogId}')">Open</button>
+          <button class="btn" onclick="__openDog('${d.dogId}')">Open</button>
         </div>
       </div>
     `).join(""):`<div class="muted small">No dogs found in this view.</div>`;
@@ -1271,9 +1196,7 @@ html,body{background:var(--rcbg)!important;color:var(--rctxt)!important;}
     if(!it){ document.getElementById("addStockStatus").textContent="Item not found"; return; }
     it.qty=Number(it.qty||0)+qty; saveInv(store);
     document.getElementById("addStockStatus").textContent="Done.";
-    
-    __jump("InventoryMenu");
-renderInv(); populateInvSelects();
+    renderInv(); populateInvSelects();
   }
   function applyReduce(){
     const qty=Math.abs(Number(document.getElementById("reduceQty").value||"0")||0);
@@ -1282,9 +1205,7 @@ renderInv(); populateInvSelects();
     if(!it){ document.getElementById("reduceStatus").textContent="Item not found"; return; }
     it.qty=Math.max(0,Number(it.qty||0)-qty); saveInv(store);
     document.getElementById("reduceStatus").textContent="Done.";
-    
-    __jump("InventoryMenu");
-renderInv(); populateInvSelects();
+    renderInv(); populateInvSelects();
   }
   function applyTransfer(){
     const qty=Math.abs(Number(document.getElementById("transferQty").value||"0")||0);
@@ -1293,9 +1214,7 @@ renderInv(); populateInvSelects();
     if(!it){ document.getElementById("transferStatus").textContent="Item not found"; return; }
     it.qty=Math.max(0,Number(it.qty||0)-qty); saveInv(store);
     document.getElementById("transferStatus").textContent="Done.";
-    
-    __jump("InventoryMenu");
-renderInv(); populateInvSelects();
+    renderInv(); populateInvSelects();
   }
 
   // Scan
@@ -1389,24 +1308,11 @@ renderInv(); populateInvSelects();
     document.getElementById("btnViewMales").addEventListener("click", ()=>{ dogsViewMode="Males"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); renderDogs(); });
     document.getElementById("btnViewFemales").addEventListener("click", ()=>{ dogsViewMode="Females"; document.getElementById("dogsUnassignedWrap").classList.add("hide"); renderDogs(); });
     document.getElementById("btnShowUnassigned").addEventListener("click", ()=>{ dogsViewMode="Unassigned"; document.getElementById("dogsUnassignedWrap").classList.remove("hide"); renderDogs(); });
-    setTimeout(()=>document.getElementById("wizCallName").focus(), 50);
+    document.getElementById("btnAddDog").addEventListener("click", ()=>{
+      const name=prompt("Call name (required):");
+      if(!name) return; addDog(name.trim());
     });
-
-    const callName = (document.getElementById("wizCallName").value || "").trim();
-      const breed = (document.getElementById("wizBreed").value || "").trim() || "German Shorthaired Pointer";
-      const sex = document.getElementById("wizSex").value || "";
-      const dob = (document.getElementById("wizDob").value || "").trim();
-      const dobEstimated = !!document.getElementById("wizDobEst").checked;
-
-      if(!callName){ alert("Call name is required."); return; }
-      if(!sex){ alert("Sex is required."); return; }
-
-      const newId = addDogWithDetails({ callName, breed, sex, dob, dobEstimated });
-
-      document.getElementById("dlgAddDogWizard").close();
-      __openDog(newId);
-    });
-document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{ document.getElementById("dogsArchivedWrap").classList.toggle("hide"); renderDogs(); });
+    document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{ document.getElementById("dogsArchivedWrap").classList.toggle("hide"); renderDogs(); });
 
     // Dog profile actions
     document.getElementById("btnDoneDog").addEventListener("click", ()=>saveDog(true));
@@ -1499,224 +1405,6 @@ document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{
     renderDogs();
   });
 })();
-
-// ===== Add Dog Sheet (Samsung-safe, no prompt/dialog) =====
-function bp_openAddDogSheet(){
-  const sheet = document.getElementById("addDogSheet");
-  if(!sheet) return;
-  document.getElementById("addDogSheetMsg").textContent = "";
-  document.getElementById("sheetCallName").value = "";
-  document.getElementById("sheetBreed").value = "German Shorthaired Pointer";
-  document.getElementById("sheetSex").value = "Unknown";
-  document.getElementById("sheetDob").value = "";
-  sheet.classList.remove("hide");
-  setTimeout(()=>document.getElementById("sheetCallName").focus(), 50);
-}
-function bp_closeAddDogSheet(){
-  const sheet = document.getElementById("addDogSheet");
-  if(sheet) sheet.classList.add("hide");
-}
-function bp_createDogFromSheet(){
-  const msg = document.getElementById("addDogSheetMsg");
-  const callName = (document.getElementById("sheetCallName").value || "").trim();
-  const breed = (document.getElementById("sheetBreed").value || "").trim() || "German Shorthaired Pointer";
-  const sex = document.getElementById("sheetSex").value || "Unknown";
-  const dob = (document.getElementById("sheetDob").value || "").trim();
-  if(!callName){
-    msg.textContent = "Call name is required.";
-    alert("Call name is required.");
-    return;
-  }
-  // Use existing helper if present; otherwise fallback to addDog
-  let newId = null;
-  if(typeof addDogWithDetails === "function"){
-    newId = addDogWithDetails({ callName, breed, sex, dob, dobEstimated:false });
-  } else if(typeof addDog === "function"){
-    addDog(callName);
-    // best-effort: open newest dog if available
-    try{
-      const store = loadDogs?.();
-      if(store?.dogs?.length) newId = store.dogs[store.dogs.length-1].dogId;
-    }catch(e){}
-  }
-  bp_closeAddDogSheet();
-  if(newId && typeof __openDog === "function") __openDog(newId);
-  else if(typeof __go === "function") __go("Dogs");
-}
-// Bind sheet buttons after DOM load
-document.addEventListener("DOMContentLoaded", ()=>{
-  const btn = document.getElementById("btnAddDog");
-  if(btn){
-    btn.onclick = (e)=>{ e.preventDefault(); bp_openAddDogSheet(); };
-  }
-  (document.getElementById("btnAddDogClose")||{}).addEventListener("click", bp_closeAddDogSheet);
-  (document.getElementById("btnAddDogCancel")||{}).addEventListener("click", bp_closeAddDogSheet);
-  (document.getElementById("btnAddDogCreate")||{}).addEventListener("click", bp_createDogFromSheet);
-});
-
-
-// UX: Save -> Done after commit (cuz human)
-function _flashCommitted(btn) {
-  if(!btn) return;
-  btn.textContent = "Done";
-  btn.disabled = true;
-  setTimeout(() => {
-    btn.textContent = "Save";
-    btn.disabled = false;
-  }, 900);
-}
-
 </script>
-
-
-<!-- Add Dog Sheet (no <dialog>, Samsung-safe) -->
-<div id="addDogSheet" class="hide" style="position:fixed; inset:0; z-index:9997; background:rgba(0,0,0,0.35);">
-  <div style="position:absolute; left:12px; right:12px; bottom:12px; background:#fff; border:1px solid #ddd; border-radius:16px; padding:14px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-      <div style="font-weight:900; font-size:16px;">Add dog</div>
-      <button class="btn" id="btnAddDogClose" type="button">✕</button>
-    </div>
-
-    <label class="label">Call name (required)</label>
-    <input id="sheetCallName" />
-
-    <label class="label">Breed</label>
-    <input id="sheetBreed" />
-
-    <label class="label">Sex</label>
-    <select id="sheetSex">
-      <option>Unknown</option>
-      <option>Male (intact)</option>
-      <option>Male (neutered)</option>
-      <option>Female (intact)</option>
-      <option>Female (spayed)</option>
-    </select>
-
-    <label class="label">DOB (optional)</label>
-    <input id="sheetDob" placeholder="YYYY-MM-DD" />
-
-    <div class="row" style="margin-top:12px;">
-      <button class="btn" id="btnAddDogCancel" type="button">Cancel</button>
-      <button class="btn primary" id="btnAddDogCreate" type="button">Done</button>
-    </div>
-
-    <div class="muted small" id="addDogSheetMsg" style="margin-top:10px;"></div>
-  </div>
-</div>
-
-
-<script id="rc-core">
-(function(){
-  const rcTZ = (Intl && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown") : "Unknown";
-  function rcNowUtc(){ return new Date().toISOString(); }
-  function rcLocal(iso){ try { return new Date(iso).toLocaleString(); } catch { return String(iso||""); } }
-  window.rcTZ=rcTZ; window.rcNowUtc=rcNowUtc; window.rcLocal=rcLocal;
-
-  const RC_KEYS={events:"rc_events_v1"};
-  function load(key, fb){ try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fb;}catch{return fb;} }
-  function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
-
-  window.rcLog=function(type, entityType, entityId, note, data){
-    const atUtc=rcNowUtc();
-    const ev={id:Date.now(),atUtc,atLocal:rcLocal(atUtc),tz:rcTZ,type:String(type||"event"),
-              entityType:String(entityType||""),entityId:(entityId===undefined?null:entityId),
-              view:(typeof window.__curView==="string"?window.__curView:""),note:note?String(note):"",data:data||{}};
-    const list=load(RC_KEYS.events,[]); list.push(ev); save(RC_KEYS.events,list); return ev;
-  };
-
-  // Wrap existing nav (do not replace)
-  window.rcGo=function(v){ try{ if(typeof window.__go==="function") return window.__go(v);}catch(e){} };
-  window.rcBack=function(){ try{ if(typeof window.__back==="function") return window.__back();}catch(e){} };
-  window.rcHome=function(){ try{ if(typeof window.__home==="function") return window.__home();}catch(e){} };
-
-  window.rcShowHistory=function(){
-    const list=load(RC_KEYS.events,[]); const last=list.slice(-60).reverse();
-    alert(last.map(ev=>`${ev.atLocal} • ${ev.type} • ${ev.entityType||""} ${ev.note||""}`).join("\n") || "No history yet.");
-  };
-})();
-</script>
-
-
-<script id="rc-adddog-pack">
-(function(){
-  function closeSheet(){ try{ var s=document.getElementById("addDogSheet"); if(s) s.classList.add("hide"); }catch(e){} }
-  function bind(id, fn){ var el=document.getElementById(id); if(!el) return; el.onclick=fn; }
-  function wrapCreate(){
-    try{
-      if(typeof bp_createDogFromSheet!=="function") return;
-      if(bp_createDogFromSheet._rcWrapped) return;
-      var orig=bp_createDogFromSheet;
-      bp_createDogFromSheet=function(){
-        var before=null; try{ before=loadDogs(); }catch(e){}
-        var res=orig();
-        try{
-          var after=loadDogs();
-          var b=(before&&before.dogs)?before.dogs.length:0;
-          var a=(after&&after.dogs)?after.dogs.length:0;
-          if(a>b){
-            var last=after.dogs[a-1];
-            try{ window.rcLog && window.rcLog("dog_created","dog",last&&last.dogId,(last&&last.callName)||"",{sex:last&&last.sex}); }catch(e){}
-            if(last && last.dogId && typeof __openDog==="function"){ __openDog(last.dogId); }
-          }
-        }catch(e){}
-        try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){}
-        return res;
-      };
-      bp_createDogFromSheet._rcWrapped=true;
-      try{ window.bp_createDogFromSheet=bp_createDogFromSheet; }catch(e){}
-    }catch(e){}
-  }
-
-  function bindSheetButtons(){
-    bind("btnAddDogClose", function(e){ e&&e.preventDefault&&e.preventDefault(); closeSheet(); });
-    bind("btnAddDogCancel", function(e){ e&&e.preventDefault&&e.preventDefault(); closeSheet(); });
-    bind("btnAddDogCreate", function(e){
-      e&&e.preventDefault&&e.preventDefault();
-      try{
-        if(typeof bp_createDogFromSheet==="function") bp_createDogFromSheet();
-      }catch(err){
-        alert("Save error: "+(err && err.message ? err.message : err));
-        return;
-      }
-      var msg=document.getElementById("addDogSheetMsg");
-      if(!msg || !msg.textContent) closeSheet();
-    });
-  }
-
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded", function(){ wrapCreate(); bindSheetButtons(); });
-  }else{
-    wrapCreate(); bindSheetButtons();
-  }
-})();
-</script>
-
-
-<script id="rc-dogs-filters">
-(function(){
-  function rerender(){ try{ if(typeof renderDogs==="function") renderDogs(); }catch(e){} }
-  function setMode(mode){
-    try{ dogsViewMode=mode; }catch(e){}
-    try{ var pill=document.getElementById("dogsCurrentViewPill"); if(pill) pill.textContent=mode; }catch(e){}
-    try{ var w=document.getElementById("dogsUnassignedWrap"); if(w){ if(mode==="Unassigned") w.classList.remove("hide"); else w.classList.add("hide"); } }catch(e){}
-    rerender();
-  }
-  function bindBtn(id, mode){
-    var el=document.getElementById(id);
-    if(!el || el._rcBound) return;
-    el.onclick=function(ev){ ev&&ev.preventDefault&&ev.preventDefault(); setMode(mode); };
-    el._rcBound=true;
-  }
-  function bindAll(){
-    bindBtn("btnViewMales","Males");
-    bindBtn("btnViewFemales","Females");
-    bindBtn("btnViewAllDogs","All");
-    bindBtn("btnShowUnassigned","Unassigned");
-  }
-  var tries=0; var t=setInterval(function(){ tries++; bindAll(); if(tries>50) clearInterval(t); }, 100);
-  document.addEventListener("DOMContentLoaded", bindAll);
-})();
-</script>
-
 </body>
 </html>
