@@ -1552,13 +1552,6 @@ function _flashCommitted(btn) {
   }, 900);
 }
 
-
-// ===== Global exports for inline onclick handlers (Android-safe) =====
-window.bp_openAddDogSheet = bp_openAddDogSheet;
-window.bp_closeAddDogSheet = bp_closeAddDogSheet;
-window.bp_createDogFromSheet = bp_createDogFromSheet;
-window.bp_addDogSheet = (typeof bp_addDogSheet==='function') ? bp_addDogSheet : undefined;
-window.bp_addDog = (typeof addDog==='function') ? addDog : undefined;
 </script>
 
 
@@ -1596,6 +1589,89 @@ window.bp_addDog = (typeof addDog==='function') ? addDog : undefined;
     <div class="muted small" id="addDogSheetMsg" style="margin-top:10px;"></div>
   </div>
 </div>
+
+  
+<script>
+/* FIX07: Ensure Add Dog globals exist even if earlier script throws. */
+(function(){
+  const DOG_KEY = "breederPro_dogs_store_v3";
+  function loadDogsSafe(){
+    try{
+      const raw = localStorage.getItem(DOG_KEY);
+      const o = raw ? JSON.parse(raw) : {dogs:[]};
+      if(!o || !Array.isArray(o.dogs)) return {dogs:[]};
+      return o;
+    }catch(e){
+      return {dogs:[]};
+    }
+  }
+  function saveDogsSafe(o){
+    try{ localStorage.setItem(DOG_KEY, JSON.stringify(o)); }catch(e){}
+  }
+
+  if(typeof window.bp_openAddDogSheet !== "function"){
+    window.bp_openAddDogSheet = function(){
+      const sheet = document.getElementById("addDogSheet");
+      if(!sheet){ alert("Add Dog sheet missing in HTML."); return; }
+      const msg = document.getElementById("addDogSheetMsg");
+      if(msg) msg.textContent = "";
+      const setVal=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
+      setVal("sheetCallName","");
+      setVal("sheetBreed","German Shorthaired Pointer");
+      setVal("sheetSex","Unknown");
+      setVal("sheetDob","");
+      sheet.classList.remove("hide");
+      try{ document.getElementById("sheetCallName")?.focus(); }catch(e){}
+    };
+  }
+
+  if(typeof window.bp_commitAddDogSheet !== "function"){
+    window.bp_commitAddDogSheet = function(){
+      const getVal=(id)=>{ const el=document.getElementById(id); return el? String(el.value||"").trim() : ""; };
+      const callName=getVal("sheetCallName");
+      if(!callName){
+        const msg=document.getElementById("addDogSheetMsg");
+        if(msg) msg.textContent="Call name is required.";
+        return;
+      }
+      const dog={
+        id: "dog_" + Date.now(),
+        callName,
+        breed: getVal("sheetBreed") || "German Shorthaired Pointer",
+        sex: getVal("sheetSex") || "Unknown",
+        dob: getVal("sheetDob"),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      const store=loadDogsSafe();
+      store.dogs.unshift(dog);
+      saveDogsSafe(store);
+
+      // close sheet + refresh dogs list if app has renderDogs()
+      document.getElementById("addDogSheet")?.classList.add("hide");
+      try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
+      try{
+        const btn=document.getElementById("btnAddDogCreate");
+        if(btn) btn.textContent="Done";
+      }catch(e){}
+    };
+  }
+
+  // Wire buttons if they exist (no-op if already wired)
+  try{
+    const cancel=document.getElementById("btnAddDogCancel");
+    if(cancel && !cancel.dataset.wired){
+      cancel.addEventListener("click", ()=>document.getElementById("addDogSheet")?.classList.add("hide"));
+      cancel.dataset.wired="1";
+    }
+    const create=document.getElementById("btnAddDogCreate");
+    if(create && !create.dataset.wired){
+      create.addEventListener("click", ()=>window.bp_commitAddDogSheet());
+      create.dataset.wired="1";
+    }
+  }catch(e){}
+})();
+</script>
 
   <script src="autoupdate.js"></script>
 </body>
