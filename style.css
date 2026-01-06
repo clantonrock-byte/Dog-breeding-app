@@ -239,3 +239,29 @@ option{ background: var(--rc-bg)!important; color: var(--rc-text)!important; }
 #btnTalk:hover, .talk-btn:hover{
   background: rgba(255,255,255,0.18) !important;
 }
+
+/* === RC_HEADER_DARK nav-34: unify header with dark theme === */
+header, .app-header, .topbar{
+  background: linear-gradient(180deg, #121216 0%, #0b0b0d 100%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+}
+header .brand-title,
+header .brand-sub,
+.app-header .brand-title,
+.app-header .brand-sub{
+  color: #f2f2f2 !important;
+}
+header .brand-sub .muted,
+.app-header .brand-sub .muted{
+  color: rgba(242,242,242,0.7) !important;
+}
+
+/* Talk button final polish */
+#btnTalk, .talk-btn, button[aria-label="Talk"]{
+  background: rgba(74,144,226,0.18) !important;
+  border: 1px solid rgba(74,144,226,0.45) !important;
+  color: #eaf2ff !important;
+}
+#btnTalk:hover, .talk-btn:hover{
+  background: rgba(74,144,226,0.28) !important;
+}
