@@ -26,8 +26,11 @@ function showDogs() {
     html += "<p>No dogs yet.</p>";
   } else {
     dogs.forEach(d => {
-      html += `<div class="card" onclick="showDogDetail(${d.id})">
-        <strong>${d.callName}</strong>
+      html += `<div class="card">
+        <div class="row">
+          <strong>${d.callName}</strong>
+          <button onclick="showDogDetail(${d.id})">Open</button>
+        </div>
       </div>`;
     });
   }
