@@ -8,18 +8,40 @@
   <link rel="stylesheet" href="portal.css" />
 </head>
 <body>
-  <div id="pinGateOverlay" class="hide">
-    <div id="pinGateCard">
-      <h2>Enter PIN</h2>
-      <input id="pinGateInput" placeholder="PIN" />
-      <button id="pinGateBtn">Continue</button>
-      <button id="pinGateReset">Reset</button>
+  <!-- PIN Gate Overlay (styled card) -->
+  <div id="pinGateOverlay" class="pin-overlay hide" aria-hidden="true">
+    <div class="pin-card">
+      <div class="pin-title">BP Portal · Rocks Corner</div>
+      <div class="pin-sub" id="pinGateSub">Enter PIN</div>
+
+      <input id="pinGateInput" class="pin-input"
+             type="password" inputmode="numeric" autocomplete="off"
+             placeholder="PIN" />
+
+      <div class="pin-row">
+        <button id="pinGateBtn" class="btn btn-primary">Continue</button>
+        <button id="pinGateReset" class="btn">Reset PIN</button>
+      </div>
+
+      <div class="pin-hint" id="pinGateHint">
+        First time here? You’ll be asked to set a PIN, then confirm it.
+      </div>
     </div>
   </div>
 
   <header class="topbar">
-    <div class="brand-title">BP Portal · Rocks Corner</div>
-    <div class="brand-sub">Dashboard</div>
+    <div class="brand">
+      <div class="brand-title">BP Portal · Rocks Corner</div>
+      <div class="brand-sub">Dashboard</div>
+    </div>
+    <div class="actions">
+      <button id="btnRefresh" class="btn">Refresh</button>
+      <button id="btnExport" class="btn btn-primary">Export JSON</button>
+      <label class="btn file-btn">
+        Import JSON
+        <input id="fileImport" type="file" accept="application/json" />
+      </label>
+    </div>
   </header>
 
   <main class="shell">
@@ -31,6 +53,25 @@
         <button class="tab" data-tab="stock_inedible">Stock (Inedible)</button>
         <button class="tab" data-tab="history">History</button>
       </div>
+
+      <div class="toolbar">
+        <input id="q" class="input" placeholder="Search…" />
+        <select id="statusFilter" class="input">
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+          <option value="transferred">Transferred</option>
+          <option value="deceased">Deceased</option>
+        </select>
+        <select id="sexFilter" class="input">
+          <option value="all">All sexes</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="unknown">Unknown</option>
+        </select>
+        <span id="meta" class="meta"></span>
+      </div>
+
       <div id="viewDash" class="view"></div>
       <div id="viewDogs" class="view hide"></div>
       <div id="viewInvEdible" class="view hide"></div>

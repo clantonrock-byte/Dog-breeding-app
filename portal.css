@@ -1,4 +1,147 @@
-.hide{display:none!important;}
-body{background:#0b0b0d;color:#f2f2f2;font-family:system-ui;}
-.topbar{padding:12px;border-bottom:1px solid #2a2a2f;background:#121216;}
-.brand-title{font-weight:900;}
+/* BP Portal v6 — restores styled PIN window + working tabs */
+:root{
+  --bg:#0b0b0d;
+  --card:#121216;
+  --border:#2a2a2f;
+  --text:#f2f2f2;
+  --muted:#b0b0b0;
+  --pri:#4a90e2;
+}
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+}
+.hide{ display:none !important; }
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:linear-gradient(180deg, var(--card), var(--bg));
+  border-bottom:1px solid rgba(255,255,255,0.10);
+  padding:12px 14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand-title{ font-weight:900; font-size:16px; }
+.brand-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
+.actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+.shell{ padding:14px; max-width:1100px; margin:0 auto; }
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:14px;
+}
+
+.btn{
+  background:rgba(255,255,255,0.10);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.18);
+  padding:8px 12px;
+  border-radius:12px;
+  cursor:pointer;
+}
+.btn:active{ transform: translateY(1px); }
+.btn-primary{
+  background:rgba(74,144,226,0.25);
+  border-color:rgba(74,144,226,0.55);
+}
+.file-btn{ position:relative; overflow:hidden; }
+.file-btn input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+.tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.tab{
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+}
+.tab.active{
+  background:rgba(74,144,226,0.25);
+  border-color:rgba(74,144,226,0.55);
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:12px;
+}
+.input{
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.18);
+  padding:10px 12px;
+  border-radius:12px;
+  min-width:220px;
+}
+.meta{ color:var(--muted); font-size:12px; }
+
+.view{ min-height:120px; }
+.list{ display:grid; gap:10px; }
+.item{
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:14px;
+  padding:12px;
+  background:rgba(0,0,0,0.10);
+}
+.row{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+.h{ font-weight:900; }
+.sub{ color:var(--muted); font-size:12px; margin-top:4px; }
+.pill{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.16);
+  font-size:12px;
+  color:var(--text);
+  opacity:0.95;
+}
+
+/* PIN overlay */
+.pin-overlay{
+  position:fixed; inset:0; z-index:99999;
+  background:rgba(0,0,0,0.75);
+  display:flex; align-items:center; justify-content:center;
+  padding:18px;
+}
+.pin-card{
+  width:min(520px, 100%);
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+}
+.pin-title{ font-weight:900; font-size:16px; margin-bottom:6px; }
+.pin-sub{ color:var(--muted); font-size:12px; margin-bottom:10px; }
+.pin-input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.06);
+  color:var(--text);
+  font-size:16px;
+}
+.pin-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.pin-hint{ color:var(--muted); font-size:12px; margin-top:10px; }
+
+/* RC_PIN_LOCK_HIDE: when PIN gate is active, hide portal UI behind it */
+body.rc-locked header,
+body.rc-locked main{
+  display:none !important;
+}
+.pin-overlay{
+  z-index: 999999 !important;
+}
