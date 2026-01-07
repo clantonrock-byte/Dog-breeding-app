@@ -12,4 +12,77 @@
   <!-- PIN Gate Overlay (blocks everything until unlocked) -->
   <div id="pinGateOverlay" class="pin-overlay hide" aria-hidden="true">
     <div class="pin-card">
-      <div class="pin-title">BP Portal · Rocks Corner</div
+      <div class="pin-title">BP Portal · Rocks Corner</div>
+      <div class="pin-sub" id="pinGateSub">Enter PIN</div>
+
+      <input
+        id="pinGateInput"
+        class="pin-input"
+        type="password"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="PIN"
+      />
+
+      <div class="pin-row">
+        <button id="pinGateBtn" class="btn btn-primary" type="button">
+          Continue
+        </button>
+        <button id="pinGateReset" class="btn" type="button">
+          Reset PIN
+        </button>
+      </div>
+
+      <div class="pin-hint" id="pinGateHint">
+        First time here? You’ll be asked to set a PIN, then confirm it.
+      </div>
+    </div>
+  </div>
+
+  <!-- Portal Header -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title">BP Portal · Rocks Corner</div>
+      <div class="brand-sub">Dashboard</div>
+    </div>
+
+    <div class="actions">
+      <!-- ALWAYS points to the WORKING APP -->
+      <a
+        class="btn btn-primary"
+        href="https://clantonrock-byte.github.io/Dog-breeding-app/"
+        target="_self"
+      >
+        Open App
+      </a>
+    </div>
+  </header>
+
+  <!-- Portal Body -->
+  <main class="shell">
+    <section class="card">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="dash" type="button">Dashboard</button>
+        <button class="tab" data-tab="dogs" type="button">Dogs</button>
+        <button class="tab" data-tab="inv_edible" type="button">Inventory (Edible)</button>
+        <button class="tab" data-tab="stock_inedible" type="button">Stock (Inedible)</button>
+        <button class="tab" data-tab="history" type="button">History</button>
+      </div>
+
+      <!-- Views -->
+      <div id="viewDash" class="view"></div>
+      <div id="viewDogs" class="view hide"></div>
+      <div id="viewInvEdible" class="view hide"></div>
+      <div id="viewStockInedible" class="view hide"></div>
+      <div id="viewHistory" class="view hide"></div>
+
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="auth.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>
