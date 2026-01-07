@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="portal.css" />
 </head>
 <body>
-  <!-- PIN Gate Overlay (styled card) -->
+
+  <!-- PIN Gate Overlay -->
   <div id="pinGateOverlay" class="pin-overlay hide" aria-hidden="true">
     <div class="pin-card">
       <div class="pin-title">BP Portal · Rocks Corner</div>
@@ -33,13 +34,9 @@
     <div class="brand">
       <div class="brand-title">BP Portal · Rocks Corner</div>
       <div class="brand-sub">Dashboard</div>
-    </div><button class="btn" onclick="window.open('https://clantonrock-byte.github.io/Dog-breeding-app/','_blank')">Open App</button>
-      <button id="btnRefresh" class="btn">Refresh</button>
-      <button id="btnExport" class="btn btn-primary">Export JSON</button>
-      <label class="btn file-btn">
-        Import JSON
-        <input id="fileImport" type="file" accept="application/json" />
-      </label>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="window.open('https://clantonrock-byte.github.io/Dog-breeding-app/','_blank')">Open App</button>
     </div>
   </header>
 
@@ -51,24 +48,6 @@
         <button class="tab" data-tab="inv_edible">Inventory (Edible)</button>
         <button class="tab" data-tab="stock_inedible">Stock (Inedible)</button>
         <button class="tab" data-tab="history">History</button>
-      </div>
-
-      <div class="toolbar">
-        <input id="q" class="input" placeholder="Search…" />
-        <select id="statusFilter" class="input">
-          <option value="all">All statuses</option>
-          <option value="active">Active</option>
-          <option value="archived">Archived</option>
-          <option value="transferred">Transferred</option>
-          <option value="deceased">Deceased</option>
-        </select>
-        <select id="sexFilter" class="input">
-          <option value="all">All sexes</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="unknown">Unknown</option>
-        </select>
-        <span id="meta" class="meta"></span>
       </div>
 
       <div id="viewDash" class="view"></div>
