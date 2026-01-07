@@ -4,21 +4,77 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0b0d" />
-  <title>BP · Rocks Corner</title>
+  <title>BP Portal · Rocks Corner</title>
+  <link rel="stylesheet" href="portal.css" />
 </head>
 <body>
-  <!-- PRE-HOME DASHBOARD STRIP -->
-  <section style="margin:14px;padding:14px;border:1px solid #2a2a2f;border-radius:16px;background:#121216;color:#f2f2f2;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-      <div>
-        <div style="font-weight:900;">Dashboard</div>
-        <div style="opacity:.8;font-size:12px;">Read-only portal for review, history, and printing</div>
-      </div>
-      <button style="background:#4a90e2;color:#fff;border:none;border-radius:12px;padding:10px 14px;font-weight:700;"
-              onclick="window.open('./portal/','_blank')">🖥️ View Dashboard</button>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title">BP Portal · Rocks Corner</div>
+      <div class="brand-sub">Read-only dashboard for nav-35 data (localStorage)</div>
     </div>
-  </section>
+    <div class="actions">
+      <button id="btnRefresh" class="btn">Refresh</button>
+      <button id="btnExport" class="btn btn-primary">Export JSON</button>
+      <label class="btn file-btn">
+        Import JSON
+        <input id="fileImport" type="file" accept="application/json" />
+      </label>
+    </div>
+  </header>
 
-  <!-- Existing app continues -->
+  
+  <!-- PIN Gate Overlay -->
+  <div id="pinGateOverlay" class="hide">
+    <div id="pinGateCard">
+      <h2 id="pinGateTitle">Enter PIN</h2>
+      <div class="sub" id="pinGateSub">This portal is protected by a local PIN on this device.</div>
+      <div class="row">
+        <input id="pinGateInput" class="input" inputmode="numeric" autocomplete="one-time-code" placeholder="PIN" />
+        <button id="pinGateBtn" class="btn btn-primary">Continue</button>
+        <button id="pinGateReset" class="btn">Reset PIN</button>
+      </div>
+      <div class="hint" id="pinGateHint">First time here? You’ll be asked to set a PIN.</div>
+    </div>
+  </div>
+
+<main class="shell">
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="dogs">Dogs</button>
+        <button class="tab" data-tab="inv_edible">Inventory (Edible)</button>
+        <button class="tab" data-tab="stock_inedible">Stock (Inedible)</button>
+        <button class="tab" data-tab="history">History</button>
+        <button class="tab" data-tab="about">About</button>
+      </div>
+
+      <div class="toolbar">
+        <input id="q" class="input" placeholder="Search…" />
+        <select id="statusFilter" class="input">
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+          <option value="transferred">Transferred</option>
+          <option value="deceased">Deceased</option>
+        </select>
+        <select id="sexFilter" class="input">
+          <option value="all">All sexes</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="unknown">Unknown</option>
+        </select>
+        <span id="meta" class="meta"></span>
+      </div>
+
+      <div id="viewDogs" class="view"></div>
+      <div id="viewInvEdible" class="view hide"></div>
+      <div id="viewStockInedible" class="view hide"></div>
+      <div id="viewHistory" class="view hide"></div>
+      <div id="viewAbout" class="view hide"></div>
+    </section>
+  </main>
+
+  <script src="auth.js"></script>
+  <script src="portal.js"></script>
 </body>
 </html>

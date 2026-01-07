@@ -106,3 +106,25 @@ body{
 }
 .pill.warn{ border-color:rgba(255,59,48,0.55); }
 code{ color:#eaf2ff; }
+
+
+/* === PIN Gate (Option A) === */
+#pinGateOverlay{
+  position:fixed; inset:0; z-index:99999;
+  background:rgba(0,0,0,0.75);
+  display:flex; align-items:center; justify-content:center;
+  padding:18px;
+}
+#pinGateCard{
+  width:min(520px, 100%);
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:16px;
+}
+#pinGateCard h2{ margin:0 0 6px 0; font-size:18px; }
+#pinGateCard .sub{ color:var(--muted); font-size:12px; margin-bottom:12px; }
+#pinGateCard .row{ display:flex; gap:10px; flex-wrap:wrap; }
+#pinGateCard .input{ flex:1; min-width: 200px; }
+#pinGateCard .hint{ color:var(--muted); font-size:12px; margin-top:10px; }
+
