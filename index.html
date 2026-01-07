@@ -4,54 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0b0d" />
-  <title>BP Portal · Rocks Corner</title>
-  <link rel="stylesheet" href="portal.css" />
+  <title>Breeder Pro · Rocks Corner</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- NOTE: This file only changes the Open App behavior -->
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-title">BP Portal · Rocks Corner</div>
-      <div class="brand-sub">Dashboard</div>
-    </div>
-
-    <div class="actions">
-      <!-- Always-correct absolute link -->
-      <a class="btn" href="https://clantonrock-byte.github.io/Dog-breeding-app/" target="_blank" rel="noopener">
-        Open App (new tab)
-      </a>
-
-      <!-- Same-tab fallback (never blocked by popup blockers) -->
-      <button class="btn btn-primary" id="btnOpenAppHere" type="button">
-        Open App (this tab)
-      </button>
-    </div>
-  </header>
-
-  <script>
-    // Same-tab fallback
-    document.addEventListener("DOMContentLoaded", function(){
-      var b=document.getElementById("btnOpenAppHere");
-      if(b){
-        b.addEventListener("click", function(){
-          window.location.href = "https://clantonrock-byte.github.io/Dog-breeding-app/";
-        });
-      }
-    });
-  </script>
-
-  <!-- The rest of the portal page is unchanged; your existing portal.js will still render tabs/content -->
-  <main class="shell">
-    <div class="card">
-      <div style="opacity:.75;font-size:12px;margin-bottom:10px;">
-        If you ever get stuck on the dashboard, tap <b>Open App (this tab)</b>.
-      </div>
-      <!-- Portal content is rendered by your existing portal.js -->
-      <div id="portalAppMount"></div>
-    </div>
-  </main>
-
-  <script src="auth.js"></script>
-  <script src="portal.js"></script>
+  <div id="app"></div>
+  <script src="app.js"></script>
 </body>
 </html>
