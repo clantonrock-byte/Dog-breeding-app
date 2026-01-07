@@ -1,4 +1,4 @@
-// Portal PIN gate v6 (styled overlay + correct mode transitions)
+// Portal PIN gate — redirect to APP HOME after unlock
 (function(){
   const KEY='bp_portal_pin_hash_v1';
   const overlay=document.getElementById('pinGateOverlay');
@@ -22,17 +22,9 @@
   let mode = stored ? 'unlock' : 'set';
   let pending='';
 
-  function show(){
-    document.body.classList.add('rc-locked');
-    overlay.classList.remove('hide');
-    overlay.setAttribute('aria-hidden','false');
-    setTimeout(()=>input.focus(), 80);
-  }
-  function hide(){
-    overlay.classList.add('hide');
-    document.body.classList.remove('rc-locked');
-    overlay.setAttribute('aria-hidden','true');
-  }
+  function show(){ overlay.classList.remove('hide'); setTimeout(()=>input.focus(),80); }
+  function hide(){ overlay.classList.add('hide'); }
+
   function setMode(m){
     mode=m;
     input.value='';
@@ -52,7 +44,7 @@
       btn.textContent='Unlock';
       reset.style.display='inline-block';
     }
-    setTimeout(()=>input.focus(), 80);
+    setTimeout(()=>input.focus(),80);
   }
 
   async function submit(){
@@ -70,7 +62,7 @@
       const h=await sha256(v);
       set(h);
       pending='';
-      hide();
+      window.location.href = "https://clantonrock-byte.github.io/Dog-breeding-app/";
       return;
     }
 
@@ -78,7 +70,7 @@
     if(!stored){ setMode('set'); return; }
     const h=await sha256(v);
     if(h!==stored){ alert('Wrong PIN'); input.value=''; input.focus(); return; }
-    hide();
+    window.location.href = "https://clantonrock-byte.github.io/Dog-breeding-app/";
   }
 
   btn.addEventListener('click', submit);
