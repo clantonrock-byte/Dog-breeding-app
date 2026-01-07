@@ -128,3 +128,12 @@ code{ color:#eaf2ff; }
 #pinGateCard .input{ flex:1; min-width: 200px; }
 #pinGateCard .hint{ color:var(--muted); font-size:12px; margin-top:10px; }
 
+
+/* === RC_PORTAL_V3 === */
+.kpis{ display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom:12px; }
+.kpi{ border:1px solid rgba(255,255,255,0.10); border-radius:14px; padding:12px; background:rgba(0,0,0,0.10); }
+.kpi .h{ font-weight:900; }
+.kpi .v{ font-size:22px; font-weight:900; margin-top:6px; }
+.kpi .sub{ color:var(--muted); font-size:12px; margin-top:2px; }
+.section-title{ font-weight:900; margin:14px 0 8px; }
+.hr{ height:1px; background:rgba(255,255,255,0.10); margin:14px 0; border-radius:999px; }

@@ -6,6 +6,28 @@
 //
 // Data keys vary by vintage; we detect the best available.
 
+
+const THRESH_KEYS = {
+  edible: "bp_low_threshold_edible_v1",
+  inedible: "bp_low_threshold_inedible_v1",
+};
+function getThreshold(kind, defVal=1){
+  try{
+    const key = THRESH_KEYS[kind];
+    const raw = localStorage.getItem(key);
+    if(raw===null || raw===undefined || raw==="") return defVal;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : defVal;
+  }catch{ return defVal; }
+}
+function setThreshold(kind, val){
+  try{
+    const key = THRESH_KEYS[kind];
+    localStorage.setItem(key, String(val));
+  }catch{}
+}
+
+
 const KEY_CANDIDATES = {
   dogs: [
     "breederPro_dogs_store_v3",
@@ -99,6 +121,7 @@ function refresh() {
 function setTab(tab) {
   state.tab = tab;
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  document.getElementById("viewDash").classList.toggle("hide", tab !== "dash");
   document.getElementById("viewDogs").classList.toggle("hide", tab !== "dogs");
   document.getElementById("viewInvEdible").classList.toggle("hide", tab !== "inv_edible");
   document.getElementById("viewStockInedible").classList.toggle("hide", tab !== "stock_inedible");
@@ -146,6 +169,25 @@ function renderDogs() {
 }
 
 function renderInventory(kind) {
+
+  const t = getThreshold(kind === "edible" ? "edible" : "inedible", 1);
+  const thLabel = kind === "edible" ? "Low inventory threshold (edible)" : "Low stock threshold (inedible)";
+  const thKind = kind === "edible" ? "edible" : "inedible";
+  const header = `
+    <div class="item" style="margin-bottom:10px;">
+      <div class="row">
+        <div>
+          <div class="h">${thLabel}</div>
+          <div class="sub">Set the number at or below which items are flagged as low on the Dashboard.</div>
+        </div>
+        <div class="row" style="gap:8px;">
+          <input id="th_${thKind}" class="input" style="min-width:140px;" inputmode="numeric" value="${t}">
+          <button class="btn btn-primary" id="btnSaveTh_${thKind}">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+
   const q = document.getElementById("q").value.trim().toLowerCase();
   const list = state.inventory
     .filter(i => invKind(i) === kind)
@@ -156,6 +198,7 @@ function renderInventory(kind) {
     });
 
   const html = `
+    ${header}
     <div class="list">
       ${list.map(i => `
         <div class="item">
@@ -171,6 +214,25 @@ function renderInventory(kind) {
       `).join("") || `<div class="sub">No items found.</div>`}
     </div>
   `;
+
+  // bind threshold save
+  setTimeout(()=>{
+    try{
+      const btn = document.getElementById("btnSaveTh_"+thKind);
+      const inp = document.getElementById("th_"+thKind);
+      if(btn && inp && !btn._bound){
+        btn.addEventListener("click", ()=>{
+          const n = Number(inp.value);
+          if(!Number.isFinite(n)){ alert("Enter a number."); return; }
+          setThreshold(thKind, n);
+          alert("Saved.");
+          render();
+        });
+        btn._bound=true;
+      }
+    }catch(e){}
+  },0);
+
   return { html, count: list.length };
 }
 
@@ -200,6 +262,93 @@ function renderHistory() {
   `;
   return list.length;
 }
+
+
+function renderDash(){
+  const dogs = state.dogs.map(d => ({...d, _sex: normSex(d.sex), _status: dogStatus(d)}));
+  const counts = {
+    total: dogs.length,
+    active: dogs.filter(d=>d._status==="active").length,
+    archived: dogs.filter(d=>d._status==="archived").length,
+    transferred: dogs.filter(d=>d._status==="transferred").length,
+    deceased: dogs.filter(d=>d._status==="deceased").length,
+  };
+
+  const tEd = getThreshold("edible", 1);
+  const tIn = getThreshold("inedible", 1);
+
+  const edibleLow = state.inventory
+    .filter(i=>invKind(i)==="edible" && !i.archived)
+    .filter(i=>Number(i.qty||0) <= tEd)
+    .sort((a,b)=>Number(a.qty||0)-Number(b.qty||0))
+    .slice(0, 20);
+
+  const inedibleLow = state.inventory
+    .filter(i=>invKind(i)==="inedible" && !i.archived)
+    .filter(i=>Number(i.qty||0) <= tIn)
+    .sort((a,b)=>Number(a.qty||0)-Number(b.qty||0))
+    .slice(0, 20);
+
+  const recentEvents = (state.events||[]).slice().reverse().slice(0, 20);
+
+  document.getElementById("viewDash").innerHTML = `
+    <div class="kpis">
+      <div class="kpi"><div class="h">Dogs</div><div class="v">${counts.total}</div><div class="sub">Active ${counts.active} • Archived ${counts.archived} • Transferred ${counts.transferred} • Deceased ${counts.deceased}</div></div>
+      <div class="kpi"><div class="h">Low Inventory (Edible)</div><div class="v">${edibleLow.length}</div><div class="sub">Threshold is set on the Inventory tab</div></div>
+      <div class="kpi"><div class="h">Low Stock (Inedible)</div><div class="v">${inedibleLow.length}</div><div class="sub">Threshold is set on the Stock tab</div></div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="section-title">Low Inventory (Edible)</div>
+    <div class="list">
+      ${edibleLow.map(i=>`
+        <div class="item">
+          <div class="row">
+            <div>
+              <div class="h">${esc(i.name||"(unnamed)")}</div>
+              <div class="sub">On hand: <b>${Number(i.qty||0)}</b> • ${esc(i.identifierType||"")} <code>${esc(i.identifierValue||"")}</code></div>
+            </div>
+            <span class="pill warn">low</span>
+          </div>
+        </div>
+      `).join("") || `<div class="sub">No low edible items.</div>`}
+    </div>
+
+    <div class="section-title">Low Stock (Inedible)</div>
+    <div class="list">
+      ${inedibleLow.map(i=>`
+        <div class="item">
+          <div class="row">
+            <div>
+              <div class="h">${esc(i.name||"(unnamed)")}</div>
+              <div class="sub">On hand: <b>${Number(i.qty||0)}</b> • ${esc(i.identifierType||"")} <code>${esc(i.identifierValue||"")}</code></div>
+            </div>
+            <span class="pill warn">low</span>
+          </div>
+        </div>
+      `).join("") || `<div class="sub">No low inedible items.</div>`}
+    </div>
+
+    <div class="section-title">Recent History</div>
+    <div class="list">
+      ${recentEvents.map(ev=>`
+        <div class="item">
+          <div class="row">
+            <div>
+              <div class="h">${esc(ev.type||"event")}</div>
+              <div class="sub">${esc(ev.atLocal||ev.atUtc||"")}</div>
+              <div class="sub">${esc(ev.note||"")}</div>
+            </div>
+            <span class="pill">${esc(ev.view||"")}</span>
+          </div>
+        </div>
+      `).join("") || `<div class="sub">No history yet.</div>`}
+    </div>
+  `;
+  return 1;
+}
+
 
 function renderAbout() {
   document.getElementById("viewAbout").innerHTML = `
@@ -234,6 +383,7 @@ function render() {
   }
 
   let count = 0;
+  if (tab === "dash") count = renderDash();
   if (tab === "dogs") count = renderDogs();
   if (tab === "inv_edible") {
     const r = renderInventory("edible");
@@ -248,7 +398,7 @@ function render() {
   if (tab === "history") count = renderHistory();
   if (tab === "about") renderAbout();
 
-  document.getElementById("meta").textContent = `Items: ${count}`;
+  document.getElementById("meta").textContent = (tab==='dogs' ? `Dogs: ${count}` : `Items: ${count}`);
 }
 
 function exportSnapshot() {
@@ -306,4 +456,4 @@ document.getElementById("statusFilter").addEventListener("change", render);
 document.getElementById("sexFilter").addEventListener("change", render);
 
 refresh();
-setTab("dogs");
+setTab("dash");

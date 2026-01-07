@@ -11,7 +11,7 @@
   <header class="topbar">
     <div class="brand">
       <div class="brand-title">BP Portal · Rocks Corner</div>
-      <div class="brand-sub">Read-only dashboard for nav-35 data (localStorage)</div>
+      <div class="brand-sub">Read-only dashboard (Portal v3)</div>
     </div>
     <div class="actions">
       <button id="btnRefresh" class="btn">Refresh</button>
@@ -41,7 +41,8 @@
 <main class="shell">
     <section class="card">
       <div class="tabs">
-        <button class="tab active" data-tab="dogs">Dogs</button>
+        <button class="tab active" data-tab="dash">Dashboard</button>
+        <button class="tab" data-tab="dogs">Dogs</button>
         <button class="tab" data-tab="inv_edible">Inventory (Edible)</button>
         <button class="tab" data-tab="stock_inedible">Stock (Inedible)</button>
         <button class="tab" data-tab="history">History</button>
@@ -66,7 +67,8 @@
         <span id="meta" class="meta"></span>
       </div>
 
-      <div id="viewDogs" class="view"></div>
+      <div id="viewDash" class="view"></div>
+      <div id="viewDogs" class="view hide"></div>
       <div id="viewInvEdible" class="view hide"></div>
       <div id="viewStockInedible" class="view hide"></div>
       <div id="viewHistory" class="view hide"></div>
