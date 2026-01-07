@@ -715,6 +715,12 @@
   let immunDraft=null;
 
   function ensureDog(d){
+    // Ensure stable ID for all dogs (prevents profile cross-contamination)
+    if(!d.dogId){
+      d.dogId = d.id || d.dogID || d.dogid || ("dog_"+Date.now()+"_"+Math.random().toString(16).slice(2));
+    }
+    // Normalize callName (string)
+    if(typeof d.callName !== "string") d.callName = (d.callName==null? "" : String(d.callName));
     if(!d.immunizationEvents) d.immunizationEvents=[];
     if(!d.microchip) d.microchip={ value:"", locked:false, lockedAt:null };
     if(typeof d.photoDataUrl!=="string") d.photoDataUrl="";
@@ -857,6 +863,9 @@
   }
 
   function renderDogProfile(d){
+    // Hard reset of profile fields to prevent UI bleed between dogs
+    try{ document.getElementById("dogCallName").value=""; }catch(e){}
+
     currentDogId=d.dogId;
     document.getElementById("dogProfileTitle").textContent=d.callName||"Dog Profile";
     document.getElementById("dogCallNameDisplay").textContent=d.callName||"(no name)";
