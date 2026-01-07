@@ -1,5 +1,15 @@
-index.html
-portal.css
-portal.js
-readme.txt
-auth.js
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0b0d" />
+  <title>BP Portal · Rocks Corner</title>
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+
+  <!-- PIN Gate Overlay (blocks everything until unlocked) -->
+  <div id="pinGateOverlay" class="pin-overlay hide" aria-hidden="true">
+    <div class="pin-card">
+      <div class="pin-title">BP Portal · Rocks Corner</div
