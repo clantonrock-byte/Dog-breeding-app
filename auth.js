@@ -16,8 +16,8 @@
 
   if (!overlay || !input || !btn) return;
 
-  function show(){ overlay.classList.remove("hide"); }
-  function hide(){ overlay.classList.add("hide"); }
+  function show(){ overlay.style.display="flex"; overlay.classList.remove("hide"); }
+  function hide(){ overlay.style.display="none"; overlay.classList.add("hide"); }
 
   async function sha256Hex(str){
     const enc = new TextEncoder().encode(str);
@@ -78,6 +78,8 @@
       setHash(h);
       pending = "";
       hide();
+      // reload to render portal with unlocked state (mobile-safe)
+      try{ location.reload(); }catch(e){}
       return;
     }
     // unlock
