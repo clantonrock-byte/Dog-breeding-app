@@ -1948,5 +1948,70 @@
 })();
 </script>
 
+
+<script id="rc-stock-available-label">
+/* RC: Ensure Stock menu truly sets inedible context + Available header matches context */
+(function(){
+  // Robust: set kind based on explicit entry buttons
+  function bindEntryButtons(){
+    try{
+      document.querySelectorAll("button").forEach(function(b){
+        if(b._rcEntryBound) return;
+        var t=(b.textContent||"").trim().toLowerCase();
+        if(t==="stock (inedible)" || t==="stock"){
+          b.addEventListener("click", function(){ window.rcInvKind="inedible"; }, {capture:true});
+          b._rcEntryBound=true;
+        }
+        if(t==="inventory (edible)" || t==="inventory"){
+          b.addEventListener("click", function(){ window.rcInvKind="edible"; }, {capture:true});
+          b._rcEntryBound=true;
+        }
+      });
+    }catch(e){}
+  }
+
+  function fixAvailableHeader(){
+    try{
+      // Only touch the Available view heading (avoid messing with other h2s)
+      var sec = document.getElementById("viewInventoryAvailable");
+      if(!sec) return;
+      // find its first h2 inside
+      var h = sec.querySelector("h2");
+      if(!h) return;
+      // only if it's an "available" title
+      if(!/available/i.test(h.textContent||"")) return;
+      var k = (window.rcInvKind==="inedible") ? "Stock" : "Inventory";
+      h.textContent = k + " available";
+    }catch(e){}
+  }
+
+  // Wrap __go so every navigation resyncs the label
+  function wrapGo(){
+    try{
+      if(typeof __go!=="function" || __go._rcWrapped) return;
+      var _g = __go;
+      window.__go = function(v){
+        var r = _g.apply(this, arguments);
+        setTimeout(function(){
+          bindEntryButtons();
+          fixAvailableHeader();
+        }, 0);
+        return r;
+      };
+      window.__go._rcWrapped=true;
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    bindEntryButtons();
+    wrapGo();
+    setInterval(function(){
+      bindEntryButtons();
+      fixAvailableHeader();
+    }, 700);
+  });
+})();
+</script>
+
 </body>
 </html>
