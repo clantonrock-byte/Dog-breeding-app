@@ -1639,5 +1639,58 @@
 })();
 </script>
 
+
+<script id="rc-fix-add-inventory">
+/* RC: Fix "Add to inventory" dialog open/save (openInvDialog got truncated) */
+(function(){
+  function openInvDialogFixed(){
+    try{
+      document.getElementById("invName").value="";
+      document.getElementById("invIdType").value="Barcode";
+      document.getElementById("invIdValue").value="";
+      // Kind selector if present
+      try{
+        var k = (window.rcInvKind==="inedible") ? "inedible" : "edible";
+        var sel = document.getElementById("invKind");
+        if(sel) sel.value = k;
+      }catch(e){}
+      var dlg = document.getElementById("dlgInv");
+      if(dlg && typeof dlg.showModal==="function") dlg.showModal();
+    }catch(e){
+      alert("Open dialog error: "+(e.message||e));
+    }
+  }
+
+  function saveInvDefFixed(){
+    try{
+      // Prefer existing saveInvDef if it exists and works
+      if(typeof window.saveInvDef==="function"){
+        return window.saveInvDef();
+      }
+    }catch(e){}
+  }
+
+  // Rebind buttons (important: old event listener holds old function reference)
+  function bind(){
+    try{
+      var b=document.getElementById("btnOpenAddDialog");
+      if(b){ b.onclick = function(e){ e&&e.preventDefault&&e.preventDefault(); openInvDialogFixed(); }; }
+      // Ensure the "Save" button inside dialog works
+      var s=document.getElementById("btnSaveInv");
+      if(s && typeof window.saveInvDef==="function"){
+        s.onclick = function(e){ e&&e.preventDefault&&e.preventDefault(); window.saveInvDef(); };
+      }
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", bind);
+  setTimeout(bind, 300);
+  setTimeout(bind, 1200);
+
+  // Export for debugging
+  window.openInvDialog = openInvDialogFixed;
+})();
+</script>
+
 </body>
 </html>
