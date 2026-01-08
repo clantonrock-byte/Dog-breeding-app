@@ -1692,5 +1692,188 @@
 })();
 </script>
 
+
+<script id="rc-kind-separation">
+/* RC: Enforce Inventory (edible) vs Stock (inedible) separation for Available lists + selects + scanner match */
+(function(){
+  // domain kind: 'edible' or 'inedible'
+  window.rcInvKind = window.rcInvKind || "edible";
+
+  function setKind(k){
+    window.rcInvKind = (k === "inedible") ? "inedible" : "edible";
+  }
+  window.rcSetKind = setKind;
+
+  function kindOf(item){
+    var k = (item && item.kind) ? String(item.kind).toLowerCase() : "";
+    if(k === "inedible") return "inedible";
+    // default old items to edible so inventory doesn't suddenly go empty
+    return "edible";
+  }
+
+  // Wrap Home buttons if they exist (best effort)
+  function bindHome(){
+    try{
+      var btns=[...document.querySelectorAll("button")];
+      btns.forEach(function(b){
+        var txt=(b.textContent||"").trim().toLowerCase();
+        if(b._rcKindBound) return;
+        if(txt==="inventory (edible)" || txt==="inventory"){
+          b.addEventListener("click", ()=>setKind("edible"), {capture:true});
+          b._rcKindBound=true;
+        }
+        if(txt==="stock (inedible)" || txt==="stock"){
+          b.addEventListener("click", ()=>setKind("inedible"), {capture:true});
+          b._rcKindBound=true;
+        }
+      });
+    }catch(e){}
+  }
+
+  // Patch renderInv to filter by kind
+  function wrapRenderInv(){
+    try{
+      if(typeof renderInv!=="function" || renderInv._rcWrapped) return;
+      var _renderInv = renderInv;
+      renderInv = function(){
+        // temporarily filter store inventory by kind by monkeypatching loadInv
+        try{
+          var s = loadInv();
+          var all = s.inventory || [];
+          var k = window.rcInvKind || "edible";
+          s.inventory = all.filter(function(i){ return kindOf(i)===k; });
+          var _load = loadInv;
+          loadInv = function(){ return s; };
+          try{ return _renderInv(); } finally { loadInv = _load; }
+        }catch(e){
+          return _renderInv();
+        }
+      };
+      renderInv._rcWrapped=true;
+      window.renderInv = renderInv;
+    }catch(e){}
+  }
+
+  // Patch populateInvSelects to filter by kind
+  function wrapPopulate(){
+    try{
+      if(typeof populateInvSelects!=="function" || populateInvSelects._rcWrapped) return;
+      var _pop = populateInvSelects;
+      populateInvSelects = function(){
+        try{
+          var s = loadInv();
+          var all = s.inventory || [];
+          var k = window.rcInvKind || "edible";
+          var filtered = all.filter(function(i){ return kindOf(i)===k && !i.archived; });
+          var _load = loadInv;
+          loadInv = function(){ return {inventory: filtered}; };
+          try{ return _pop(); } finally { loadInv = _load; }
+        }catch(e){
+          return _pop();
+        }
+      };
+      populateInvSelects._rcWrapped=true;
+      window.populateInvSelects = populateInvSelects;
+    }catch(e){}
+  }
+
+  // Patch saveInvDef to stamp kind on new definitions
+  function wrapSaveInvDef(){
+    try{
+      if(typeof saveInvDef!=="function" || saveInvDef._rcWrapped) return;
+      var _save = saveInvDef;
+      saveInvDef = function(){
+        // record before length
+        var before=0;
+        try{ before=(loadInv().inventory||[]).length; }catch(e){}
+        var res = _save();
+        try{
+          var s = loadInv();
+          var inv = s.inventory || [];
+          if(inv.length>before){
+            inv[inv.length-1].kind = (window.rcInvKind==="inedible") ? "inedible" : "edible";
+            saveInv(s);
+          }
+        }catch(e){}
+        return res;
+      };
+      saveInvDef._rcWrapped=true;
+      window.saveInvDef = saveInvDef;
+    }catch(e){}
+  }
+
+  // Patch scanner match to respect kind (if findMatch exists)
+  function wrapFindMatch(){
+    try{
+      if(typeof findMatch!=="function" || findMatch._rcWrapped) return;
+      var _find = findMatch;
+      findMatch = function(code){
+        var m = _find(code);
+        if(!m) return null;
+        var k = window.rcInvKind || "edible";
+        return (kindOf(m)===k) ? m : null;
+      };
+      findMatch._rcWrapped=true;
+      window.findMatch = findMatch;
+    }catch(e){}
+  }
+
+  function init(){
+    bindHome();
+    wrapRenderInv();
+    wrapPopulate();
+    wrapSaveInvDef();
+    wrapFindMatch();
+    // ensure UI refresh uses filtered data
+    try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
+    try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+  setInterval(init, 900);
+})();
+</script>
+
+
+<script id="rc-scan-done-back">
+/* RC: After confirmScan (scanner Done), refresh and return to correct Available page (Inventory vs Stock) */
+(function(){
+  function goAvailable(){
+    try{
+      var k = (window.rcInvKind==="inedible") ? "inedible" : "edible";
+      if(typeof __go==="function"){
+        __go("InventoryAvailable");
+        // InventoryAvailable is filtered by kind; label in UI differs but view is correct
+      }
+    }catch(e){}
+  }
+  function safeRefresh(){
+    try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
+    try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
+  }
+
+  function wrapConfirm(){
+    try{
+      if(typeof confirmScan!=="function" || confirmScan._rcWrappedDone) return;
+      var _c = confirmScan;
+      confirmScan = function(){
+        var res = _c.apply(this, arguments);
+        setTimeout(function(){
+          safeRefresh();
+          goAvailable();
+        }, 0);
+        return res;
+      };
+      confirmScan._rcWrappedDone = true;
+      window.confirmScan = confirmScan;
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", wrapConfirm);
+  setTimeout(wrapConfirm, 300);
+  setInterval(wrapConfirm, 1200);
+})();
+</script>
+
 </body>
 </html>
