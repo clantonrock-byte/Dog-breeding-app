@@ -1199,6 +1199,7 @@
       kind:(function(){ try{ return document.getElementById("invKind").value|| (window.rcInvKind||"edible"); }catch(e){ return (window.rcInvKind||"edible"); } })(),
       qty:0, archived:false });
     saveInv(store);
+      try{ window.rcToast && window.rcToast((didBump?'+1 saved':'Saved') + (didMerge?' (deduped)':'')); }catch(e){}
     document.getElementById("dlgInv").close();
     renderInv(); populateInvSelects();
   }
@@ -1212,6 +1213,7 @@
     const store=loadInv(); const it=store.inventory.find(x=>x.itemId===addStockItemId);
     if(!it){ document.getElementById("addStockStatus").textContent="Item not found"; return; }
     it.qty=Number(it.qty||0)+qty; saveInv(store);
+      try{ window.rcToast && window.rcToast((didBump?'+1 saved':'Saved') + (didMerge?' (deduped)':'')); }catch(e){}
     document.getElementById("addStockStatus").textContent="Done.";
     renderInv(); populateInvSelects();
   }
@@ -1221,6 +1223,7 @@
     const store=loadInv(); const it=store.inventory.find(x=>x.itemId===reduceItemId);
     if(!it){ document.getElementById("reduceStatus").textContent="Item not found"; return; }
     it.qty=Math.max(0,Number(it.qty||0)-qty); saveInv(store);
+      try{ window.rcToast && window.rcToast((didBump?'+1 saved':'Saved') + (didMerge?' (deduped)':'')); }catch(e){}
     document.getElementById("reduceStatus").textContent="Done.";
     renderInv(); populateInvSelects();
   }
@@ -1230,6 +1233,7 @@
     const store=loadInv(); const it=store.inventory.find(x=>x.itemId===transferItemId);
     if(!it){ document.getElementById("transferStatus").textContent="Item not found"; return; }
     it.qty=Math.max(0,Number(it.qty||0)-qty); saveInv(store);
+      try{ window.rcToast && window.rcToast((didBump?'+1 saved':'Saved') + (didMerge?' (deduped)':'')); }catch(e){}
     document.getElementById("transferStatus").textContent="Done.";
     renderInv(); populateInvSelects();
   }
@@ -1629,6 +1633,7 @@
           try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
           try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
           goAvailable();
+          try{ window.rcToast && window.rcToast('Saved'); }catch(e){}
         }, 0);
         return res;
       };
@@ -1861,6 +1866,7 @@
         setTimeout(function(){
           safeRefresh();
           goAvailable();
+          try{ window.rcToast && window.rcToast('Saved'); }catch(e){}
         }, 0);
         return res;
       };
@@ -2088,8 +2094,10 @@
 
       if(didMerge || didBump){
         saveInv(store);
+      try{ window.rcToast && window.rcToast((didBump?'+1 saved':'Saved') + (didMerge?' (deduped)':'')); }catch(e){}
       }
-      setTimeout(()=>{ refreshUI(); goAvailable(); }, 0);
+      setTimeout(()=>{ refreshUI(); goAvailable();
+          try{ window.rcToast && window.rcToast('Saved'); }catch(e){} }, 0);
     }catch(e){}
   }
 
@@ -2113,6 +2121,43 @@
   });
 })();
 </script>
+
+
+<style id="rc-toast-style">
+#rcToast{
+  position:fixed;
+  left:12px; right:12px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  z-index: 999999;
+  display:none;
+  background: rgba(0,0,0,0.78);
+  color:#f2f2f2;
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:14px;
+  padding:10px 12px;
+  font-size:14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.45);
+}
+</style>
+<script id="rc-toast-js">
+(function(){
+  window.rcToast = function(msg){
+    try{
+      var el=document.getElementById("rcToast");
+      if(!el){
+        el=document.createElement("div");
+        el.id="rcToast";
+        document.body.appendChild(el);
+      }
+      el.textContent = String(msg||"");
+      el.style.display="block";
+      clearTimeout(el._t);
+      el._t=setTimeout(()=>{ el.style.display="none"; }, 1400);
+    }catch(e){}
+  };
+})();
+</script>
+<div id="rcToast"></div>
 
 </body>
 </html>
