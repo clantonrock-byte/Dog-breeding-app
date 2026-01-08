@@ -1,14 +1,16 @@
-BP Identity Header Everywhere (v1)
+BP DogID + Photo Binding Fix
 
-Adds a consistent identity header to dog cards:
-- Photo (or 📷 Add photo)
-- Microchip: On file / None
-- Rabies: On file / None
+What it does:
+1) Adds a stable dogId to each dog record (one-time migration) so future bindings can be reliable.
+2) Updates dog_photo_open.js to bind photos per dog (dogId-aware, callName fallback), and never reuse another dog’s photo.
 
 Install:
-1) Upload identity_header.js to repo root.
-2) Add this line near the bottom of root index.html before </body>:
-   <script src="identity_header.js"></script>
+- Upload/replace these files in repo root:
+  dog_id_migrate.js
+  dog_photo_open.js
+- Add to root index.html before </body>:
+  <script src="dog_id_migrate.js"></script>
+  <script src="dog_photo_open.js"></script>
 
 Cache-bust:
-? v=identity
+? v=dogid1
