@@ -1,10 +1,6 @@
-// dog_photo_open.js — v9 (layout-agnostic, Open-button based)
-// If your Dogs list has an "Open" button, this will add a thumbnail/placeholder next to it.
-// - Finds every button whose text is "Open" (case-insensitive)
-// - Attempts to find the dog name near that button and pull photoDataUrl from localStorage by callName
-// - If a photo exists: shows it; otherwise shows 📷 Add photo
-// - Clicking the thumbnail triggers the same Open button click
-// - Hides the Open button
+// dog_photo_open.js — v10 (call-name bound, no photo bleed)
+// Since dogId isn't available yet, bind photos by Call Name exactly.
+// IMPORTANT: If a dog has no stored photo, show 📷 Add photo (do NOT reuse another dog’s photo).
 
 (function(){
   const DOG_KEYS=["breederPro_dogs_store_v3","breeder_dogs_v1","breederPro_dogs_store_v1"];
@@ -22,19 +18,21 @@
     return [];
   }
 
-  function photoByCallName(call){
-    const dogs=loadDogs();
-    const key=(call||"").toString().trim().toLowerCase();
+  function norm(s){ return (s||"").toString().trim().toLowerCase(); }
+
+  function photoForCallName(call){
+    const key = norm(call);
     if(!key) return "";
-    const d=dogs.find(x=>((x.callName||x.name||"").toString().trim().toLowerCase()===key));
+    const dogs = loadDogs();
+    const d = dogs.find(x => norm(x.callName||x.name) === key);
     if(!d) return "";
     return d.photoDataUrl || d.photo || d.photoUrl || d.photoURI || "";
   }
 
   function injectCSS(){
-    if(document.getElementById("rcDogThumbCssV9")) return;
+    if(document.getElementById("rcDogThumbCssV10")) return;
     const st=document.createElement("style");
-    st.id="rcDogThumbCssV9";
+    st.id="rcDogThumbCssV10";
     st.textContent=`
       .rc-openwrap{display:flex;align-items:center;gap:10px;}
       .rc-thumb{
@@ -67,15 +65,16 @@
     return el;
   }
 
-  function findNearbyName(btn){
-    // Try to find a name element in the same container/card
-    const host = btn.closest(".card") || btn.parentElement;
-    if(!host) return "";
-    const nameEl = host.querySelector(".h") || host.querySelector("strong") || host.querySelector(".rc-dog-name");
+  function findCard(btn){
+    return btn.closest(".card") || btn.parentElement;
+  }
+
+  function extractNameFromCard(card){
+    if(!card) return "";
+    const nameEl = card.querySelector(".h") || card.querySelector("strong");
     if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    // fallback: first line of text in host
-    const text = (host.textContent||"").trim().split("\n").map(s=>s.trim()).filter(Boolean);
-    return text.length ? text[0] : "";
+    const lines = (card.innerText||card.textContent||"").split("\n").map(s=>s.trim()).filter(Boolean);
+    return lines.length ? lines[0] : "";
   }
 
   function enhance(){
@@ -85,10 +84,11 @@
       document.querySelectorAll("button").forEach(btn=>{
         const t=(btn.textContent||"").trim().toLowerCase();
         if(t!=="open") return;
-        if(btn._rcDone) return;
+        if(btn._rcDoneV10) return;
 
-        const name=findNearbyName(btn);
-        const photo=photoByCallName(name);
+        const card=findCard(btn);
+        const name=extractNameFromCard(card);
+        const photo=photoForCallName(name);
 
         const wrap=document.createElement("span");
         wrap.className="rc-openwrap";
@@ -96,22 +96,19 @@
 
         thumb.addEventListener("click",(e)=>{ e.preventDefault(); e.stopPropagation(); btn.click(); });
 
-        // Wrap the button in place
         const parent=btn.parentNode;
         if(!parent) return;
         parent.insertBefore(wrap, btn);
         wrap.appendChild(thumb);
         wrap.appendChild(btn);
 
-        // hide button
         btn.style.display="none";
-        btn._rcDone=true;
+        btn._rcDoneV10=true;
         injected++;
       });
 
-      // optional toast once we inject anything
       if(injected>0){
-        try{ if(typeof window.rcToast==="function") window.rcToast("Dog thumbnails active"); }catch(e){}
+        try{ if(typeof window.rcToast==="function") window.rcToast("Dog photos linked"); }catch(e){}
       }
     }catch(e){}
   }
