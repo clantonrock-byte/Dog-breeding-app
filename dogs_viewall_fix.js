@@ -1,75 +1,45 @@
-// dogs_viewall_fix.js — v3
-// Fix: View all must truly show ALL dogs after using females/males filters.
-// We clear known filter vars AND force renderDogs to ignore sex filter when mode=All.
-
+// dogs_viewall_fix.js — v4
 (function(){
-  function clearSexFilters(){
-    const candidates = [
-      "dogsSexFilter","sexFilter","dogSexFilter","dogsGenderFilter","dogsFilterSex","dogsOnlySex",
-      "dogsSex","dogsGender","dogsViewSex","dogsViewGender","filterSex","filterGender","dogsFilterGender",
-      "dogsShowFemalesOnly","dogsShowMalesOnly","showFemalesOnly","showMalesOnly"
-    ];
-    candidates.forEach(k=>{
+  function clear(){
+    const keys=["dogsSexFilter","sexFilter","dogSexFilter","dogsGenderFilter","dogsFilterSex","dogsOnlySex",
+      "dogsShowFemalesOnly","dogsShowMalesOnly","showFemalesOnly","showMalesOnly","dogsFilterGender"];
+    keys.forEach(k=>{
       try{
-        if(typeof window[k] === "boolean") window[k] = false;
-        else if(typeof window[k] === "string") window[k] = "all";
-        else if(typeof window[k] !== "undefined") window[k] = null;
+        if(typeof window[k]==="boolean") window[k]=false;
+        else if(typeof window[k]==="string") window[k]="all";
+        else if(typeof window[k]!=="undefined") window[k]=null;
       }catch(e){}
     });
   }
-
-  function doViewAll(){
-    try{ window.dogsViewMode = "All"; }catch(e){}
-    try{ dogsViewMode = "All"; }catch(e){}
-    clearSexFilters();
-    try{
-      const pill=document.getElementById("dogsCurrentViewPill");
-      if(pill) pill.textContent="All";
-    }catch(e){}
-    try{
-      const w=document.getElementById("dogsUnassignedWrap");
-      if(w) w.classList.add("hide");
-    }catch(e){}
+  function setModeAll(){
+    try{ window.dogsViewMode="All"; }catch(e){}
+    try{ dogsViewMode="All"; }catch(e){}
+    clear();
     try{ if(typeof window.renderDogs==="function") window.renderDogs(); }catch(e){}
   }
-
-  function wrapRenderDogs(){
-    try{
-      if(typeof window.renderDogs!=="function" || window.renderDogs._rcWrappedAll) return;
-      const orig = window.renderDogs;
-      window.renderDogs = function(){
-        // If view is All, clear sex filters just-in-time before rendering
-        try{
-          if((window.dogsViewMode||"").toString().toLowerCase()==="all"){
-            clearSexFilters();
-          }
-        }catch(e){}
-        return orig.apply(this, arguments);
-      };
-      window.renderDogs._rcWrappedAll = true;
-    }catch(e){}
-  }
-
   function bind(){
     try{
-      const byId = document.getElementById("btnViewAllDogs");
-      if(byId && !byId._rcBound){
-        byId.addEventListener("click", (e)=>{ e.preventDefault(); doViewAll(); });
-        byId._rcBound=true;
-      }
       document.querySelectorAll("button").forEach(b=>{
         const t=(b.textContent||"").trim().toLowerCase();
-        if(t==="view all" && !b._rcBoundText){
-          b.addEventListener("click", (e)=>{ e.preventDefault(); doViewAll(); });
-          b._rcBoundText=true;
+        if(t==="view all" && !b._rcAll){
+          b.addEventListener("click",(e)=>{e.preventDefault(); setModeAll();});
+          b._rcAll=true;
         }
       });
     }catch(e){}
   }
-
-  document.addEventListener("DOMContentLoaded", ()=>{
-    wrapRenderDogs();
-    bind();
-    setInterval(()=>{ wrapRenderDogs(); bind(); }, 900);
-  });
+  function wrap(){
+    try{
+      if(typeof window.renderDogs!=="function" || window.renderDogs._rcWrapped) return;
+      const orig=window.renderDogs;
+      window.renderDogs=function(){
+        try{
+          if((window.dogsViewMode||"").toString().toLowerCase()==="all"){ clear(); }
+        }catch(e){}
+        return orig.apply(this, arguments);
+      };
+      window.renderDogs._rcWrapped=true;
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded",()=>{wrap(); bind(); setInterval(()=>{wrap(); bind();},900);});
 })();
