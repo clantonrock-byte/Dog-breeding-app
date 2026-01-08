@@ -1894,5 +1894,59 @@
 })();
 </script>
 
+
+<script id="rc-final-kind-scan">
+/* RC FINAL: ensure scanner-stamped items respect domain + header sync */
+(function(){
+  function kind(){ return (window.rcInvKind==="inedible") ? "inedible" : "edible"; }
+
+  // Force header sync whenever view changes
+  function fixHeader(){
+    try{
+      var h=document.querySelector("h2,h3");
+      if(!h) return;
+      if(/available/i.test(h.textContent)){
+        h.textContent = (kind()==="inedible" ? "Stock" : "Inventory") + " available";
+      }
+    }catch(e){}
+  }
+
+  // Wrap confirmScan to stamp kind on scanned item before save
+  function wrapConfirm(){
+    try{
+      if(typeof confirmScan!=="function" || confirmScan._rcFinalWrapped) return;
+      var _c=confirmScan;
+      confirmScan=function(){
+        var res=_c.apply(this, arguments);
+        try{
+          var s=loadInv();
+          var inv=s.inventory||[];
+          if(inv.length){
+            var last=inv[inv.length-1];
+            if(!last.kind) last.kind=kind();
+            saveInv(s);
+          }
+        }catch(e){}
+        setTimeout(function(){
+          try{ renderInv(); }catch(e){}
+          try{ populateInvSelects(); }catch(e){}
+          try{ __go("InventoryAvailable"); }catch(e){}
+          fixHeader();
+        },0);
+        return res;
+      };
+      confirmScan._rcFinalWrapped=true;
+      window.confirmScan=confirmScan;
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    wrapConfirm();
+    fixHeader();
+  });
+  setInterval(function(){ wrapConfirm(); fixHeader(); }, 800);
+})();
+</script>
+
 </body>
 </html>
