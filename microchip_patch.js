@@ -1,53 +1,59 @@
-// microchip_patch.js — immutable microchip entries w/ double-confirm on manual entry
-// Works by hooking #btnAddMicrochip and enhancing the microchip panel after renderDogProfile runs.
-// Assumes app defines: renderDogProfile(d), updateDog(d), getDog(dogId), window.__curDogId or current dog selection.
-// Safe no-op if elements/functions not found.
-
+// microchip_patch.js — v2: immutable microchips w/ double-confirm + manufacturer hint
 (function(){
   function fmtMDY(ts){
-    try{
-      const d = new Date(ts);
-      return d.toLocaleDateString('en-US'); // M/D/YYYY
-    }catch(e){ return ""; }
+    try{ return new Date(ts).toLocaleDateString('en-US'); }catch(e){ return ""; }
+  }
+
+  // Best-effort manufacturer heuristics (not authoritative)
+  function detectMfr(code){
+    const v = String(code||"").replace(/\s+/g,"");
+    if(/^\d{15}$/.test(v)){
+      if(v.startsWith("985")) return "HomeAgain (likely)";
+      if(v.startsWith("956")) return "AKC Reunite (likely)";
+      if(v.startsWith("900")) return "ISO (900...) (likely)";
+      if(v.startsWith("941")) return "ISO (941...) (likely)";
+      if(v.startsWith("981")) return "ISO (981...) (likely)";
+      if(v.startsWith("982")) return "ISO (982...) (likely)";
+      if(v.startsWith("983")) return "ISO (983...) (likely)";
+      if(v.startsWith("984")) return "ISO (984...) (likely)";
+      if(v.startsWith("986")) return "ISO (986...) (likely)";
+      if(v.startsWith("987")) return "ISO (987...) (likely)";
+      if(v.startsWith("988")) return "ISO (988...) (likely)";
+      if(v.startsWith("989")) return "ISO (989...) (likely)";
+      return "ISO microchip (likely)";
+    }
+    if(/^\d{9,10}$/.test(v)) return "Non‑ISO numeric (unknown mfr)";
+    if(/[A-Za-z]/.test(v)) return "Alphanumeric (unknown mfr)";
+    return "Unknown";
   }
 
   function ensureArrayMicrochips(d){
     if(!d) return;
     if(!Array.isArray(d.microchips)) d.microchips = [];
-    // migrate legacy single microchip if present
     if(d.microchip && d.microchip.value){
       const exists = d.microchips.some(x => String(x.value) === String(d.microchip.value));
       if(!exists){
         d.microchips.push({
           value: String(d.microchip.value),
           atUtc: d.microchip.lockedAt || new Date().toISOString(),
-          source: "legacy"
+          source: "legacy",
+          mfr: d.microchip.mfr || detectMfr(d.microchip.value)
         });
       }
-      // keep legacy object but do not allow editing
     }
   }
 
   function getCurrentDog(){
-    try{
-      // Try common globals
-      if(typeof window.__curDogId === "string" && typeof window.getDog === "function") return window.getDog(window.__curDogId);
-    }catch(e){}
-    try{
-      if(typeof window.curDogId === "string" && typeof window.getDog === "function") return window.getDog(window.curDogId);
-    }catch(e){}
-    try{
-      // Some builds keep current dog object
-      if(window.__curDog && typeof window.__curDog === "object") return window.__curDog;
-    }catch(e){}
+    try{ if(typeof window.currentDogId === "string" && typeof window.getDog === "function") return window.getDog(window.currentDogId); }catch(e){}
+    try{ if(typeof window.__curDogId === "string" && typeof window.getDog === "function") return window.getDog(window.__curDogId); }catch(e){}
+    try{ if(window.__curDog && typeof window.__curDog === "object") return window.__curDog; }catch(e){}
     return null;
   }
 
   function saveDog(d){
     try{
-      if(typeof window.updateDog === "function"){ window.updateDog(d); return true; }
+      if(typeof window.updateDog === "function"){ window.updateDog(d.dogId, ()=>d); return true; }
     }catch(e){}
-    // fallback: try loadDogs/saveDogs
     try{
       if(typeof window.loadDogs === "function" && typeof window.saveDogs === "function"){
         const store = window.loadDogs();
@@ -81,6 +87,17 @@
       <label style="display:block;font-size:12px;opacity:.8;margin:10px 0 6px;">Confirm microchip number</label>
       <input id="mc2" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#f2f2f2;font-size:16px;" inputmode="numeric" autocomplete="off" />
 
+      <label style="display:block;font-size:12px;opacity:.8;margin:10px 0 6px;">Manufacturer (optional)</label>
+      <select id="mcMfr" style="width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:#f2f2f2;font-size:16px;">
+        <option value="">Auto-detect</option>
+        <option>HomeAgain</option>
+        <option>AKC Reunite</option>
+        <option>AVID</option>
+        <option>Datamars</option>
+        <option>ISO (generic)</option>
+        <option>Other/Unknown</option>
+      </select>
+
       <div id="mcMatch" style="font-size:12px;opacity:.85;margin-top:10px;"></div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end;">
@@ -95,16 +112,23 @@
     const match = dlg.querySelector("#mcMatch");
     const save = dlg.querySelector("#mcSave");
     const cancel = dlg.querySelector("#mcCancel");
+    const mfrSel = dlg.querySelector("#mcMfr");
 
     function check(){
       const a=(mc1.value||"").trim();
       const b=(mc2.value||"").trim();
       const ok = a.length>0 && a===b;
       save.disabled = !ok;
-      match.textContent = ok ? "✓ Numbers match" : (b.length>0 ? "✕ Numbers do not match" : "");
+      if(ok){
+        const mfr = (mfrSel.value||"").trim() || detectMfr(a);
+        match.textContent = "✓ Numbers match" + (mfr ? (" · " + mfr) : "");
+      } else {
+        match.textContent = (b.length>0 ? "✕ Numbers do not match" : "");
+      }
     }
     mc1.addEventListener("input", check);
     mc2.addEventListener("input", check);
+    mfrSel.addEventListener("change", check);
 
     cancel.addEventListener("click", ()=>dlg.close());
 
@@ -115,20 +139,20 @@
       if(!d){ alert("No dog selected."); return; }
       ensureArrayMicrochips(d);
 
-      // immutable append-only
-      d.microchips.push({ value: v, atUtc: new Date().toISOString(), source: "manual" });
+      const mfr = (mfrSel.value||"").trim() || detectMfr(v);
 
-      // also maintain legacy microchip view by setting last chip, but never edit it
-      d.microchip = d.microchip || { value:"", locked:true, lockedAt:null };
+      d.microchips.push({ value: v, atUtc: new Date().toISOString(), source: "manual", mfr });
+
+      d.microchip = d.microchip || { value:"", locked:true, lockedAt:null, mfr:"" };
       d.microchip.value = v;
       d.microchip.locked = true;
       d.microchip.lockedAt = new Date().toISOString();
+      d.microchip.mfr = mfr;
 
       saveDog(d);
       toast("Microchip saved");
       dlg.close();
 
-      // re-render profile if possible
       try{ if(typeof window.renderDogProfile==="function") window.renderDogProfile(d); }catch(e){}
     });
   }
@@ -138,7 +162,7 @@
       const host = document.getElementById("microchipValueWrap");
       if(!host) return;
       ensureArrayMicrochips(d);
-      // add a list container if missing
+
       let list = document.getElementById("microchipList");
       if(!list){
         list = document.createElement("div");
@@ -149,11 +173,12 @@
       const items = (d.microchips||[]).slice().reverse();
       list.innerHTML = items.length ? items.map(x=>{
         const when = fmtMDY(x.atUtc);
+        const mfr = x.mfr ? ` · <span class="muted small">${String(x.mfr).replaceAll("<","&lt;")}</span>` : "";
         return `<div class="muted small" style="margin-top:6px;">
-          ${when} · <span class="big-code" style="display:inline-block;margin-left:6px;">${String(x.value).replaceAll("<","&lt;")}</span>
+          ${when} · <span class="big-code" style="display:inline-block;margin-left:6px;">${String(x.value).replaceAll("<","&lt;")}</span>${mfr}
         </div>`;
       }).join("") : "";
-      // allow adding another chip
+
       const btn = document.getElementById("btnAddMicrochip");
       if(btn){
         btn.disabled = false;
@@ -177,7 +202,6 @@
     }catch(e){}
   }
 
-  // Wrap renderDogProfile so we can update microchip section after each render
   function wrapRender(){
     try{
       if(typeof window.renderDogProfile!=="function" || window.renderDogProfile._mcWrapped) return;
