@@ -1,10 +1,9 @@
-// microchip_patch.js — v3: immutable microchips + confirm + manufacturer hint + registry lookup (A,C)
+// microchip_patch.js — v4: immutable microchips + confirm + manufacturer + registry lookup + history log
 (function(){
   function fmtMDY(ts){
     try{ return new Date(ts).toLocaleDateString('en-US'); }catch(e){ return ""; }
   }
 
-  // Best-effort manufacturer heuristics (not authoritative)
   function detectMfr(code){
     const v = String(code||"").replace(/\s+/g,"");
     if(/^\d{15}$/.test(v)){
@@ -20,24 +19,31 @@
     return "Unknown";
   }
 
-  // Registry helper links. Many registries don't support direct-number URL params; in those cases we open the site.
-  const REGISTRY_LINKS = [
-    { name:"AAHA Universal Pet Microchip Lookup", url:"https://www.aaha.org/your-pet/pet-microchip-lookup/" },
-    { name:"AKC Reunite", url:"https://www.akcreunite.org/" },
-    { name:"HomeAgain", url:"https://www.homeagain.com/" },
-    { name:"Found Animals / Microchip Registry", url:"https://www.found.org/" },
-    { name:"24PetWatch", url:"https://www.24petwatch.com/" }
-  ];
+  const REGISTRY = { name:"AAHA Universal Pet Microchip Lookup", url:"https://www.aaha.org/your-pet/pet-microchip-lookup/" };
 
-  function openRegistry(name, baseUrl, code){
-    // Try a query-based fallback using the registry name + chip number
+  function toast(msg){
+    try{ if(typeof window.rcToast==="function") window.rcToast(msg); }catch(e){}
+  }
+
+  function logLookup(dog, code, registryName){
     try{
-      const q = encodeURIComponent(name + " microchip lookup " + code);
-      // Open a web search in a new tab (works everywhere, no API needed)
-      window.open("https://www.google.com/search?q="+q, "_blank", "noopener");
-    }catch(e){
-      window.open(baseUrl, "_blank", "noopener");
-    }
+      const note = `${registryName} lookup opened for ${code}`;
+      // Preferred historian log
+      if(typeof window.rcLog === "function"){
+        window.rcLog("microchip_lookup", "dog", dog && (dog.dogId||dog.id), note, { microchip: code, registry: registryName });
+      }
+      // Optional per-dog history array (if app uses it)
+      if(dog){
+        dog.history = dog.history || [];
+        dog.history.push({ type:"microchip_lookup", date: fmtMDY(new Date()), atUtc: new Date().toISOString(), note, microchip: code, registry: registryName });
+      }
+    }catch(e){}
+  }
+
+  function openRegistrySearch(code){
+    // Opens a search query so it works even if registry doesn't support direct query parameters.
+    const q = encodeURIComponent(REGISTRY.name + " microchip lookup " + code);
+    window.open("https://www.google.com/search?q="+q, "_blank", "noopener");
   }
 
   async function copyText(t){
@@ -47,7 +53,6 @@
         return true;
       }
     }catch(e){}
-    // fallback
     try{
       const ta=document.createElement("textarea");
       ta.value=String(t);
@@ -100,10 +105,6 @@
       }
     }catch(e){}
     return false;
-  }
-
-  function toast(msg){
-    try{ if(typeof window.rcToast==="function") window.rcToast(msg); }catch(e){}
   }
 
   function ensureDialog(){
@@ -205,7 +206,7 @@
       }
 
       const items = (d.microchips||[]).slice().reverse();
-      list.innerHTML = items.length ? items.map((x, idx)=>{
+      list.innerHTML = items.length ? items.map((x)=>{
         const when = fmtMDY(x.atUtc);
         const mfr = x.mfr ? String(x.mfr).replaceAll("<","&lt;") : detectMfr(x.value);
         const code = String(x.value).replaceAll("<","&lt;");
@@ -214,26 +215,29 @@
             ${when} · <span class="big-code" style="display:inline-block;margin-left:6px;">${code}</span>
             <div class="muted small" style="margin-top:4px;">${mfr}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-              <button class="btn" type="button" data-mc="${code}" data-mcname="${mfr}" data-act="copy">Copy #</button>
-              <button class="btn btn-primary" type="button" data-mc="${code}" data-mcname="${mfr}" data-act="lookup">Lookup registry</button>
+              <button class="btn" type="button" data-mc="${code}" data-act="copy">Copy #</button>
+              <button class="btn btn-primary" type="button" data-mc="${code}" data-act="lookup">Lookup registry</button>
             </div>
           </div>`;
       }).join("") : "";
 
-      // bind buttons
       list.querySelectorAll("button[data-act]").forEach(btn=>{
         if(btn._bound) return;
         btn._bound=true;
         btn.addEventListener("click", async ()=>{
           const code = btn.getAttribute("data-mc") || "";
-          const mfr = btn.getAttribute("data-mcname") || "";
           if(btn.getAttribute("data-act")==="copy"){
             const ok = await copyText(code);
             toast(ok ? "Copied" : "Copy failed");
             return;
           }
-          // lookup: open registry helper search
-          openRegistry("AAHA Universal Pet Microchip Lookup", "https://www.aaha.org/your-pet/pet-microchip-lookup/", code);
+          // Log + open lookup
+          try{
+            const dog=getCurrentDog();
+            logLookup(dog, code, REGISTRY.name);
+          }catch(e){}
+          openRegistrySearch(code);
+          toast("Lookup opened");
         });
       });
 
