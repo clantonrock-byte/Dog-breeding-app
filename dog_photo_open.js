@@ -1,10 +1,39 @@
+// dog_photo_open.js — v8 (layout-proof)
+// Finds ANY element that opens a dog profile by looking for "__openDog(" in onclick.
+// Adds a thumbnail (photo or 📷 Add photo) next to it and hides the original "Open" control.
+
 (function () {
+  const DOG_KEYS = ["breederPro_dogs_store_v3", "breeder_dogs_v1", "breederPro_dogs_store_v1"];
+
+  function loadDogsStore() {
+    for (const k of DOG_KEYS) {
+      try {
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        const obj = JSON.parse(raw);
+        if (Array.isArray(obj)) return { dogs: obj };
+        if (obj && Array.isArray(obj.dogs)) return obj;
+      } catch {}
+    }
+    return { dogs: [] };
+  }
+
+  function photoMap() {
+    const store = loadDogsStore();
+    const byId = new Map();
+    (store.dogs || []).forEach(d => {
+      const id = d.dogId || d.id;
+      const photo = d.photoDataUrl || d.photo || d.photoUrl || d.photoURI || "";
+      if (id) byId.set(String(id), photo);
+    });
+    return byId;
+  }
+
   function injectCSS() {
-    if (document.getElementById("rcDogThumbCss")) return;
+    if (document.getElementById("rcDogThumbCssV8")) return;
     const css = document.createElement("style");
-    css.id = "rcDogThumbCss";
+    css.id = "rcDogThumbCssV8";
     css.textContent = `
-      .rc-thumbrow{display:flex;gap:12px;align-items:center;margin-bottom:10px;}
       .rc-thumb{
         width:66px;height:54px;border-radius:12px;
         border:1px solid rgba(255,255,255,0.18);
@@ -13,13 +42,12 @@
         display:flex;align-items:center;justify-content:center;
         padding:6px;text-align:center;line-height:1.05;
         color:rgba(242,242,242,0.85);
+        margin-right:10px;
       }
       .rc-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
       .rc-thumb .cam{font-size:16px;display:block;}
       .rc-thumb .txt{font-size:11px;opacity:.9;margin-top:2px;}
-      .rc-thumbtext{flex:1;min-width:0;}
-      .rc-thumbtext .n{font-weight:900;}
-      .rc-thumbtext .s{opacity:.75;font-size:12px;margin-top:2px;}
+      .rc-openwrap{display:flex;align-items:center;gap:10px;}
     `;
     document.head.appendChild(css);
   }
@@ -38,89 +66,78 @@
     return el;
   }
 
-  function getDogsStore() {
-    const keys = ["breederPro_dogs_store_v3", "breeder_dogs_v1", "breederPro_dogs_store_v1"];
-    for (const k of keys) {
-      try {
-        const raw = localStorage.getItem(k);
-        if (!raw) continue;
-        const obj = JSON.parse(raw);
-        if (Array.isArray(obj)) return { dogs: obj };
-        if (obj && Array.isArray(obj.dogs)) return obj;
-      } catch {}
-    }
-    return { dogs: [] };
-  }
-
-  function buildPhotoMap() {
-    const store = getDogsStore();
-    const byId = new Map();
-    const byCall = new Map();
-    (store.dogs || []).forEach(d => {
-      const id = d.dogId || d.id;
-      const call = (d.callName || d.name || "").toString().trim().toLowerCase();
-      const photo = d.photoDataUrl || d.photo || d.photoUrl || d.photoURI || "";
-      if (id) byId.set(String(id), photo);
-      if (call) byCall.set(call, photo);
-    });
-    return { byId, byCall };
-  }
-
-  function dogIdFromOpen(btn) {
+  function dogIdFromOnclick(s) {
     try {
-      const oc = btn.getAttribute("onclick") || "";
-      const m = oc.match(/__openDog\(['"]([^'"]+)['"]\)/);
-      if (m) return m[1];
-    } catch {}
-    return "";
+      const m = String(s || "").match(/__openDog\(['"]([^'"]+)['"]\)/);
+      return m ? m[1] : "";
+    } catch {
+      return "";
+    }
   }
 
   function enhance() {
-    injectCSS();
-    const maps = buildPhotoMap();
-    const scope = document.getElementById("viewDogs") || document.body;
-    scope.querySelectorAll(".card").forEach(card => {
-      if (card._rcThumbDone) return;
+    try {
+      injectCSS();
+      const byId = photoMap();
 
-      const openBtn = Array.from(card.querySelectorAll("button"))
-        .find(b => (b.textContent || "").trim().toLowerCase() === "open");
-      if (!openBtn) return;
+      // Look inside Dogs view if it exists; otherwise scan whole doc (safe fallback)
+      const scope = document.getElementById("viewDogs") || document.body;
 
-      const id = dogIdFromOpen(openBtn);
-      const nameEl = card.querySelector(".h") || card.querySelector("strong");
-      const subEl = card.querySelector(".sub") || card.querySelector(".small");
-      const name = nameEl ? nameEl.textContent.trim() : "Dog";
-      const callKey = name.toLowerCase();
+      // Find anything with onclick containing __openDog(
+      const nodes = Array.from(scope.querySelectorAll("[onclick]"))
+        .filter(el => String(el.getAttribute("onclick") || "").includes("__openDog("));
 
-      let photo = "";
-      if (id && maps.byId.has(String(id))) photo = maps.byId.get(String(id)) || "";
-      if (!photo && maps.byCall.has(callKey)) photo = maps.byCall.get(callKey) || "";
+      nodes.forEach(openEl => {
+        if (openEl._rcThumbDone) return;
 
-      const row = document.createElement("div");
-      row.className = "rc-thumbrow";
+        const oc = openEl.getAttribute("onclick") || "";
+        const dogId = dogIdFromOnclick(oc);
+        const src = dogId ? (byId.get(String(dogId)) || "") : "";
 
-      const thumb = mkThumb(photo);
-      const text = document.createElement("div");
-      text.className = "rc-thumbtext";
-      text.innerHTML = `<div class="n">${name}</div>${subEl ? `<div class="s">${subEl.textContent.trim()}</div>` : ""}`;
+        // Wrap open element so we can place thumb beside it without breaking layout
+        const wrap = document.createElement("span");
+        wrap.className = "rc-openwrap";
 
-      row.appendChild(thumb);
-      row.appendChild(text);
-      card.insertBefore(row, card.firstChild);
+        const thumb = mkThumb(src);
+        thumb.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openEl.click();
+        });
 
-      const open = () => openBtn.click();
-      thumb.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); open(); });
-      text.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); open(); });
+        // Insert wrapper in DOM
+        const parent = openEl.parentNode;
+        if (!parent) return;
 
-      // Hide Open button now that the thumb/name opens the profile
-      openBtn.style.display = "none";
+        parent.insertBefore(wrap, openEl);
+        wrap.appendChild(thumb);
+        wrap.appendChild(openEl);
 
-      card._rcThumbDone = true;
-    });
+        // Hide original open label/button if it’s a visible button/link
+        try { openEl.style.display = "none"; } catch {}
+
+        // But keep the click target by cloning a hidden click proxy inside wrap
+        const proxy = document.createElement("button");
+        proxy.textContent = "Open";
+        proxy.style.display = "none";
+        proxy.addEventListener("click", () => openEl.click());
+        wrap.appendChild(proxy);
+
+        // Clicking the thumbnail should be the main path; also allow clicking wrapper
+        wrap.addEventListener("click", (e) => {
+          // avoid double triggers if click was on the thumb already
+          if (e.target === thumb) return;
+          openEl.click();
+        });
+
+        openEl._rcThumbDone = true;
+      });
+    } catch {}
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     enhance();
+    // Keep enhancing as lists change (filters etc.)
     setInterval(enhance, 1200);
   });
 })();
