@@ -1875,5 +1875,24 @@
 })();
 </script>
 
+
+<script id="rc-available-label-fix">
+/* RC: Correct Available header label for Inventory vs Stock */
+(function(){
+  function fixLabel(){
+    try{
+      var h=document.querySelector("h2,h3");
+      if(!h) return;
+      var k = (window.rcInvKind==="inedible") ? "Stock" : "Inventory";
+      if(/available/i.test(h.textContent)){
+        h.textContent = k + " available";
+      }
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded", fixLabel);
+  setInterval(fixLabel, 500);
+})();
+</script>
+
 </body>
 </html>
