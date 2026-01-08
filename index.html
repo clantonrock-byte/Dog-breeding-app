@@ -1608,5 +1608,36 @@
 })();
 </script>
 
+
+<script id="rc-inv-done-back">
+/* RC: after add/reduce/transfer quantity, return to Available list automatically */
+(function(){
+  function goAvailable(){
+    try{
+      if(typeof __go==="function") __go("InventoryAvailable");
+    }catch(e){}
+  }
+  function wrap(name){
+    try{
+      var fn = window[name];
+      if(typeof fn!=="function") return;
+      if(fn._rcDoneWrapped) return;
+      window[name]=function(){
+        var res = fn.apply(this, arguments);
+        setTimeout(function(){
+          // refresh then go back
+          try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
+          try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
+          goAvailable();
+        }, 0);
+        return res;
+      };
+      window[name]._rcDoneWrapped=true;
+    }catch(e){}
+  }
+  ["applyAddStock","applyReduce","applyTransfer"].forEach(wrap);
+})();
+</script>
+
 </body>
 </html>
