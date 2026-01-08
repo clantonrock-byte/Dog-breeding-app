@@ -1,5 +1,5 @@
 {
   "built_at": "",
   "sha": "",
-  "build": "MASTER-LOCKED nav-35 +inv-refresh +done-back +scan-done-back +label-fix +final-scan-kind +stock-label"
+  "build": "MASTER-LOCKED nav-35 +inv-refresh +done-back +scan-done-back +label-fix +final-scan-kind +stock-label +scan-qty"
 }

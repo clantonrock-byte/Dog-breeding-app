@@ -2013,5 +2013,106 @@
 })();
 </script>
 
+
+<script id="rc-scan-qty-dedupe">
+/* RC: Scan should change quantity (+1) and avoid duplicate definitions for same barcode */
+(function(){
+  function kind(){ return (window.rcInvKind==="inedible") ? "inedible" : "edible"; }
+
+  function getLastScanCode(){
+    try{
+      // common elements
+      const ids=["scanResult","scanOut","scanValue","scannedCode","scanText"];
+      for(const id of ids){
+        const el=document.getElementById(id);
+        if(!el) continue;
+        const v=(el.value||el.textContent||"").trim();
+        if(v) return v;
+      }
+    }catch(e){}
+    return "";
+  }
+
+  function normalizeStore(store){
+    store = store || {};
+    store.inventory = store.inventory || [];
+    // ensure kind default
+    store.inventory.forEach(i=>{
+      if(!i.kind) i.kind = "edible";
+      if(typeof i.qty!=="number") i.qty = Number(i.qty||0);
+    });
+    return store;
+  }
+
+  function dedupeByBarcode(store, barcode){
+    const inv = store.inventory;
+    const matches = inv.filter(i => (i.identifierValue||"") === barcode && (i.kind||"edible") === kind());
+    if(matches.length <= 1) return false;
+    // merge into first
+    const keep = matches[0];
+    const sum = matches.reduce((a,b)=>a + Number(b.qty||0), 0);
+    keep.qty = sum;
+    // remove others
+    store.inventory = inv.filter(i => !((i.identifierValue||"") === barcode && (i.kind||"edible") === kind() && i !== keep));
+    return true;
+  }
+
+  function bumpQtyByBarcode(store, barcode){
+    const inv = store.inventory;
+    const item = inv.find(i => (i.identifierValue||"") === barcode && (i.kind||"edible") === kind() && !i.archived);
+    if(!item) return false;
+    item.qty = Number(item.qty||0) + 1;
+    return true;
+  }
+
+  function refreshUI(){
+    try{ if(typeof renderInv==="function") renderInv(); }catch(e){}
+    try{ if(typeof populateInvSelects==="function") populateInvSelects(); }catch(e){}
+  }
+
+  function goAvailable(){
+    try{ if(typeof __go==="function") __go("InventoryAvailable"); }catch(e){}
+  }
+
+  function applyScanFixes(){
+    try{
+      const code = getLastScanCode();
+      if(!code) return;
+      if(typeof loadInv!=="function" || typeof saveInv!=="function") return;
+
+      let store = normalizeStore(loadInv());
+      // Merge duplicates first
+      const didMerge = dedupeByBarcode(store, code);
+      // If scanner flow did not add quantity, enforce +1
+      const didBump = bumpQtyByBarcode(store, code);
+
+      if(didMerge || didBump){
+        saveInv(store);
+      }
+      setTimeout(()=>{ refreshUI(); goAvailable(); }, 0);
+    }catch(e){}
+  }
+
+  function wrapConfirmScan(){
+    try{
+      if(typeof confirmScan!=="function" || confirmScan._rcQtyWrapped) return;
+      const _c = confirmScan;
+      window.confirmScan = function(){
+        const res = _c.apply(this, arguments);
+        // After the app's normal scan handling, enforce quantity + dedupe
+        setTimeout(applyScanFixes, 0);
+        return res;
+      };
+      window.confirmScan._rcQtyWrapped = true;
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    wrapConfirmScan();
+    setInterval(wrapConfirmScan, 1200);
+  });
+})();
+</script>
+
 </body>
 </html>
