@@ -1,16 +1,15 @@
-BP DogID + Photo Binding Fix
+BP Photo Bind Per Dog (v1)
 
-What it does:
-1) Adds a stable dogId to each dog record (one-time migration) so future bindings can be reliable.
-2) Updates dog_photo_open.js to bind photos per dog (dogId-aware, callName fallback), and never reuse another dog’s photo.
+Fixes the 'all dogs show same photo' problem by storing ONE current photo per dog.
+
+Storage:
+- localStorage rc_dog_photos_v1 maps callName -> dataURL (and also id:dogId when available)
 
 Install:
-- Upload/replace these files in repo root:
-  dog_id_migrate.js
-  dog_photo_open.js
-- Add to root index.html before </body>:
-  <script src="dog_id_migrate.js"></script>
-  <script src="dog_photo_open.js"></script>
+1) Upload photo_bind_per_dog.js to repo root.
+2) Add to index.html before </body>:
+   <script src="photo_bind_per_dog.js"></script>
 
-Cache-bust:
-? v=dogid1
+Then:
+- Update each dog's photo once in the profile to seed the per-dog map.
+- Dog list will show the correct photo per dog, otherwise 📷 Add photo.
