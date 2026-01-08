@@ -1,6 +1,10 @@
-// dog_photo_open.js — v10 (call-name bound, no photo bleed)
-// Since dogId isn't available yet, bind photos by Call Name exactly.
-// IMPORTANT: If a dog has no stored photo, show 📷 Add photo (do NOT reuse another dog’s photo).
+// dog_photo_open.js — v11 (self-healing, updates existing thumbs; no stale bleed)
+// Fixes "all dogs show same photo" caused by stale injected thumbs from earlier versions.
+// Strategy:
+// - Always locate each "Open" button.
+// - For each, find (or create) a wrapper with a thumb.
+// - Recompute photo by call name each pass and UPDATE the thumb in-place.
+// - Never trust old flags; will overwrite stale image with placeholder if no photo.
 
 (function(){
   const DOG_KEYS=["breederPro_dogs_store_v3","breeder_dogs_v1","breederPro_dogs_store_v1"];
@@ -30,9 +34,9 @@
   }
 
   function injectCSS(){
-    if(document.getElementById("rcDogThumbCssV10")) return;
+    if(document.getElementById("rcDogThumbCssV11")) return;
     const st=document.createElement("style");
-    st.id="rcDogThumbCssV10";
+    st.id="rcDogThumbCssV11";
     st.textContent=`
       .rc-openwrap{display:flex;align-items:center;gap:10px;}
       .rc-thumb{
@@ -51,18 +55,17 @@
     document.head.appendChild(st);
   }
 
-  function mkThumb(src){
-    const el=document.createElement("div");
-    el.className="rc-thumb";
+  function renderThumb(el, src){
+    // wipe contents
+    el.innerHTML = "";
     if(src){
       const img=document.createElement("img");
       img.src=src;
       img.alt="Dog photo";
       el.appendChild(img);
     } else {
-      el.innerHTML=`<span class="cam">📷</span><span class="txt">Add photo</span>`;
+      el.innerHTML = `<span class="cam">📷</span><span class="txt">Add photo</span>`;
     }
-    return el;
   }
 
   function findCard(btn){
@@ -73,42 +76,82 @@
     if(!card) return "";
     const nameEl = card.querySelector(".h") || card.querySelector("strong");
     if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    const lines = (card.innerText||card.textContent||"").split("\n").map(s=>s.trim()).filter(Boolean);
-    return lines.length ? lines[0] : "";
+    // Fallback: attempt to grab first bold-ish line (avoid breed line)
+    const lines = (card.innerText||card.textContent||"")
+      .split("\n")
+      .map(s=>s.trim())
+      .filter(Boolean);
+    // choose first line that is not starting with "Breed:" and not "German"
+    for(const ln of lines){
+      if(/^breed:/i.test(ln)) continue;
+      if(/^sex:/i.test(ln)) continue;
+      if(/^german\s/i.test(ln)) continue;
+      if(ln.length<=2) continue;
+      return ln;
+    }
+    return lines.length?lines[0]:"";
+  }
+
+  function ensureWrap(btn){
+    // If already wrapped, return existing wrap+thumb
+    const existing = btn.parentElement && btn.parentElement.classList && btn.parentElement.classList.contains("rc-openwrap")
+      ? btn.parentElement
+      : null;
+    if(existing){
+      let thumb = existing.querySelector(".rc-thumb");
+      if(!thumb){
+        thumb = document.createElement("div");
+        thumb.className="rc-thumb";
+        existing.insertBefore(thumb, existing.firstChild);
+      }
+      return {wrap: existing, thumb};
+    }
+    // Create wrapper
+    const wrap = document.createElement("span");
+    wrap.className="rc-openwrap";
+    const thumb = document.createElement("div");
+    thumb.className="rc-thumb";
+    const parent = btn.parentNode;
+    if(!parent) return null;
+    parent.insertBefore(wrap, btn);
+    wrap.appendChild(thumb);
+    wrap.appendChild(btn);
+    return {wrap, thumb};
   }
 
   function enhance(){
     try{
       injectCSS();
-      let injected=0;
+      let changed=0;
       document.querySelectorAll("button").forEach(btn=>{
         const t=(btn.textContent||"").trim().toLowerCase();
         if(t!=="open") return;
-        if(btn._rcDoneV10) return;
 
         const card=findCard(btn);
-        const name=extractNameFromCard(card);
-        const photo=photoForCallName(name);
+        const callName=extractNameFromCard(card);
 
-        const wrap=document.createElement("span");
-        wrap.className="rc-openwrap";
-        const thumb=mkThumb(photo);
+        const photo=photoForCallName(callName); // strict match; may be ""
 
-        thumb.addEventListener("click",(e)=>{ e.preventDefault(); e.stopPropagation(); btn.click(); });
+        const obj = ensureWrap(btn);
+        if(!obj) return;
 
-        const parent=btn.parentNode;
-        if(!parent) return;
-        parent.insertBefore(wrap, btn);
-        wrap.appendChild(thumb);
-        wrap.appendChild(btn);
+        // Update thumb every time (self-heal)
+        renderThumb(obj.thumb, photo);
 
+        // Click thumb to open
+        if(!obj.thumb._rcBound){
+          obj.thumb.addEventListener("click",(e)=>{ e.preventDefault(); e.stopPropagation(); btn.click(); });
+          obj.thumb._rcBound=true;
+        }
+
+        // Hide Open button
         btn.style.display="none";
-        btn._rcDoneV10=true;
-        injected++;
+
+        changed++;
       });
 
-      if(injected>0){
-        try{ if(typeof window.rcToast==="function") window.rcToast("Dog photos linked"); }catch(e){}
+      if(changed>0){
+        try{ if(typeof window.rcToast==="function") window.rcToast("Dog thumbnails refreshed"); }catch(e){}
       }
     }catch(e){}
   }
