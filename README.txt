@@ -1,14 +1,13 @@
-BP Portal v1
+BP Dog List Photo Open Patch
 
-What this is:
-- A simple web portal/dashboard for your BP app (MASTER-LOCKED nav-35+).
-- Reads localStorage from the same origin (same GitHub Pages domain).
-- Shows Dogs, Inventory (Edible), Stock (Inedible), and History.
+What it does:
+- In the Dogs list, adds a small photo placeholder on each dog card.
+- Tapping the photo/placeholder triggers the existing profile open action.
+- Hides the old 'Open' button (to encourage the new UX).
 
-How to deploy (recommended):
-- Upload the /portal folder into your repo root.
-- Access at: https://<your_pages_domain>/Dog-breeding-app/portal/
+Install:
+1) Upload dog_photo_open.js to your repo root.
+2) Add this line near the bottom of your root index.html before </body>:
+   <script src="dog_photo_open.js"></script>
 
-Notes:
-- If you host the portal on a different domain, it will NOT share localStorage.
-- Export/Import allows moving a snapshot between devices.
+No other changes required. This is non-invasive and preserves your baseline behavior.
