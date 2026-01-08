@@ -1,16 +1,46 @@
-// dog_photo_open.js — v3
-// - Anchors a thumbnail/placeholder to each dog card
-// - Placeholder shows a small camera + "Add photo"
-// - Tapping the thumbnail (or name) opens the profile (uses existing Open button click)
+// dog_photo_open.js — v4
+// Shows current dog photo (if available) on dog list cards; photo/placeholder opens profile.
+// Does NOT rebuild cards; it injects a small header row and hides the Open button.
+// Photo source: looks up dogId from the Open button (onclick "__openDog('...')") and then
+// reads photoDataUrl from the dogs store in localStorage.
 
 (function(){
+  const DOG_KEYS = ["breederPro_dogs_store_v3","breeder_dogs_v1","breederPro_dogs_store_v1"];
+
+  function loadDogsStore(){
+    for(const k of DOG_KEYS){
+      try{
+        const raw = localStorage.getItem(k);
+        if(!raw) continue;
+        const obj = JSON.parse(raw);
+        if(Array.isArray(obj)) return {dogs: obj};
+        if(obj && Array.isArray(obj.dogs)) return obj;
+      }catch(e){}
+    }
+    return {dogs: []};
+  }
+
+  function buildPhotoMap(){
+    const store = loadDogsStore();
+    const map = new Map();
+    (store.dogs||[]).forEach(d=>{
+      const id = d.dogId || d.id;
+      if(!id) return;
+      const photo = d.photoDataUrl || d.photo || d.photoUrl || "";
+      if(photo) map.set(String(id), photo);
+    });
+    return map;
+  }
+
   function injectCSS(){
     if(document.getElementById("rcDogThumbCss")) return;
     const css = document.createElement("style");
     css.id = "rcDogThumbCss";
     css.textContent = `
-      .rc-dog-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-      .rc-dog-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+      .rc-dog-head{
+        display:flex; align-items:center; gap:12px;
+        margin-bottom:10px;
+      }
       .rc-dog-thumb{
         width:66px;height:54px;
         border-radius:12px;
@@ -28,9 +58,7 @@
       .rc-dog-thumb:active{ transform: translateY(1px); }
       .rc-dog-thumb .cam{ font-size:16px; display:block; }
       .rc-dog-thumb .txt{ font-size:11px; opacity:.9; margin-top:2px; }
-      .rc-dog-namewrap{ min-width:0; }
-      .rc-dog-namewrap .rc-dog-name{ font-weight:900; }
-      .rc-dog-namewrap .rc-dog-sub{ opacity:.75;font-size:12px;margin-top:2px; }
+      .rc-dog-titleblock{ min-width:0; flex:1; }
     `;
     document.head.appendChild(css);
   }
@@ -49,56 +77,66 @@
     return wrap;
   }
 
-  function findDogCards(){
-    const dogsView = document.getElementById("viewDogs") || document.body;
-    return dogsView.querySelectorAll(".card");
+  function extractDogIdFromOpen(btn){
+    try{
+      // onclick attribute: __openDog('dog_...')
+      const oc = btn.getAttribute("onclick") || "";
+      const m = oc.match(/__openDog\(['"]([^'"]+)['"]\)/);
+      if(m) return m[1];
+    }catch(e){}
+    return "";
   }
 
   function enhance(){
-    try{
-      injectCSS();
-      const cards = findDogCards();
-      cards.forEach(card=>{
-        const btn = Array.from(card.querySelectorAll("button")).find(b => (b.textContent||"").trim().toLowerCase()==="open");
-        if(!btn) return;
-        if(card._rcThumbDone) return;
+    injectCSS();
+    const photoMap = buildPhotoMap();
 
-        let nameEl = card.querySelector("strong") || card.querySelector(".h") || card.querySelector(".dog-name");
-        const nameText = nameEl ? (nameEl.textContent||"").trim() : "";
-        let subEl = card.querySelector(".small") || card.querySelector(".sub");
-        const subText = subEl ? (subEl.textContent||"").trim() : "";
+    // Dog cards generally have .card class in the Dogs view
+    const dogsView = document.getElementById("viewDogs") || document.body;
+    const cards = dogsView.querySelectorAll(".card");
+    cards.forEach(card=>{
+      if(card._rcPhotoDone) return;
+      const btn = Array.from(card.querySelectorAll("button")).find(b => (b.textContent||"").trim().toLowerCase()==="open");
+      if(!btn) return;
 
-        const left=document.createElement("div");
-        left.className="rc-dog-left";
-        const thumb = mkThumb(null);
+      const dogId = extractDogIdFromOpen(btn);
+      const src = dogId ? (photoMap.get(String(dogId))||"") : "";
 
-        const nameWrap=document.createElement("div");
-        nameWrap.className="rc-dog-namewrap";
-        nameWrap.innerHTML = `<div class="rc-dog-name">${nameText || "Dog"}</div>${subText ? `<div class="rc-dog-sub">${subText}</div>` : ""}`;
+      // Create head row and move the existing title lines into it (without deleting anything)
+      const head=document.createElement("div");
+      head.className="rc-dog-head";
+      const thumb = mkThumb(src);
 
-        left.appendChild(thumb);
-        left.appendChild(nameWrap);
+      const titleBlock=document.createElement("div");
+      titleBlock.className="rc-dog-titleblock";
 
-        thumb.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); btn.click(); });
-        nameWrap.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); btn.click(); });
+      // Move the first two text nodes/elements that look like title/subtitle into titleBlock
+      // Typically: <div class="h">Name</div> and <div class="sub">Breed...</div>
+      const h = card.querySelector(".h") || card.querySelector("strong");
+      const sub = card.querySelector(".sub") || card.querySelector(".small");
+      if(h) titleBlock.appendChild(h);
+      if(sub) titleBlock.appendChild(sub);
 
-        const row=document.createElement("div");
-        row.className="rc-dog-row";
-        row.appendChild(left);
-        row.appendChild(btn);
+      head.appendChild(thumb);
+      head.appendChild(titleBlock);
 
-        card.innerHTML = "";
-        card.appendChild(row);
+      // Insert head at top of card
+      card.insertBefore(head, card.firstChild);
 
-        // keep button visible for now; user taps photo/name mostly
-        btn.textContent = "Open";
-        card._rcThumbDone=true;
-      });
-    }catch(e){}
+      // clicking thumb or title opens profile via existing button
+      const open = ()=>btn.click();
+      thumb.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); open(); });
+      titleBlock.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); open(); });
+
+      // Hide open button to encourage thumb-as-open UX
+      btn.style.display="none";
+
+      card._rcPhotoDone=true;
+    });
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
     enhance();
-    setInterval(enhance, 900);
+    setInterval(enhance, 1200);
   });
 })();

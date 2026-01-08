@@ -1,7 +1,11 @@
+Dog list photo-open v4
+
+- Adds a thumbnail (current dog photo if available) to each dog card.
+- If no photo yet, shows a small camera + 'Add photo'.
+- Tapping thumbnail/title opens the dog profile (uses existing Open button).
+- Hides the Open button.
+
 Install:
-1) Replace dog_photo_open.js with this version (camera + Add photo).
-2) Add dogs_viewall_fix.js to repo root.
-3) Ensure index.html includes:
-   <script src="dog_photo_open.js"></script>
-   <script src="dogs_viewall_fix.js"></script>
-   (near the bottom before </body>)
+- Replace repo root dog_photo_open.js with this version.
+- Ensure root index.html includes: <script src="dog_photo_open.js"></script>
+Cache-bust: ?v=dogphoto4
