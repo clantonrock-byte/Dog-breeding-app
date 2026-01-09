@@ -1,12 +1,13 @@
-# BP Photo Debug Pack
+BP Profile Photo Label
 
-This zip contains:
-- rc_photo_diag.js  → Diagnoses where dog photos are coming from
-- disable_list_photos.js → Temporarily disables photos in dog list (safety)
+What it does:
+- Shows a small label next to the current profile photo:
+  "Current photo · <Call Name>"
 
-How to use:
-1. Upload rc_photo_diag.js to repo root and open it in browser to see alert.
-2. If dogs all share same photo, it's a data issue.
-3. Optionally include disable_list_photos.js AFTER app.js to stop list photo bleed.
+Install:
+1) Upload dog_profile_photo_label.js to repo root
+2) Add to index.html before </body>:
+   <script src="dog_profile_photo_label.js"></script>
 
-This pack does NOT delete data.
+Cache-bust:
+?v=photolabel
