@@ -106,7 +106,7 @@
           const tile = btn.parentElement.querySelector(".rc-profile-tile");
           if(tile){
             const call = extractCallNameFromRow(btn);
-            renderTile(tile, call);
+            renderTile(tile);
           }
           return;
         }
@@ -127,7 +127,7 @@
         tile.className="rc-profile-tile";
 
         const call = extractCallNameFromRow(btn);
-        renderTile(tile, call);
+        renderTile(tile);
 
         wrap.insertBefore(tile, btn);
 
