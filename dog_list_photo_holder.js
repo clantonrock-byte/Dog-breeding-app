@@ -43,7 +43,7 @@
         return;
       }
     }catch(e){}
-    alert("Could not open dog profile.");
+    try{ if(window.rcToast) window.rcToast("Opening profile…"); }catch(e){}
   }
 
   function injectCSS(){
@@ -120,7 +120,7 @@
         holder.addEventListener("click",(e)=>{
           e.preventDefault(); e.stopPropagation();
           const d=findDogByCall(call);
-          if(d) openDog(d);
+          if(d) setTimeout(()=>openDog(d), 0);
         });
 
         // Optional: also make the name area clickable
@@ -128,7 +128,7 @@
           // don't trigger if clicked on a button inside
           try{ if(e.target.closest("button,a,input,select,textarea,label")) return; }catch(_){}
           const d=findDogByCall(call);
-          if(d) openDog(d);
+          if(d) setTimeout(()=>openDog(d), 0);
         });
 
         el._rcHolderBound = true;
