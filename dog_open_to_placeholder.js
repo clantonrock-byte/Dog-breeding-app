@@ -85,17 +85,11 @@
     return lines.length?lines[0]:"";
   }
 
-  function renderTile(tile, call){
-    const photo = photoForCall(call);
-    tile.innerHTML="";
-    if(photo){
-      const img=document.createElement("img");
-      img.src=photo;
-      img.alt=call ? (call+" photo") : "Dog photo";
-      tile.appendChild(img);
-    }else{
-      tile.innerHTML = `<div class="ph"><div class="cam">📷</div><div class="txt">Add photo</div></div>`;
-    }
+  function renderTile(tile){
+  tile.innerHTML = `<div class="ph">
+    <div class="cam">📷</div>
+    <div class="txt">Profile</div>
+  </div>`;
   }
 
   function enhance(){
