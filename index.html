@@ -1,89 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Breeder Pro – Dogs</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0e0f14;
-  color: #eaeaea;
-}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background:#0e0f14;
+    color:#eaeaea;
+  }
 
-header {
-  padding: 12px;
-  background: #12131a;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
+  header{
+    padding:12px;
+    background:#12131a;
+    position:sticky;
+    top:0;
+    z-index:10;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
 
-h1 {
-  margin: 0;
-  font-size: 18px;
-}
+  h1{
+    margin:0;
+    font-size:18px;
+    font-weight:900;
+  }
 
-button {
-  background: #2f6df6;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
-}
+  .section{ padding:12px; }
 
-button.secondary {
-  background: #2a2a2a;
-}
+  .card{
+    background:#161821;
+    border-radius:14px;
+    padding:12px;
+    margin-bottom:12px;
+    border:1px solid rgba(255,255,255,0.08);
+  }
 
-.section {
-  padding: 12px;
-}
+  .row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
 
-.card {
-  background: #161821;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
+  .title{
+    font-size:16px;
+    font-weight:900;
+    margin:0 0 4px 0;
+  }
 
-.card h3 {
-  margin: 0 0 4px 0;
-}
+  .sub{
+    margin:0;
+    font-size:13px;
+    opacity:0.85;
+  }
 
-.card p {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.85;
-}
+  .badge{
+    display:inline-block;
+    font-size:12px;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.18);
+    opacity:0.95;
+    margin-top:6px;
+  }
+  .badge.warn{ border-color: rgba(255,59,48,0.55); }
+  .badge.ok{ border-color: rgba(74,144,226,0.55); }
 
-.photo-placeholder {
-  width: 64px;
-  height: 64px;
-  border-radius: 10px;
-  background: #2a2a2a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  margin-top: 8px;
-  cursor: pointer;
-}
+  button{
+    background:#2f6df6;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:14px;
+    font-weight:800;
+  }
+  button.secondary{ background:#2a2a2a; }
+  button.ghost{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.18);
+  }
+  button:active{ transform: translateY(1px); }
 
-.photo-placeholder img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
+  /* Photo tile in list + profile */
+  .photo-tile{
+    width:66px;
+    height:54px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.06);
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px;
+    text-align:center;
+    line-height:1.05;
+    color:rgba(242,242,242,0.9);
+    cursor:pointer;
+    flex:0 0 auto;
+  }
+  .photo-tile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:10px;
+    display:block;
+  }
+  .photo-tile .cam{ font-size:16px; display:block; }
+  .photo-tile .txt{ font-size:11px; opacity:.9; margin-top:2px; display:block; }
+
+  /* Profile sections */
+  .section-title{
+    font-weight:900;
+    margin:0 0 8px 0;
+  }
+  .field{
+    margin-top:10px;
+  }
+  .label{
+    font-size:12px;
+    opacity:.8;
+    margin-bottom:6px;
+  }
+  input, select{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.06);
+    color:#f2f2f2;
+    font-size:16px;
+    outline:none;
+  }
+
+  .divider{
+    height:1px;
+    background:rgba(255,255,255,0.10);
+    margin:14px 0;
+    border-radius:999px;
+  }
+
+  /* Simple toggle button row */
+  .btnrow{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+
+  /* Microchip list */
+  .chipline{
+    font-size:13px;
+    opacity:.92;
+    margin-top:6px;
+  }
+  code{
+    background:rgba(0,0,0,0.35);
+    padding:2px 6px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.12);
+  }
+
+  /* Toast */
+  #rcToastLite{
+    position:fixed;
+    left:12px; right:12px;
+    bottom:18px;
+    z-index:999999;
+    display:none;
+    background:rgba(0,0,0,0.78);
+    color:#f2f2f2;
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:14px;
+    padding:10px 12px;
+    font-size:14px;
+  }
 </style>
 </head>
 
 <body>
-
 <header>
   <h1>Breeder Pro – Dogs</h1>
 </header>
@@ -91,51 +191,86 @@ button.secondary {
 <div id="viewList" class="section"></div>
 <div id="viewProfile" class="section" style="display:none;"></div>
 
+<div id="rcToastLite"></div>
+
 <script>
 /* =========================
-   DATA + STORAGE
+   STORAGE + STATE
 ========================= */
-
-const STORAGE_KEY = "breederPro_dogs_v_clean";
+const STORAGE_KEY = "breederPro_dogs_v_clean_v2";
 
 let dogs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
-  { id: crypto.randomUUID(), callName: "Aina", sex: "Female", status: "Adult", photo: null },
-  { id: crypto.randomUUID(), callName: "Buddha", sex: "Male", status: "Adult", photo: null },
-  { id: crypto.randomUUID(), callName: "Hank", sex: "Male", status: "Adult", photo: null },
-  { id: crypto.randomUUID(), callName: "Kaia", sex: "Unknown", status: "Archived", photo: null },
-  { id: crypto.randomUUID(), callName: "Kama", sex: "Female", status: "Puppy", photo: null }
+  { id: crypto.randomUUID(), callName: "Aina", sex: "Female", status: "Adult", photo: null, microchips: [], rabiesOnFile: false },
+  { id: crypto.randomUUID(), callName: "Buddha", sex: "Male", status: "Adult", photo: null, microchips: [], rabiesOnFile: false },
+  { id: crypto.randomUUID(), callName: "Hank", sex: "Male", status: "Adult", photo: null, microchips: [], rabiesOnFile: false },
+  { id: crypto.randomUUID(), callName: "Kaia", sex: "Unknown", status: "Archived", photo: null, microchips: [], rabiesOnFile: false },
+  { id: crypto.randomUUID(), callName: "Kama", sex: "Female", status: "Puppy", photo: null, microchips: [], rabiesOnFile: false }
 ];
 
 let activeDogId = null;
 
-function saveDogs() {
+function saveDogs(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dogs));
+}
+
+function toast(msg){
+  const el = document.getElementById("rcToastLite");
+  if(!el) return;
+  el.textContent = String(msg||"");
+  el.style.display = "block";
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.display="none"; }, 1400);
+}
+
+function isArchivedStatus(status){
+  const s = (status||"").toLowerCase();
+  return s.includes("archived") || s.includes("deceased");
 }
 
 /* =========================
    LIST VIEW
 ========================= */
-
-function renderList() {
+function renderList(){
   const el = document.getElementById("viewList");
   const profile = document.getElementById("viewProfile");
   profile.style.display = "none";
   el.style.display = "block";
-
   el.innerHTML = "";
 
-  dogs.forEach(dog => {
+  dogs.forEach(dog=>{
     const card = document.createElement("div");
     card.className = "card";
-    card.onclick = () => openProfile(dog.id);
+    card.onclick = ()=> openProfile(dog.id);
+
+    const statusBadge = isArchivedStatus(dog.status)
+      ? `<span class="badge warn">${dog.status}</span>`
+      : "";
+
+    // Option A: show thumbnail only if photo exists; otherwise show 📷 Add photo
+    const tileInner = dog.photo
+      ? `<img src="${dog.photo}" alt="${dog.callName} photo">`
+      : `<span class="cam">📷</span><span class="txt">Add photo</span>`;
 
     card.innerHTML = `
-      <h3>${dog.callName}</h3>
-      <p>${dog.sex} • ${dog.status}</p>
-      <div class="photo-placeholder">
-        ${dog.photo ? `<img src="${dog.photo}">` : "Profile"}
+      <div class="row">
+        <div style="flex:1; min-width:0;">
+          <div class="title">${dog.callName}</div>
+          <div class="sub">${dog.sex} • ${dog.status}</div>
+          ${statusBadge}
+        </div>
+
+        <div class="photo-tile" data-dogid="${dog.id}">
+          ${tileInner}
+        </div>
       </div>
     `;
+
+    // Make the tile open the profile too (same behavior)
+    const tile = card.querySelector(".photo-tile");
+    tile.addEventListener("click",(e)=>{
+      e.preventDefault(); e.stopPropagation();
+      openProfile(dog.id);
+    });
 
     el.appendChild(card);
   });
@@ -144,51 +279,114 @@ function renderList() {
 /* =========================
    PROFILE VIEW
 ========================= */
-
-function openProfile(id) {
+function openProfile(id){
   activeDogId = id;
-  const dog = dogs.find(d => d.id === id);
-  if (!dog) return;
+  const dog = dogs.find(d=>d.id===id);
+  if(!dog) return;
 
   const list = document.getElementById("viewList");
   const profile = document.getElementById("viewProfile");
   list.style.display = "none";
   profile.style.display = "block";
 
+  const archived = isArchivedStatus(dog.status);
+
+  const statusBadge = archived
+    ? `<span class="badge warn">${dog.status}</span>`
+    : `<span class="badge ok">${dog.status}</span>`;
+
+  // Photo placeholder label = Call Name (rule)
+  const photoTileInner = dog.photo
+    ? `<img src="${dog.photo}" alt="${dog.callName} photo">`
+    : `<span class="cam">📷</span><span class="txt">${dog.callName} · Add photo</span>`;
+
+  // Microchip display
+  const chips = Array.isArray(dog.microchips) ? dog.microchips : [];
+  const chipLines = chips.length
+    ? chips.slice().reverse().map(c => `<div class="chipline">${c.date} · <code>${c.value}</code></div>`).join("")
+    : `<div class="sub">None on file.</div>`;
+
+  // Microchip actions: immutable add (append-only); archived = locked
+  const chipActionBtn = archived
+    ? `<button class="ghost" disabled>Microchip locked (archived)</button>`
+    : `<button class="ghost" onclick="openMicrochipDialog()">Add microchip</button>`;
+
+  // Rabies simple toggle
+  const rabiesLabel = dog.rabiesOnFile ? "On file" : "None";
+  const rabiesBadge = dog.rabiesOnFile ? "ok" : "warn";
+  const rabiesToggleBtn = archived
+    ? `<button class="ghost" disabled>Rabies locked (archived)</button>`
+    : `<button class="ghost" onclick="toggleRabies()">Toggle Rabies</button>`;
+
   profile.innerHTML = `
     <button class="secondary" onclick="renderList()">← Back</button>
 
     <div class="card">
-      <h3>${dog.callName}</h3>
-      <p>${dog.sex} • ${dog.status}</p>
-
-      <div class="photo-placeholder" onclick="pickPhoto()">
-        ${dog.photo ? `<img src="${dog.photo}">` : "Tap to add photo"}
+      <div class="row">
+        <div style="flex:1; min-width:0;">
+          <div class="title">${dog.callName}</div>
+          <div class="sub">${dog.sex} • ${dog.status}</div>
+          ${statusBadge}
+        </div>
       </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Photo</div>
+      <div class="photo-tile" onclick="pickPhoto()" style="width:100%; height:180px; border-radius:16px;">
+        ${photoTileInner}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Microchip</div>
+      ${chipLines}
+      <div class="btnrow">
+        ${chipActionBtn}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Rabies</div>
+      <div class="sub">Rabies: <span class="badge ${rabiesBadge}">${rabiesLabel}</span></div>
+      <div class="btnrow">
+        ${rabiesToggleBtn}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="sub">Health record (expiration, vet notes, etc.) will live in the health record section later.</div>
     </div>
+
+    ${renderMicrochipDialog()}
   `;
 }
 
 /* =========================
    PHOTO HANDLING (PER DOG)
 ========================= */
+function pickPhoto(){
+  const dog = dogs.find(d=>d.id===activeDogId);
+  if(!dog) return;
 
-function pickPhoto() {
-  const dog = dogs.find(d => d.id === activeDogId);
-  if (!dog) return;
+  if(isArchivedStatus(dog.status)){
+    toast("Photo locked (archived)");
+    return;
+  }
 
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
 
-  input.onchange = () => {
+  input.onchange = ()=>{
     const file = input.files[0];
-    if (!file) return;
+    if(!file) return;
 
     const reader = new FileReader();
-    reader.onload = () => {
-      dog.photo = reader.result;
+    reader.onload = ()=>{
+      dog.photo = reader.result;   // ✅ per-dog, no bleed
       saveDogs();
+      toast("Photo saved for " + dog.callName);
       openProfile(dog.id);
     };
     reader.readAsDataURL(file);
@@ -198,11 +396,115 @@ function pickPhoto() {
 }
 
 /* =========================
+   RABIES (simple toggle)
+========================= */
+function toggleRabies(){
+  const dog = dogs.find(d=>d.id===activeDogId);
+  if(!dog) return;
+  if(isArchivedStatus(dog.status)){
+    toast("Rabies locked (archived)");
+    return;
+  }
+  dog.rabiesOnFile = !dog.rabiesOnFile;
+  saveDogs();
+  toast("Rabies updated");
+  openProfile(dog.id);
+}
+
+/* =========================
+   MICROCHIP (immutable, double-confirm)
+========================= */
+function renderMicrochipDialog(){
+  return `
+    <dialog id="dlgMicrochip" style="border:none; border-radius:16px; padding:14px; background:#161821; color:#f2f2f2; width:min(520px, 96vw);">
+      <div style="font-weight:900; font-size:16px; margin-bottom:6px;">Add microchip (manual)</div>
+      <div class="sub" style="margin-bottom:10px;">Enter the number twice to confirm. Microchips are immutable.</div>
+
+      <div class="field">
+        <div class="label">Microchip number</div>
+        <input id="mc1" inputmode="numeric" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <div class="label">Confirm microchip number</div>
+        <input id="mc2" inputmode="numeric" autocomplete="off" />
+      </div>
+
+      <div id="mcMatch" class="sub" style="margin-top:10px;"></div>
+
+      <div class="btnrow" style="justify-content:flex-end;">
+        <button class="secondary" onclick="closeMicrochipDialog()">Cancel</button>
+        <button id="mcSaveBtn" onclick="saveMicrochip()" disabled>Save</button>
+      </div>
+    </dialog>
+  `;
+}
+
+function openMicrochipDialog(){
+  const dog = dogs.find(d=>d.id===activeDogId);
+  if(!dog) return;
+  if(isArchivedStatus(dog.status)){
+    toast("Microchip locked (archived)");
+    return;
+  }
+  const dlg = document.getElementById("dlgMicrochip");
+  const mc1 = document.getElementById("mc1");
+  const mc2 = document.getElementById("mc2");
+  const match = document.getElementById("mcMatch");
+  const saveBtn = document.getElementById("mcSaveBtn");
+
+  mc1.value = "";
+  mc2.value = "";
+  match.textContent = "";
+  saveBtn.disabled = true;
+
+  function check(){
+    const a = (mc1.value||"").trim();
+    const b = (mc2.value||"").trim();
+    const ok = a.length>0 && a===b;
+    saveBtn.disabled = !ok;
+    match.textContent = ok ? "✓ Numbers match" : (b.length>0 ? "✕ Numbers do not match" : "");
+  }
+  mc1.oninput = check;
+  mc2.oninput = check;
+
+  dlg.showModal();
+}
+
+function closeMicrochipDialog(){
+  const dlg = document.getElementById("dlgMicrochip");
+  if(dlg) dlg.close();
+}
+
+function saveMicrochip(){
+  const dog = dogs.find(d=>d.id===activeDogId);
+  if(!dog) return;
+
+  const a = (document.getElementById("mc1").value||"").trim();
+  const b = (document.getElementById("mc2").value||"").trim();
+  if(!a || a!==b){
+    toast("Microchip mismatch");
+    return;
+  }
+
+  if(!Array.isArray(dog.microchips)) dog.microchips = [];
+
+  // Immutable append-only record
+  const now = new Date();
+  const date = now.toLocaleDateString("en-US"); // MM/DD/YYYY
+  dog.microchips.push({ value: a, date: date });
+
+  saveDogs();
+  toast("Microchip saved for " + dog.callName);
+  closeMicrochipDialog();
+  openProfile(dog.id);
+}
+
+/* =========================
    INIT
 ========================= */
-
+saveDogs();
 renderList();
 </script>
-
 </body>
 </html>
