@@ -1,21 +1,42 @@
-// dog_photo_per_callname.js — v1
-// CONFIRMED RULE A: one current photo per dog (keyed by Call Name), overwrite allowed.
-// Adds photo thumbnails to dog list and prevents "all dogs same photo" by never using global photo state.
-//
-// How it works:
-// - Stores photos in localStorage key: rc_dog_photos_v1  (object map { "<callname>": "<dataUrl>" })
-// - In dog list, for each dog card, shows photo if available, otherwise 📷 Add photo.
-// - If photo missing: tapping thumbnail opens file picker to set photo for THAT dog.
-// - If photo exists: tapping thumbnail opens the dog profile (triggers existing Open button click).
-// - Hides the Open button once thumbnail is installed.
-// - One-time cleanup: removes common legacy global photo keys (safe).
+// dog_photo_per_callname.js — v2
+// One current photo per dog keyed by Call Name, no bleed.
+// Built-in toast fallback, and list reflects photo stored on dog record when available.
 
 (function(){
   const MAP_KEY="rc_dog_photos_v1";
+  const DOG_KEYS=["breederPro_dogs_store_v3","breeder_dogs_v1","breederPro_dogs_store_v1"];
   const LEGACY_KEYS=["dogPhoto","bp_dog_photo","rc_dog_photo","dog_photo","dogPhotoDataUrl"];
+  const FLAG_CLEAN="rc_photo_cleanup_v1";
 
   function norm(s){ return (s||"").toString().trim().toLowerCase(); }
-  function toast(msg){ try{ if(typeof window.rcToast==="function") window.rcToast(msg); }catch(e){} }
+
+  function toast(msg){
+    try{ if(typeof window.rcToast==="function"){ window.rcToast(msg); return; } }catch(e){}
+    try{
+      let el=document.getElementById("rcToastLite");
+      if(!el){
+        el=document.createElement("div");
+        el.id="rcToastLite";
+        el.style.position="fixed";
+        el.style.left="12px";
+        el.style.right="12px";
+        el.style.bottom="18px";
+        el.style.zIndex="999999";
+        el.style.display="none";
+        el.style.background="rgba(0,0,0,0.78)";
+        el.style.color="#f2f2f2";
+        el.style.border="1px solid rgba(255,255,255,0.18)";
+        el.style.borderRadius="14px";
+        el.style.padding="10px 12px";
+        el.style.fontSize="14px";
+        document.body.appendChild(el);
+      }
+      el.textContent=String(msg||"");
+      el.style.display="block";
+      clearTimeout(el._t);
+      el._t=setTimeout(function(){ el.style.display="none"; }, 1400);
+    }catch(e){}
+  }
 
   function loadMap(){
     try{ return JSON.parse(localStorage.getItem(MAP_KEY)||"{}") || {}; }catch(e){ return {}; }
@@ -25,18 +46,52 @@
   }
 
   function cleanupLegacyOnce(){
-    const flag="rc_photo_cleanup_v1";
     try{
-      if(localStorage.getItem(flag)==="1") return;
-      LEGACY_KEYS.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
-      localStorage.setItem(flag,"1");
+      if(localStorage.getItem(FLAG_CLEAN)==="1") return;
+      LEGACY_KEYS.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+      localStorage.setItem(FLAG_CLEAN,"1");
     }catch(e){}
   }
 
+  function loadDogs(){
+    for(const k of DOG_KEYS){
+      try{
+        const raw=localStorage.getItem(k);
+        if(!raw) continue;
+        const obj=JSON.parse(raw);
+        if(Array.isArray(obj)) return obj;
+        if(obj && Array.isArray(obj.dogs)) return obj.dogs;
+      }catch(e){}
+    }
+    return [];
+  }
+
+  function photoFromStore(callKey){
+    if(!callKey) return "";
+    const dogs=loadDogs();
+    const d=dogs.find(function(x){ return norm(x.callName||x.name)===callKey; });
+    if(!d) return "";
+    return d.photoDataUrl || d.photo || d.photoUrl || d.photoURI || "";
+  }
+
+  function setPhoto(callKey, dataUrl, prettyName){
+    if(!callKey || !dataUrl) return;
+    const m=loadMap();
+    m[callKey]=dataUrl;
+    saveMap(m);
+    toast("Photo saved for " + (prettyName||callKey));
+  }
+
+  function getPhoto(callKey){
+    const m=loadMap();
+    if(callKey && m[callKey]) return m[callKey];
+    return photoFromStore(callKey) || "";
+  }
+
   function injectCSS(){
-    if(document.getElementById("rcDogPhotoCallCss")) return;
+    if(document.getElementById("rcDogPhotoCallCssV2")) return;
     const st=document.createElement("style");
-    st.id="rcDogPhotoCallCss";
+    st.id="rcDogPhotoCallCssV2";
     st.textContent=`
       .rc-openwrap{display:flex;align-items:center;gap:10px;}
       .rc-thumb{
@@ -67,9 +122,26 @@
       img.alt="Dog photo";
       el.appendChild(img);
     }else{
-      el.innerHTML=`<span class="cam">📷</span><span class="txt">Add photo</span>`;
+      el.innerHTML='<span class="cam">📷</span><span class="txt">Add photo</span>';
     }
     return el;
+  }
+
+  function pickPhotoFor(callName, onDone){
+    const input=document.createElement("input");
+    input.type="file";
+    input.accept="image/*";
+    input.className="rc-file";
+    input.addEventListener("change", function(){
+      const file=input.files && input.files[0];
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=function(){ onDone(String(reader.result||"")); };
+      reader.readAsDataURL(file);
+    });
+    document.body.appendChild(input);
+    input.click();
+    setTimeout(function(){ try{ document.body.removeChild(input); }catch(e){} }, 30000);
   }
 
   function findCard(btn){
@@ -79,109 +151,83 @@
     if(!card) return "";
     const nameEl = card.querySelector(".h") || card.querySelector("strong");
     if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    const lines=(card.innerText||card.textContent||"").split("\n").map(s=>s.trim()).filter(Boolean);
+    const lines=(card.innerText||card.textContent||"").split("\n").map(function(s){return s.trim();}).filter(Boolean);
     return lines.length?lines[0]:"";
   }
 
-  function ensureWrap(btn){
-    const existing = btn.parentElement && btn.parentElement.classList && btn.parentElement.classList.contains("rc-openwrap")
-      ? btn.parentElement : null;
-    if(existing){
-      let thumb=existing.querySelector(".rc-thumb");
-      if(!thumb){
-        thumb=document.createElement("div");
-        thumb.className="rc-thumb";
-        existing.insertBefore(thumb, existing.firstChild);
+  function seedFromProfile(){
+    try{
+      const ids=["dogCallName","callName","bp_dog_callName","profileCallName"];
+      let call="";
+      for(const id of ids){
+        const el=document.getElementById(id);
+        if(el && (el.value||"").trim()){ call=el.value.trim(); break; }
       }
-      return {wrap:existing, thumb};
-    }
-    const wrap=document.createElement("span");
-    wrap.className="rc-openwrap";
-    const parent=btn.parentNode;
-    if(!parent) return null;
-    parent.insertBefore(wrap, btn);
-    wrap.appendChild(btn);
-    return {wrap, thumb:null};
-  }
-
-  function pickPhotoFor(callName, onDone){
-    const input=document.createElement("input");
-    input.type="file";
-    input.accept="image/*";
-    input.className="rc-file";
-    input.addEventListener("change", ()=>{
-      const file=input.files && input.files[0];
-      if(!file) return;
-      const reader=new FileReader();
-      reader.onload=()=>{
-        onDone(String(reader.result||""));
-      };
-      reader.readAsDataURL(file);
-    });
-    document.body.appendChild(input);
-    input.click();
-    // cleanup node later
-    setTimeout(()=>{ try{ document.body.removeChild(input); }catch(e){} }, 30000);
+      const callKey=norm(call);
+      if(!callKey) return;
+      const imgs=Array.from(document.querySelectorAll("img"));
+      for(const img of imgs){
+        const src=img.src||"";
+        if(src.startsWith("data:image")){
+          const m=loadMap();
+          if(!m[callKey]){
+            m[callKey]=src;
+            saveMap(m);
+            toast("Photo synced to list for " + call);
+          }
+          break;
+        }
+      }
+    }catch(e){}
   }
 
   function enhance(){
     cleanupLegacyOnce();
     injectCSS();
-    const map=loadMap();
+    seedFromProfile();
 
     const buttons = Array.from(document.querySelectorAll("button"))
-      .filter(b => (b.textContent||"").trim().toLowerCase() === "open");
+      .filter(function(b){ return (b.textContent||"").trim().toLowerCase() === "open"; });
 
-    buttons.forEach(btn=>{
+    buttons.forEach(function(btn){
       const card=findCard(btn);
       if(!card) return;
       const callName=extractCallNameFromCard(card);
-      const key=norm(callName);
-      if(!key) return;
+      const callKey=norm(callName);
+      if(!callKey) return;
 
-      const wrapObj=ensureWrap(btn);
-      if(!wrapObj) return;
-
-      // ensure thumb exists
-      let thumb = wrapObj.wrap.querySelector(".rc-thumb");
-      if(!thumb){
-        thumb=mkThumb(map[key]||"");
-        wrapObj.wrap.insertBefore(thumb, btn);
-      }else{
-        // update thumb state in place
-        const photo=map[key]||"";
-        thumb.replaceWith(mkThumb(photo));
-        thumb = wrapObj.wrap.querySelector(".rc-thumb");
+      let wrap = btn.parentElement && btn.parentElement.classList && btn.parentElement.classList.contains("rc-openwrap") ? btn.parentElement : null;
+      if(!wrap){
+        wrap=document.createElement("span");
+        wrap.className="rc-openwrap";
+        btn.parentNode.insertBefore(wrap, btn);
+        wrap.appendChild(btn);
       }
 
-      // bind click once
-      if(!thumb._rcBound){
-        thumb.addEventListener("click",(e)=>{
-          e.preventDefault(); e.stopPropagation();
-          const m=loadMap();
-          const photo=m[key]||"";
-          if(photo){
-            btn.click(); // open profile
-          }else{
-            pickPhotoFor(callName, (dataUrl)=>{
-              const mm=loadMap();
-              mm[key]=dataUrl; // overwrite allowed
-              saveMap(mm);
-              toast("Photo saved for " + callName);
-              // refresh this thumb immediately
-              thumb.replaceWith(mkThumb(dataUrl));
-            });
-          }
-        });
-        thumb._rcBound=true;
-      }
+      const photo = getPhoto(callKey);
+      const newThumb = mkThumb(photo);
 
-      // hide Open button
+      const oldThumb = wrap.querySelector(".rc-thumb");
+      if(oldThumb) oldThumb.replaceWith(newThumb);
+      else wrap.insertBefore(newThumb, btn);
+
+      newThumb.addEventListener("click", function(e){
+        e.preventDefault(); e.stopPropagation();
+        const curPhoto=getPhoto(callKey);
+        if(curPhoto){
+          btn.click();
+        }else{
+          pickPhotoFor(callName, function(dataUrl){
+            setPhoto(callKey, dataUrl, callName);
+          });
+        }
+      });
+
       btn.style.display="none";
     });
   }
 
-  document.addEventListener("DOMContentLoaded", ()=>{
+  document.addEventListener("DOMContentLoaded", function(){
     enhance();
     setInterval(enhance, 1200);
   });
