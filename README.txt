@@ -1,17 +1,12 @@
-BP_CLEAR_DOG_LIST_PHOTOS
+# BP Photo Debug Pack
 
-What:
-- Clears photo-mapping keys used by dog list thumbnail experiments.
-- Does NOT delete dog records or inventory.
+This zip contains:
+- rc_photo_diag.js  → Diagnoses where dog photos are coming from
+- disable_list_photos.js → Temporarily disables photos in dog list (safety)
 
-Install:
-1) Upload rc_clear_dog_list_photos.js to repo root.
-2) Temporarily add this line to index.html before </body>:
-   <script src="rc_clear_dog_list_photos.js"></script>
-3) Load the app once. You will see an alert; it will reload.
-4) Remove the script tag from index.html afterwards (important).
+How to use:
+1. Upload rc_photo_diag.js to repo root and open it in browser to see alert.
+2. If dogs all share same photo, it's a data issue.
+3. Optionally include disable_list_photos.js AFTER app.js to stop list photo bleed.
 
-Alternative run:
-- Open directly:
-  https://clantonrock-byte.github.io/Dog-breeding-app/rc_clear_dog_list_photos.js
-  (May be blocked by browser; script tag method is most reliable.)
+This pack does NOT delete data.
