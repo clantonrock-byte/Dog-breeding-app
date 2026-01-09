@@ -6,191 +6,53 @@
 <title>Breeder Pro – Dogs</title>
 
 <style>
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background:#0e0f14;
-    color:#eaeaea;
-  }
-
-  header{
-    padding:12px;
-    background:#12131a;
-    position:sticky;
-    top:0;
-    z-index:10;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-  }
-
-  h1{
-    margin:0;
-    font-size:18px;
-    font-weight:900;
-  }
-
-  .section{ padding:12px; }
-
-  .card{
-    background:#161821;
-    border-radius:14px;
-    padding:12px;
-    margin-bottom:12px;
-    border:1px solid rgba(255,255,255,0.08);
-  }
-
-  .row{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:12px;
-  }
-
-  .title{
-    font-size:16px;
-    font-weight:900;
-    margin:0 0 4px 0;
-  }
-
-  .sub{
-    margin:0;
-    font-size:13px;
-    opacity:0.85;
-  }
-
-  .badge{
-    display:inline-block;
-    font-size:12px;
-    padding:2px 8px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,0.18);
-    opacity:0.95;
-    margin-top:6px;
-  }
-  .badge.warn{ border-color: rgba(255,59,48,0.55); }
-  .badge.ok{ border-color: rgba(74,144,226,0.55); }
-
-  button{
-    background:#2f6df6;
-    color:white;
-    border:none;
-    border-radius:10px;
-    padding:10px 14px;
-    font-size:14px;
-    font-weight:800;
-  }
-  button.secondary{ background:#2a2a2a; }
-  button.ghost{
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.18);
-  }
-  button:active{ transform: translateY(1px); }
-
-  /* Photo tile in list + profile */
+  body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:#0e0f14;color:#eaeaea;}
+  header{padding:12px;background:#12131a;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,0.08);}
+  h1{margin:0;font-size:18px;font-weight:900;}
+  .section{padding:12px;}
+  .card{background:#161821;border-radius:14px;padding:12px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);}
+  .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .title{font-size:16px;font-weight:900;margin:0 0 4px 0;}
+  .sub{margin:0;font-size:13px;opacity:0.85;}
+  .badge{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);opacity:0.95;margin-top:6px;}
+  .badge.warn{border-color: rgba(255,59,48,0.55);}
+  .badge.ok{border-color: rgba(74,144,226,0.55);}
+  button{background:#2f6df6;color:white;border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:800;}
+  button.secondary{background:#2a2a2a;}
+  button.ghost{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);}
+  button:active{transform:translateY(1px);}
   .photo-tile{
-    width:66px;
-    height:54px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.18);
-    background:rgba(255,255,255,0.06);
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:6px;
-    text-align:center;
-    line-height:1.05;
-    color:rgba(242,242,242,0.9);
-    cursor:pointer;
-    flex:0 0 auto;
+    width:66px;height:54px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.06);overflow:hidden;display:flex;align-items:center;justify-content:center;
+    padding:6px;text-align:center;line-height:1.05;color:rgba(242,242,242,0.9);cursor:pointer;flex:0 0 auto;
   }
-  .photo-tile img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    border-radius:10px;
-    display:block;
-  }
-  .photo-tile .cam{ font-size:16px; display:block; }
-  .photo-tile .txt{ font-size:11px; opacity:.9; margin-top:2px; display:block; }
-
-  /* Profile sections */
-  .section-title{
-    font-weight:900;
-    margin:0 0 8px 0;
-  }
-  .field{
-    margin-top:10px;
-  }
-  .label{
-    font-size:12px;
-    opacity:.8;
-    margin-bottom:6px;
-  }
+  .photo-tile img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block;}
+  .photo-tile .cam{font-size:16px;display:block;}
+  .photo-tile .txt{font-size:11px;opacity:.9;margin-top:2px;display:block;}
+  .section-title{font-weight:900;margin:0 0 8px 0;}
+  .field{margin-top:10px;}
+  .label{font-size:12px;opacity:.8;margin-bottom:6px;}
   input, select{
-    width:100%;
-    box-sizing:border-box;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.18);
-    background:rgba(255,255,255,0.06);
-    color:#f2f2f2;
-    font-size:16px;
-    outline:none;
+    width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.06);color:#f2f2f2;font-size:16px;outline:none;
   }
-
-  .divider{
-    height:1px;
-    background:rgba(255,255,255,0.10);
-    margin:14px 0;
-    border-radius:999px;
-  }
-
-  /* Simple toggle button row */
-  .btnrow{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:10px;
-  }
-
-  /* Microchip list */
-  .chipline{
-    font-size:13px;
-    opacity:.92;
-    margin-top:6px;
-  }
-  code{
-    background:rgba(0,0,0,0.35);
-    padding:2px 6px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,0.12);
-  }
-
-  /* Toast */
+  .divider{height:1px;background:rgba(255,255,255,0.10);margin:14px 0;border-radius:999px;}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .chipline{font-size:13px;opacity:.92;margin-top:6px;}
+  code{background:rgba(0,0,0,0.35);padding:2px 6px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);}
   #rcToastLite{
-    position:fixed;
-    left:12px; right:12px;
-    bottom:18px;
-    z-index:999999;
-    display:none;
-    background:rgba(0,0,0,0.78);
-    color:#f2f2f2;
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:14px;
-    padding:10px 12px;
-    font-size:14px;
+    position:fixed;left:12px;right:12px;bottom:18px;z-index:999999;
+    display:none;background:rgba(0,0,0,0.78);color:#f2f2f2;border:1px solid rgba(255,255,255,0.18);
+    border-radius:14px;padding:10px 12px;font-size:14px;
   }
 </style>
 </head>
 
 <body>
-<header>
-  <h1>Breeder Pro – Dogs</h1>
-</header>
+<header><h1>Breeder Pro – Dogs</h1></header>
 
 <div id="viewList" class="section"></div>
 <div id="viewProfile" class="section" style="display:none;"></div>
-
 <div id="rcToastLite"></div>
 
 <script>
@@ -209,17 +71,19 @@ let dogs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
 
 let activeDogId = null;
 
-function saveDogs(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dogs));
-}
+function saveDogs(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(dogs)); }
 
 function toast(msg){
   const el = document.getElementById("rcToastLite");
   if(!el) return;
   el.textContent = String(msg||"");
   el.style.display = "block";
+  el.style.opacity = "1";
   clearTimeout(el._t);
-  el._t = setTimeout(()=>{ el.style.display="none"; }, 1400);
+  el._t = setTimeout(()=>{
+    el.style.opacity = "0";
+    el.style.display = "none";
+  }, 1600);
 }
 
 function isArchivedStatus(status){
@@ -246,7 +110,6 @@ function renderList(){
       ? `<span class="badge warn">${dog.status}</span>`
       : "";
 
-    // Option A: show thumbnail only if photo exists; otherwise show 📷 Add photo
     const tileInner = dog.photo
       ? `<img src="${dog.photo}" alt="${dog.callName} photo">`
       : `<span class="cam">📷</span><span class="txt">Add photo</span>`;
@@ -258,14 +121,12 @@ function renderList(){
           <div class="sub">${dog.sex} • ${dog.status}</div>
           ${statusBadge}
         </div>
-
         <div class="photo-tile" data-dogid="${dog.id}">
           ${tileInner}
         </div>
       </div>
     `;
 
-    // Make the tile open the profile too (same behavior)
     const tile = card.querySelector(".photo-tile");
     tile.addEventListener("click",(e)=>{
       e.preventDefault(); e.stopPropagation();
@@ -295,23 +156,19 @@ function openProfile(id){
     ? `<span class="badge warn">${dog.status}</span>`
     : `<span class="badge ok">${dog.status}</span>`;
 
-  // Photo placeholder label = Call Name (rule)
   const photoTileInner = dog.photo
     ? `<img src="${dog.photo}" alt="${dog.callName} photo">`
     : `<span class="cam">📷</span><span class="txt">${dog.callName} · Add photo</span>`;
 
-  // Microchip display
   const chips = Array.isArray(dog.microchips) ? dog.microchips : [];
   const chipLines = chips.length
     ? chips.slice().reverse().map(c => `<div class="chipline">${c.date} · <code>${c.value}</code></div>`).join("")
     : `<div class="sub">None on file.</div>`;
 
-  // Microchip actions: immutable add (append-only); archived = locked
   const chipActionBtn = archived
     ? `<button class="ghost" disabled>Microchip locked (archived)</button>`
     : `<button class="ghost" onclick="openMicrochipDialog()">Add microchip</button>`;
 
-  // Rabies simple toggle
   const rabiesLabel = dog.rabiesOnFile ? "On file" : "None";
   const rabiesBadge = dog.rabiesOnFile ? "ok" : "warn";
   const rabiesToggleBtn = archived
@@ -341,17 +198,13 @@ function openProfile(id){
 
       <div class="section-title">Microchip</div>
       ${chipLines}
-      <div class="btnrow">
-        ${chipActionBtn}
-      </div>
+      <div class="btnrow">${chipActionBtn}</div>
 
       <div class="divider"></div>
 
       <div class="section-title">Rabies</div>
       <div class="sub">Rabies: <span class="badge ${rabiesBadge}">${rabiesLabel}</span></div>
-      <div class="btnrow">
-        ${rabiesToggleBtn}
-      </div>
+      <div class="btnrow">${rabiesToggleBtn}</div>
 
       <div class="divider"></div>
 
@@ -363,7 +216,7 @@ function openProfile(id){
 }
 
 /* =========================
-   PHOTO HANDLING (PER DOG)
+   PHOTO HANDLING (PER DOG) — FIXED
 ========================= */
 function pickPhoto(){
   const dog = dogs.find(d=>d.id===activeDogId);
@@ -384,10 +237,15 @@ function pickPhoto(){
 
     const reader = new FileReader();
     reader.onload = ()=>{
-      dog.photo = reader.result;   // ✅ per-dog, no bleed
+      dog.photo = reader.result;   // per-dog, no bleed
       saveDogs();
-      toast("Photo saved for " + dog.callName);
+
+      // Force immediate refresh of profile + list
       openProfile(dog.id);
+      renderList();
+
+      // Toast AFTER render so it's visible
+      setTimeout(()=>toast("Photo saved for " + dog.callName), 50);
     };
     reader.readAsDataURL(file);
   };
@@ -488,8 +346,6 @@ function saveMicrochip(){
   }
 
   if(!Array.isArray(dog.microchips)) dog.microchips = [];
-
-  // Immutable append-only record
   const now = new Date();
   const date = now.toLocaleDateString("en-US"); // MM/DD/YYYY
   dog.microchips.push({ value: a, date: date });
