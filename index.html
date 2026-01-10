@@ -161,7 +161,7 @@ function goHome(){
         <button onclick="goDogs()">Dogs</button>
         <button onclick="goInventory()">Inventory (Edible)</button>
         <button onclick="goStock()">Stock (Inedible)</button>
-        <button onclick="goScanner()">Scanner</button>
+        <button onclick="goScanner('inventory')">Scanner</button>
       </div>
     </div>
   `;
@@ -170,7 +170,7 @@ function goHome(){
 function goDogs(){
   showOnly("viewDogs");
   const el=document.getElementById("viewDogs");
-  el.innerHTML=`<button class="secondary" onclick="goHome()">← Back</button>`;
+  el.innerHTML=`<button class="secondary" onclick="(scannerMode===\'stock\'?goStock():goInventory())">← Back</button>`;
   dogs.forEach(d=>{
     const tile=d.photo?`<img src="${d.photo}">`:`<span class="cam">📷</span><span class="txt">Profile</span>`;
     const badge=isArchived(d.status)?`<span class="badge warn">${d.status}</span>`:"";
@@ -243,7 +243,8 @@ function goStock(){
   renderStock(false);
 }
 
-function goScanner(){
+function goScanner(mode){
+  if(mode){ scannerMode = (mode==="stock") ? "stock" : "inventory"; }
   showOnly("viewScanner");
   renderScanner();
 }
@@ -348,6 +349,7 @@ function renderStock(showArchived){
       <div class="sub">Tools, supplies, equipment. No deletes — archive only.</div>
       <div class="btnrow">
         <button onclick="openStockAdd()">Add stock</button>
+        <button class="ghost" onclick="goScanner(\'stock\')">Scanner</button>
         <button class="ghost" onclick="renderStock(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
       </div>
     </div>
@@ -465,6 +467,7 @@ function renderInventory(showArchived){
       <div class="sub">Add items and track quantities. No deletes — archive only.</div>
       <div class="btnrow">
         <button onclick="openInvAdd()">Add item</button>
+        <button class="ghost" onclick="goScanner(\'inventory\')">Scanner</button>
         <button class="ghost" onclick="renderInventory(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
       </div>
     </div>
