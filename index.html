@@ -1584,14 +1584,7 @@
 
 
 
-<script id="rc-doglist-ui-patch">
-/* RC Dog List UX Patch (baseline-v2-clean compatible)
-   - Make dog rows clickable (clicking row triggers existing Open button)
-   - Replace visible Open button with:
-       * thumbnail if dog.photoDataUrl exists
-       * camera "Add photo" placeholder if not
-   - Does NOT touch dog data, scanner, inventory, stock
-*/
+<script id="rcDogListPatchV2">
 (function(){
   const DOG_STORE_KEY = "breederPro_dogs_store_v3";
 
@@ -1615,16 +1608,16 @@
     return dogs.find(d => norm(d.callName||d.name) === key) || null;
   }
 
-  function getPhoto(d){
+  function photoForDog(d){
     if(!d) return "";
-    return d.photoDataUrl || d.photo || d.photoUrl || d.photoURI || "";
+    return d.photoDataUrl || "";
   }
 
   function injectCSS(){
-    if(document.getElementById("rcDogListCss")) return;
+    if(document.getElementById("rcDogListCssV2")) return;
     const st=document.createElement("style");
-    st.id="rcDogListCss";
-    st.textContent = `
+    st.id="rcDogListCssV2";
+    st.textContent=`
       .rc-openwrap{display:flex;align-items:center;gap:10px;}
       .rc-tile{
         width:66px;height:54px;border-radius:12px;
@@ -1646,86 +1639,14 @@
   }
 
   function isInsideControl(el){
-    try{ return !!el.closest("button,a,input,select,textarea,label"); }catch(e){ return false; }
+    try{ return !!el.closest("button,a,input,select,textarea,label,.rc-tile"); }catch(e){ return false; }
   }
 
-  function enhance(){
-    try{
-      injectCSS();
-
-      const dogsView = document.getElementById("viewDogs");
-      if(!dogsView) return;
-
-      // Identify all Open buttons in dog list
-      const openBtns = Array.from(dogsView.querySelectorAll("button"))
-        .filter(b => (b.textContent||"").trim().toLowerCase() === "open");
-
-      openBtns.forEach(btn=>{
-        if(btn._rcDone) {
-          // refresh tile photo if it exists
-          const wrap = btn.parentElement && btn.parentElement.classList.contains("rc-openwrap") ? btn.parentElement : null;
-          const tile = wrap ? wrap.querySelector(".rc-tile") : null;
-          if(tile){
-            const call = getCallNameNear(btn);
-            const d = findDogByCall(call);
-            renderTile(tile, getPhoto(d));
-          }
-          return;
-        }
-
-        const host = btn.closest(".card") || btn.closest("li") || btn.closest(".row") || btn.parentElement;
-        if(!host) return;
-
-        // Make whole host clickable
-        if(!host._rcRowClick){
-          host.classList.add("rc-row-click");
-          host.addEventListener("click", (e)=>{
-            if(isInsideControl(e.target)) return;
-            btn.click();
-          });
-          host._rcRowClick = true;
-        }
-
-        // Wrap button
-        const parent = btn.parentNode;
-        if(!parent) return;
-
-        let wrap = parent.classList && parent.classList.contains("rc-openwrap") ? parent : null;
-        if(!wrap){
-          wrap = document.createElement("span");
-          wrap.className = "rc-openwrap";
-          parent.insertBefore(wrap, btn);
-          wrap.appendChild(btn);
-        }
-
-        // Create tile
-        const tile = document.createElement("div");
-        tile.className = "rc-tile";
-
-        const call = getCallNameNear(btn);
-        const d = findDogByCall(call);
-        const photo = getPhoto(d);
-        renderTile(tile, photo);
-
-        wrap.insertBefore(tile, btn);
-        btn.style.display = "none";
-
-        tile.addEventListener("click", (e)=>{
-          e.preventDefault(); e.stopPropagation();
-          btn.click();
-        });
-
-        btn._rcDone = true;
-      });
-    }catch(e){}
-  }
-
-  function getCallNameNear(btn){
-    const host = btn.closest(".card") || btn.closest("li") || btn.closest(".row") || btn.parentElement;
-    if(!host) return "";
-    const nameEl = host.querySelector(".h") || host.querySelector("strong") || host.querySelector(".title");
+  function getCallNameFromCard(card){
+    if(!card) return "";
+    const nameEl = card.querySelector(".h") || card.querySelector("strong") || card.querySelector(".title");
     if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    const lines = (host.innerText||host.textContent||"").split("
+    const lines=(card.innerText||card.textContent||"").split("
 ").map(s=>s.trim()).filter(Boolean);
     return lines.length ? lines[0] : "";
   }
@@ -1733,12 +1654,69 @@
   function renderTile(tile, photo){
     tile.innerHTML = "";
     if(photo){
-      const img = document.createElement("img");
+      const img=document.createElement("img");
       img.src = photo;
       tile.appendChild(img);
     }else{
       tile.innerHTML = `<div class="ph"><div class="cam">📷</div><div class="txt">Add photo</div></div>`;
     }
+  }
+
+  function enhance(){
+    try{
+      injectCSS();
+      const dogsView = document.getElementById("viewDogs") || document.body;
+
+      const openBtns = Array.from(dogsView.querySelectorAll("button"))
+        .filter(b => (b.textContent||"").trim().toLowerCase() === "open");
+
+      openBtns.forEach(btn=>{
+        const card = btn.closest(".card") || btn.closest("li") || btn.closest("div");
+        if(!card) return;
+
+        if(btn._rcDone){
+          const tile = card.querySelector(".rc-tile");
+          if(tile){
+            const call = getCallNameFromCard(card);
+            const d = findDogByCall(call);
+            renderTile(tile, photoForDog(d));
+          }
+          return;
+        }
+
+        if(!card._rcRowClick){
+          card.classList.add("rc-row-click");
+          card.addEventListener("click",(e)=>{
+            if(isInsideControl(e.target)) return;
+            btn.click();
+          });
+          card._rcRowClick = true;
+        }
+
+        const parent = btn.parentNode;
+        const wrap=document.createElement("span");
+        wrap.className="rc-openwrap";
+        parent.insertBefore(wrap, btn);
+        wrap.appendChild(btn);
+
+        const tile=document.createElement("div");
+        tile.className="rc-tile";
+
+        const call = getCallNameFromCard(card);
+        const d = findDogByCall(call);
+        renderTile(tile, photoForDog(d));
+
+        wrap.insertBefore(tile, btn);
+        btn.style.display="none";
+
+        tile.addEventListener("click",(e)=>{
+          e.preventDefault(); e.stopPropagation();
+          btn.click();
+        });
+
+        btn._rcDone = true;
+      });
+    }catch(e){}
   }
 
   document.addEventListener("DOMContentLoaded", ()=>{
