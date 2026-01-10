@@ -269,22 +269,18 @@ function renderScanner(){
         <input id="scanCode" inputmode="numeric" autocomplete="off" placeholder="Enter or paste barcode"/>
       </div>
       <div class="btnrow">
-  <button class="ghost" onclick="scanStartCamera()">Start camera</button>
-  <button class="ghost" onclick="scanStopCamera()">Stop camera</button>
-</div>
+        <button class="ghost" onclick="scanStartCamera()">Start camera</button>
+        <button class="ghost" onclick="scanStopCamera()">Stop camera</button>
+      </div>
 
-<div class="divider"></div>
+      <div class="divider"></div>
 
-<video id="scanVideo"
-       playsinline
-       style="width:100%; border-radius:14px;
-              border:1px solid rgba(255,255,255,0.12);
-              display:none;">
-</video>
+      <video id="scanVideo" playsinline
+        style="width:100%; border-radius:14px; border:1px solid rgba(255,255,255,0.12); display:none;">
+      </video>
 
-<div class="sub muted" id="scanCamStatus" style="margin-top:8px;">
-  Camera idle.
-</div>
+      <div class="sub muted" id="scanCamStatus" style="margin-top:8px;">Camera idle.</div>
+
       <div class="btnrow" style="justify-content:flex-end;">
         <button onclick="scanApply()">Done</button>
       </div>
@@ -325,95 +321,7 @@ function scanApply(){
     goInventory();
     return;
   }
-/* =========================
-   CAMERA SCAN (BarcodeDetector)
-========================= */
 
-let _scanStream = null;
-let _scanTimer = null;
-
-async function scanStartCamera(){
-  const statusEl = document.getElementById("scanCamStatus");
-  const video = document.getElementById("scanVideo");
-
-  try{
-    if(!video){ toast("Scanner view not active"); return; }
-
-    // Show preview
-    video.style.display = "block";
-    statusEl.textContent = "Requesting camera permission…";
-
-    // Get camera stream
-    _scanStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
-      audio: false
-    });
-
-    video.srcObject = _scanStream;
-    await video.play();
-
-    // Check BarcodeDetector support
-    if(!("BarcodeDetector" in window)){
-      statusEl.textContent = "Camera preview on. BarcodeDetector not supported — use manual barcode entry.";
-      toast("Camera on (manual entry only)");
-      return;
-    }
-
-    const detector = new BarcodeDetector({
-      formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"]
-    });
-
-    statusEl.textContent = "Scanning… point camera at barcode.";
-
-    // Poll detection
-    _scanTimer = setInterval(async ()=>{
-      try{
-        if(video.readyState < 2) return;
-        const barcodes = await detector.detect(video);
-        if(barcodes && barcodes.length){
-          const code = (barcodes[0].rawValue || "").trim();
-          if(code){
-            document.getElementById("scanCode").value = code;
-            toast("Scanned: " + code);
-            statusEl.textContent = "Scanned: " + code;
-
-            // Optional: auto-apply immediately
-            // scanApply();
-
-            // Stop camera after a successful scan
-            scanStopCamera();
-          }
-        }
-      }catch(e){
-        // ignore intermittent detector errors
-      }
-    }, 350);
-
-  }catch(e){
-    if(statusEl) statusEl.textContent = "Camera error: " + (e.message || e);
-    toast("Camera error");
-    scanStopCamera();
-  }
-}
-
-function scanStopCamera(){
-  const statusEl = document.getElementById("scanCamStatus");
-  const video = document.getElementById("scanVideo");
-
-  try{
-    if(_scanTimer){ clearInterval(_scanTimer); _scanTimer = null; }
-    if(_scanStream){
-      _scanStream.getTracks().forEach(t=>t.stop());
-      _scanStream = null;
-    }
-    if(video){
-      video.pause();
-      video.srcObject = null;
-      video.style.display = "none";
-    }
-    if(statusEl) statusEl.textContent = "Camera idle.";
-  }catch(e){}
-           }
   // stock mode
   let it = stock.find(i => (i.barcode||"")===code && !i.archived);
   if(!it){
@@ -668,6 +576,83 @@ function unarchiveItem(id){
   }
   goHome();
 })();
+
+/* =========================
+   CAMERA SCAN (BarcodeDetector)
+========================= */
+let _scanStream = null;
+let _scanTimer = null;
+
+async function scanStartCamera(){
+  const statusEl = document.getElementById("scanCamStatus");
+  const video = document.getElementById("scanVideo");
+  try{
+    if(!video){ toast("Scanner view not active"); return; }
+    video.style.display = "block";
+    if(statusEl) statusEl.textContent = "Requesting camera permission…";
+
+    _scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" },
+      audio: false
+    });
+
+    video.srcObject = _scanStream;
+    await video.play();
+
+    if(!("BarcodeDetector" in window)){
+      if(statusEl) statusEl.textContent = "Camera preview on. BarcodeDetector not supported — use manual entry.";
+      toast("Camera on (manual entry only)");
+      return;
+    }
+
+    const detector = new BarcodeDetector({
+      formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"]
+    });
+
+    if(statusEl) statusEl.textContent = "Scanning… point camera at barcode.";
+
+    _scanTimer = setInterval(async ()=>{
+      try{
+        if(video.readyState < 2) return;
+        const barcodes = await detector.detect(video);
+        if(barcodes && barcodes.length){
+          const code = (barcodes[0].rawValue || "").trim();
+          if(code){
+            const inp = document.getElementById("scanCode");
+            if(inp) inp.value = code;
+            toast("Scanned: " + code);
+            if(statusEl) statusEl.textContent = "Scanned: " + code;
+            scanStopCamera();
+          }
+        }
+      }catch(e){}
+    }, 350);
+
+  }catch(e){
+    toast("No camera available");
+    if(statusEl) statusEl.textContent = "No camera available (or permission denied).";
+    scanStopCamera();
+  }
+}
+
+function scanStopCamera(){
+  const statusEl = document.getElementById("scanCamStatus");
+  const video = document.getElementById("scanVideo");
+  try{
+    if(_scanTimer){ clearInterval(_scanTimer); _scanTimer = null; }
+    if(_scanStream){
+      _scanStream.getTracks().forEach(t=>t.stop());
+      _scanStream = null;
+    }
+    if(video){
+      try{ video.pause(); }catch(e){}
+      video.srcObject = null;
+      video.style.display = "none";
+    }
+    if(statusEl) statusEl.textContent = "Camera idle.";
+  }catch(e){}
+}
+
 </script>
 </body>
 </html>
