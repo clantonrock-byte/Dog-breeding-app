@@ -56,6 +56,7 @@
 <div id="viewDogs" class="section" style="display:none;"></div>
 <div id="viewDogProfile" class="section" style="display:none;"></div>
 <div id="viewInventory" class="section" style="display:none;"></div>
+<div id="viewStock" class="section" style="display:none;"></div>
 
 <div id="rcToastLite"></div>
 
@@ -63,6 +64,7 @@
 const CLEAN_KEY="breederPro_dogs_v_clean_v2";
 const MIGRATION_DONE="bp_migration_done_v1";
 const INV_KEY="bp_inventory_v1";
+const STOCK_KEY="bp_stock_v1";
 
 function toast(msg){
   const el=document.getElementById("rcToastLite");
@@ -135,12 +137,14 @@ function skipMigration(){
 let dogs = JSON.parse(localStorage.getItem(CLEAN_KEY)) || [];
 let activeDogId=null;
 let inventory = JSON.parse(localStorage.getItem(INV_KEY)) || [];
+let stock = JSON.parse(localStorage.getItem(STOCK_KEY)) || [];
 
 function saveDogs(){ localStorage.setItem(CLEAN_KEY, JSON.stringify(dogs)); }
 function saveInventory(){ localStorage.setItem(INV_KEY, JSON.stringify(inventory)); }
+function saveStock(){ localStorage.setItem(STOCK_KEY, JSON.stringify(stock)); }
 
 function showOnly(id){
-  ["viewMigration","viewHome","viewDogs","viewDogProfile","viewInventory"].forEach(v=>{
+  ["viewMigration","viewHome","viewDogs","viewDogProfile","viewInventory","viewStock"].forEach(v=>{
     document.getElementById(v).style.display = (v===id) ? "block" : "none";
   });
 }
@@ -153,6 +157,7 @@ function goHome(){
       <div class="btnrow">
         <button onclick="goDogs()">Dogs</button>
         <button onclick="goInventory()">Inventory (Edible)</button>
+        <button onclick="goStock()">Stock (Inedible)</button>
       </div>
     </div>
   `;
@@ -228,6 +233,129 @@ function goInventory(){
   showOnly("viewInventory");
   renderInventory(false);
 }
+
+function goStock(){
+  showOnly("viewStock");
+  renderStock(false);
+}
+
+function renderStock(showArchived){
+  const el=document.getElementById("viewStock");
+  const items = stock.filter(i => !!i.archived === !!showArchived)
+                     .sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  el.innerHTML=`
+    <button class="secondary" onclick="goHome()">← Back</button>
+    <div class="card">
+      <div class="title">Stock (Inedible)</div>
+      <div class="sub">Tools, supplies, equipment. No deletes — archive only.</div>
+      <div class="btnrow">
+        <button onclick="openStockAdd()">Add stock</button>
+        <button class="ghost" onclick="renderStock(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
+      </div>
+    </div>
+    <div id="stockList"></div>
+    ${renderStockDialog()}
+  `;
+  const list=document.getElementById("stockList");
+  if(!items.length){
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`<div class="sub muted">No items ${showArchived?"archived":"yet"}.</div>`;
+    list.appendChild(c);
+    return;
+  }
+  items.forEach(it=>{
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`
+      <div class="row">
+        <div style="flex:1;min-width:0;">
+          <div class="title">${it.name}</div>
+          <div class="sub">On hand: <b>${Number(it.qty||0)}</b> ${it.unit||""}</div>
+          ${it.barcode?`<div class="sub"><span class="muted">Barcode:</span> <code>${it.barcode}</code></div>`:""}
+          ${it.archived?`<span class="badge warn">Archived</span>`:""}
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="ghost" onclick="stockAdjQty('${it.id}', +1)">+1</button>
+        <button class="ghost" onclick="stockAdjQty('${it.id}', -1)">-1</button>
+        ${it.archived?`<button class="ghost" onclick="stockUnarchive('${it.id}')">Unarchive</button>`:`<button class="ghost" onclick="stockArchive('${it.id}')">Archive</button>`}
+      </div>
+    `;
+    list.appendChild(c);
+  });
+}
+
+function renderStockDialog(){
+  return `
+    <dialog id="dlgStock" style="border:none;border-radius:16px;padding:14px;background:#161821;color:#f2f2f2;width:min(520px,96vw);">
+      <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Add stock item</div>
+      <div class="field">
+        <div class="label">Name</div>
+        <input id="stockName" autocomplete="off" />
+      </div>
+      <div class="field">
+        <div class="label">Unit (optional)</div>
+        <input id="stockUnit" autocomplete="off" placeholder="boxes, rolls, tools..." />
+      </div>
+      <div class="field">
+        <div class="label">Barcode (optional)</div>
+        <input id="stockBarcode" inputmode="numeric" autocomplete="off" />
+      </div>
+      <div class="btnrow" style="justify-content:flex-end;">
+        <button class="secondary" onclick="closeStockAdd()">Cancel</button>
+        <button onclick="saveStockAdd()">Save</button>
+      </div>
+    </dialog>
+  `;
+}
+
+function openStockAdd(){
+  const dlg=document.getElementById("dlgStock");
+  document.getElementById("stockName").value="";
+  document.getElementById("stockUnit").value="";
+  document.getElementById("stockBarcode").value="";
+  dlg.showModal();
+}
+function closeStockAdd(){ document.getElementById("dlgStock").close(); }
+
+function saveStockAdd(){
+  const name=(document.getElementById("stockName").value||"").trim();
+  const unit=(document.getElementById("stockUnit").value||"").trim();
+  const barcode=(document.getElementById("stockBarcode").value||"").trim();
+  if(!name){ toast("Name required"); return; }
+  stock.push({id: crypto.randomUUID(), name, unit, barcode, qty:0, archived:false});
+  saveStock();
+  toast("Stock added");
+  closeStockAdd();
+  renderStock(false);
+}
+
+function stockAdjQty(id, delta){
+  const it=stock.find(x=>x.id===id);
+  if(!it) return;
+  it.qty=Math.max(0, Number(it.qty||0)+Number(delta||0));
+  saveStock();
+  toast("Saved");
+  renderStock(false);
+}
+function stockArchive(id){
+  const it=stock.find(x=>x.id===id);
+  if(!it) return;
+  it.archived=true;
+  saveStock();
+  toast("Archived");
+  renderStock(false);
+}
+function stockUnarchive(id){
+  const it=stock.find(x=>x.id===id);
+  if(!it) return;
+  it.archived=false;
+  saveStock();
+  toast("Unarchived");
+  renderStock(true);
+}
+
 function renderInventory(showArchived){
   const el=document.getElementById("viewInventory");
   const items = inventory.filter(i => !!i.archived === !!showArchived)
