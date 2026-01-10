@@ -569,11 +569,25 @@ function unarchiveItem(id){
 
 /* Init */
 (function init(){
-  if(!localStorage.getItem(MIGRATION_DONE)){
-    const found=findLegacyDogs();
-    if(found){ showMigration(found); return; }
-    localStorage.setItem(MIGRATION_DONE,"true");
+  // If we already have clean dogs, DO NOT re-migrate. Ever.
+  const existingClean = JSON.parse(localStorage.getItem(CLEAN_KEY) || "[]");
+  if (Array.isArray(existingClean) && existingClean.length) {
+    localStorage.setItem(MIGRATION_DONE, "true");
+    dogs = existingClean;
+    goHome();
+    return;
   }
+
+  // Only offer migration if we truly haven't migrated yet
+  if(!localStorage.getItem(MIGRATION_DONE)){
+    const found = findLegacyDogs();
+    if(found){
+      showMigration(found);
+      return;
+    }
+    localStorage.setItem(MIGRATION_DONE, "true");
+  }
+
   goHome();
 })();
 
