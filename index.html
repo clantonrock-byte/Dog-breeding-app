@@ -1746,6 +1746,132 @@
   });
 })();
 </script>
+<script id="rc-doglist-stabilize">
+/*
+  RC Dog List Stabilizer (no hunting required)
+  - Wraps renderDogs() if present
+  - Replaces the "Open" button with a thumbnail tile (profile photoDataUrl)
+  - Uses getDog(dogId) as source of truth (no localStorage guessing)
+*/
 
+(function(){
+  function cssOnce(){
+    if(document.getElementById("rcDogListStableCss")) return;
+    const st=document.createElement("style");
+    st.id="rcDogListStableCss";
+    st.textContent=`
+      .rcDogTile{
+        width:66px;height:54px;border-radius:12px;
+        border:1px solid rgba(255,255,255,0.18);
+        background:rgba(255,255,255,0.06);
+        overflow:hidden;display:flex;align-items:center;justify-content:center;
+        flex:0 0 auto;
+      }
+      .rcDogTile img{width:100%;height:100%;object-fit:cover;display:block;}
+      .rcDogTile .ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;}
+      .rcDogTile .cam{font-size:16px;line-height:1;}
+      .rcDogTile .txt{font-size:10px;opacity:.9;}
+      .rcRowClick{cursor:pointer;}
+    `;
+    document.head.appendChild(st);
+  }
+
+  function extractDogIdFromOpenBtn(btn){
+    // button has onclick like: _openDog('abc123')
+    const on = btn.getAttribute("onclick") || "";
+    const m = on.match(/_openDog\(\s*'([^']+)'\s*\)/);
+    return m ? m[1] : "";
+  }
+
+  function buildTile(dog){
+    const tile=document.createElement("div");
+    tile.className="rcDogTile";
+    const photo = (dog && dog.photoDataUrl) ? dog.photoDataUrl : "";
+    if(photo){
+      const img=document.createElement("img");
+      img.src = photo;
+      tile.appendChild(img);
+    }else{
+      tile.innerHTML = `<div class="ph"><div class="cam">📷</div><div class="txt">Add photo</div></div>`;
+    }
+    return tile;
+  }
+
+  function patchDogsList(){
+    cssOnce();
+
+    // Only target the Dogs view list container
+    const listEl = document.getElementById("dogsList");
+    if(!listEl) return;
+
+    const openBtns = Array.from(listEl.querySelectorAll("button"))
+      .filter(b => (b.textContent||"").trim().toLowerCase()==="open");
+
+    openBtns.forEach(btn=>{
+      if(btn._rcPatched) return;
+
+      const dogId = extractDogIdFromOpenBtn(btn);
+      if(!dogId) return;
+
+      const dog = (typeof window.getDog === "function") ? window.getDog(dogId) : null;
+
+      // Make the entire timeline item clickable
+      const item = btn.closest(".timeline-item") || btn.closest(".row") || btn.parentElement;
+      if(item && !item._rcRowClick){
+        item.classList.add("rcRowClick");
+        item.addEventListener("click", (e)=>{
+          // don’t double-trigger if user taps tile area
+          if(e.target.closest(".rcDogTile")) return;
+          if(typeof window.__openDog === "function") window.__openDog(dogId);
+          else if(typeof window._openDog === "function") window._openDog(dogId);
+        });
+        item._rcRowClick = true;
+      }
+
+      // Replace the button with the tile
+      const tile = buildTile(dog);
+      tile.addEventListener("click", (e)=>{
+        e.preventDefault(); e.stopPropagation();
+        if(typeof window.__openDog === "function") window.__openDog(dogId);
+        else if(typeof window._openDog === "function") window._openDog(dogId);
+      });
+
+      btn.parentNode.insertBefore(tile, btn);
+      btn.remove();
+      btn._rcPatched = true;
+    });
+  }
+
+  function wrapRenderDogs(){
+    if(typeof window.renderDogs !== "function") return false;
+    if(window.renderDogs._rcWrapped) return true;
+
+    const orig = window.renderDogs;
+    window.renderDogs = function(){
+      const res = orig.apply(this, arguments);
+      // Patch immediately after every render
+      try{ patchDogsList(); }catch(e){}
+      return res;
+    };
+    window.renderDogs._rcWrapped = true;
+
+    // Also patch once right now
+    try{ patchDogsList(); }catch(e){}
+    return true;
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    // Wrap once DOM is ready
+    wrapRenderDogs();
+    // Safety: sometimes renderDogs is defined after load, so retry a few times
+    let tries = 0;
+    const t = setInterval(()=>{
+      tries++;
+      wrapRenderDogs();
+      if(tries >= 15) clearInterval(t);
+    }, 400);
+  });
+})();
+</script>
 </body>
 </html>
