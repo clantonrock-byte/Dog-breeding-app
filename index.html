@@ -161,7 +161,7 @@ function goHome(){
         <button onclick="goDogs()">Dogs</button>
         <button onclick="goInventory()">Inventory (Edible)</button>
         <button onclick="goStock()">Stock (Inedible)</button>
-        <button onclick="goScanner('inventory')">Scanner</button>
+        <button onclick="goScanner()">Scanner</button>
       </div>
     </div>
   `;
@@ -170,7 +170,7 @@ function goHome(){
 function goDogs(){
   showOnly("viewDogs");
   const el=document.getElementById("viewDogs");
-  el.innerHTML=`<button class="secondary" onclick="(scannerMode===\'stock\'?goStock():goInventory())">← Back</button>`;
+  el.innerHTML=`<button class="secondary" onclick="goHome()">← Back</button>`;
   dogs.forEach(d=>{
     const tile=d.photo?`<img src="${d.photo}">`:`<span class="cam">📷</span><span class="txt">Profile</span>`;
     const badge=isArchived(d.status)?`<span class="badge warn">${d.status}</span>`:"";
@@ -243,58 +243,101 @@ function goStock(){
   renderStock(false);
 }
 
-function goScanner(mode){
-  if(mode){ scannerMode = (mode==="stock") ? "stock" : "inventory"; }
+function goScanner(){
   showOnly("viewScanner");
   renderScanner();
 }
 
+
 function renderScanner(){
   const el=document.getElementById("viewScanner");
+  const lastMode = localStorage.getItem("scan_last_mode") || "quick"; // quick|reconcile
+  const lastQty = Number(localStorage.getItem("scan_last_qty") || 1);
   const modeLabel = (scannerMode==="inventory") ? "Inventory (Edible)" : "Stock (Inedible)";
-  const actionLabel = (scannerAction==="add") ? "Add +1" : "Reduce -1";
+
   el.innerHTML=`
-    <button class="secondary" onclick="goHome()">← Back</button>
+    <button class="secondary" onclick="${scannerMode==='inventory' ? 'goInventory()' : 'goStock()'}">← Back</button>
     <div class="card">
       <div class="title">Scanner</div>
-      <div class="sub">Mode: <b>${modeLabel}</b> • Action: <b>${actionLabel}</b></div>
+      <div class="sub">Target: <b>${modeLabel}</b></div>
+
       <div class="btnrow">
         <button class="ghost" onclick="setScanMode('inventory')">Inventory</button>
         <button class="ghost" onclick="setScanMode('stock')">Stock</button>
-        <button class="ghost" onclick="setScanAction('add')">Add +1</button>
-        <button class="ghost" onclick="setScanAction('reduce')">Reduce -1</button>
       </div>
+
       <div class="divider"></div>
+
+      <div class="btnrow">
+        <button class="ghost" onclick="setScanFlow('quick')">Quick</button>
+        <button class="ghost" onclick="setScanFlow('reconcile')">Reconcile</button>
+      </div>
+
+      <div class="divider"></div>
+
       <div class="field">
         <div class="label">Barcode</div>
-        <input id="scanCode" inputmode="numeric" autocomplete="off" placeholder="Enter or paste barcode"/>
+        <input id="scanCode" inputmode="numeric" autocomplete="off" placeholder="Scan or type barcode"/>
       </div>
-      <div class="btnrow">
-        <button class="ghost" onclick="scanStartCamera()">Start camera</button>
-        <button class="ghost" onclick="scanStopCamera()">Stop camera</button>
+
+      <div id="quickBlock">
+        <div class="field">
+          <div class="label">Quantity</div>
+          <input id="scanQty" type="number" min="0" step="1" value="${lastQty}"/>
+        </div>
+        <div class="btnrow">
+          <button class="ghost" onclick="setQty(1)">+1</button>
+          <button class="ghost" onclick="setQty(10)">+10</button>
+          <button class="ghost" onclick="setQty(25)">+25</button>
+          <button class="ghost" onclick="setQty(32)">+32</button>
+          <button class="ghost" onclick="setQty(50)">+50</button>
+        </div>
+      </div>
+
+      <div id="reconBlock" style="display:none;">
+        <div class="field">
+          <div class="label">Planned</div>
+          <input id="scanPlanned" type="number" min="0" step="1" value="${lastQty}"/>
+        </div>
+        <div class="field">
+          <div class="label">Counted</div>
+          <input id="scanCounted" type="number" min="0" step="1" value="${lastQty}"/>
+        </div>
+        <div class="sub muted">Only <b>Counted</b> will be applied.</div>
       </div>
 
       <div class="divider"></div>
-
-      <video id="scanVideo" playsinline
-        style="width:100%; border-radius:14px; border:1px solid rgba(255,255,255,0.12); display:none;">
-      </video>
-
-      <div class="sub muted" id="scanCamStatus" style="margin-top:8px;">Camera idle.</div>
 
       <div class="btnrow" style="justify-content:flex-end;">
-        <button onclick="scanApply()">Done</button>
+        <button onclick="scanApply()">Apply</button>
       </div>
-      <div class="divider"></div>
-      <div class="sub muted">Camera scanning can be added later. This is stable and phone-proof.</div>
     </div>
   `;
+
+  setScanFlow(lastMode);
 }
+
 
 function setScanMode(m){
   scannerMode = (m==="stock") ? "stock" : "inventory";
   toast("Scanner mode: " + (scannerMode==="inventory" ? "Inventory" : "Stock"));
   renderScanner();
+}
+
+
+function setScanFlow(flow){
+  localStorage.setItem("scan_last_mode", flow);
+  const q=document.getElementById("quickBlock");
+  const r=document.getElementById("reconBlock");
+  if(q && r){
+    q.style.display = (flow==="quick") ? "block" : "none";
+    r.style.display = (flow==="reconcile") ? "block" : "none";
+  }
+  toast("Scanner mode: " + (flow==="quick" ? "Quick" : "Reconcile"));
+}
+function setQty(v){
+  const el=document.getElementById("scanQty");
+  if(el){ el.value = v; localStorage.setItem("scan_last_qty", v); }
 }
 
 function setScanAction(a){
@@ -303,39 +346,46 @@ function setScanAction(a){
   renderScanner();
 }
 
+
 function scanApply(){
   const code=(document.getElementById("scanCode").value||"").trim();
   if(!code){ toast("Enter barcode"); return; }
 
+  const flow = localStorage.getItem("scan_last_mode") || "quick";
+  let qty = 0;
+
+  if(flow==="quick"){
+    qty = Number(document.getElementById("scanQty").value||0);
+  }else{
+    qty = Number(document.getElementById("scanCounted").value||0);
+  }
+  if(qty<=0){ toast("Qty must be > 0"); return; }
+  localStorage.setItem("scan_last_qty", qty);
+
   if(scannerMode==="inventory"){
-    // find item by barcode
     let it = inventory.find(i => (i.barcode||"")===code && !i.archived);
     if(!it){
       it = {id: crypto.randomUUID(), name: "Inventory item " + code, unit:"", barcode:code, qty:0, archived:false};
       inventory.push(it);
-      saveInventory();
-      toast("New inventory item created");
     }
-    it.qty = (scannerAction==="add") ? (Number(it.qty||0)+1) : Math.max(0, Number(it.qty||0)-1);
+    it.qty = Number(it.qty||0) + qty;
     saveInventory();
     toast("Saved");
     goInventory();
     return;
   }
 
-  // stock mode
   let it = stock.find(i => (i.barcode||"")===code && !i.archived);
   if(!it){
     it = {id: crypto.randomUUID(), name: "Stock item " + code, unit:"", barcode:code, qty:0, archived:false};
     stock.push(it);
-    saveStock();
-    toast("New stock item created");
   }
-  it.qty = (scannerAction==="add") ? (Number(it.qty||0)+1) : Math.max(0, Number(it.qty||0)-1);
+  it.qty = Number(it.qty||0) + qty;
   saveStock();
   toast("Saved");
   goStock();
 }
+
 
 
 function renderStock(showArchived){
@@ -349,7 +399,6 @@ function renderStock(showArchived){
       <div class="sub">Tools, supplies, equipment. No deletes — archive only.</div>
       <div class="btnrow">
         <button onclick="openStockAdd()">Add stock</button>
-        <button class="ghost" onclick="goScanner(\'stock\')">Scanner</button>
         <button class="ghost" onclick="renderStock(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
       </div>
     </div>
@@ -467,7 +516,6 @@ function renderInventory(showArchived){
       <div class="sub">Add items and track quantities. No deletes — archive only.</div>
       <div class="btnrow">
         <button onclick="openInvAdd()">Add item</button>
-        <button class="ghost" onclick="goScanner(\'inventory\')">Scanner</button>
         <button class="ghost" onclick="renderInventory(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
       </div>
     </div>
@@ -572,104 +620,13 @@ function unarchiveItem(id){
 
 /* Init */
 (function init(){
-  // If we already have clean dogs, DO NOT re-migrate. Ever.
-  const existingClean = JSON.parse(localStorage.getItem(CLEAN_KEY) || "[]");
-  if (Array.isArray(existingClean) && existingClean.length) {
-    localStorage.setItem(MIGRATION_DONE, "true");
-    dogs = existingClean;
-    goHome();
-    return;
-  }
-
-  // Only offer migration if we truly haven't migrated yet
   if(!localStorage.getItem(MIGRATION_DONE)){
-    const found = findLegacyDogs();
-    if(found){
-      showMigration(found);
-      return;
-    }
-    localStorage.setItem(MIGRATION_DONE, "true");
+    const found=findLegacyDogs();
+    if(found){ showMigration(found); return; }
+    localStorage.setItem(MIGRATION_DONE,"true");
   }
-
   goHome();
 })();
-
-/* =========================
-   CAMERA SCAN (BarcodeDetector)
-========================= */
-let _scanStream = null;
-let _scanTimer = null;
-
-async function scanStartCamera(){
-  const statusEl = document.getElementById("scanCamStatus");
-  const video = document.getElementById("scanVideo");
-  try{
-    if(!video){ toast("Scanner view not active"); return; }
-    video.style.display = "block";
-    if(statusEl) statusEl.textContent = "Requesting camera permission…";
-
-    _scanStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
-      audio: false
-    });
-
-    video.srcObject = _scanStream;
-    await video.play();
-
-    if(!("BarcodeDetector" in window)){
-      if(statusEl) statusEl.textContent = "Camera preview on. BarcodeDetector not supported — use manual entry.";
-      toast("Camera on (manual entry only)");
-      return;
-    }
-
-    const detector = new BarcodeDetector({
-      formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"]
-    });
-
-    if(statusEl) statusEl.textContent = "Scanning… point camera at barcode.";
-
-    _scanTimer = setInterval(async ()=>{
-      try{
-        if(video.readyState < 2) return;
-        const barcodes = await detector.detect(video);
-        if(barcodes && barcodes.length){
-          const code = (barcodes[0].rawValue || "").trim();
-          if(code){
-            const inp = document.getElementById("scanCode");
-            if(inp) inp.value = code;
-            toast("Scanned: " + code);
-            if(statusEl) statusEl.textContent = "Scanned: " + code;
-            scanStopCamera();
-          }
-        }
-      }catch(e){}
-    }, 350);
-
-  }catch(e){
-    toast("No camera available");
-    if(statusEl) statusEl.textContent = "No camera available (or permission denied).";
-    scanStopCamera();
-  }
-}
-
-function scanStopCamera(){
-  const statusEl = document.getElementById("scanCamStatus");
-  const video = document.getElementById("scanVideo");
-  try{
-    if(_scanTimer){ clearInterval(_scanTimer); _scanTimer = null; }
-    if(_scanStream){
-      _scanStream.getTracks().forEach(t=>t.stop());
-      _scanStream = null;
-    }
-    if(video){
-      try{ video.pause(); }catch(e){}
-      video.srcObject = null;
-      video.style.display = "none";
-    }
-    if(statusEl) statusEl.textContent = "Camera idle.";
-  }catch(e){}
-}
-
 </script>
 </body>
 </html>
