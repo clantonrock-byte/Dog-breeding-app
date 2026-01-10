@@ -1584,7 +1584,15 @@
 
 
 
-<script id="rcDogListPatchV2">
+<script id="rcDogListPatchV3">
+/* RC Dog List Patch v3 (structure-agnostic)
+   - Finds ALL buttons with text "Open" inside the Dogs view
+   - Replaces each with a tile:
+       * dog.photoDataUrl thumbnail (from breederPro_dogs_store_v3) if present
+       * 📷 Add photo placeholder otherwise
+   - Makes the nearest reasonable container clickable to open (clicks the existing Open button)
+   - Does not modify dog data
+*/
 (function(){
   const DOG_STORE_KEY = "breederPro_dogs_store_v3";
 
@@ -1614,9 +1622,9 @@
   }
 
   function injectCSS(){
-    if(document.getElementById("rcDogListCssV2")) return;
+    if(document.getElementById("rcDogListCssV3")) return;
     const st=document.createElement("style");
-    st.id="rcDogListCssV2";
+    st.id="rcDogListCssV3";
     st.textContent=`
       .rc-openwrap{display:flex;align-items:center;gap:10px;}
       .rc-tile{
@@ -1642,11 +1650,14 @@
     try{ return !!el.closest("button,a,input,select,textarea,label,.rc-tile"); }catch(e){ return false; }
   }
 
-  function getCallNameFromCard(card){
-    if(!card) return "";
-    const nameEl = card.querySelector(".h") || card.querySelector("strong") || card.querySelector(".title");
+  function getCallNameFromNearby(btn){
+    // find nearest container and pick first strong/h/title text
+    const host = btn.closest(".card") || btn.closest(".dog-card") || btn.closest("li") || btn.closest("section") || btn.parentElement;
+    if(!host) return "";
+    const nameEl = host.querySelector(".h") || host.querySelector("strong") || host.querySelector(".title") || host.querySelector("h3");
     if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    const lines=(card.innerText||card.textContent||"").split("
+    // fallback: first non-empty line of text
+    const lines=(host.innerText||host.textContent||"").split("
 ").map(s=>s.trim()).filter(Boolean);
     return lines.length ? lines[0] : "";
   }
@@ -1662,6 +1673,11 @@
     }
   }
 
+  function findClickableContainer(btn){
+    // prefer a card-like container
+    return btn.closest(".card") || btn.closest(".dog-card") || btn.closest("li") || btn.closest("div") || btn.parentElement;
+  }
+
   function enhance(){
     try{
       injectCSS();
@@ -1671,29 +1687,34 @@
         .filter(b => (b.textContent||"").trim().toLowerCase() === "open");
 
       openBtns.forEach(btn=>{
-        const card = btn.closest(".card") || btn.closest("li") || btn.closest("div");
-        if(!card) return;
-
         if(btn._rcDone){
-          const tile = card.querySelector(".rc-tile");
+          // refresh photo
+          const container = findClickableContainer(btn);
+          const tile = container ? container.querySelector(".rc-tile") : null;
           if(tile){
-            const call = getCallNameFromCard(card);
+            const call = getCallNameFromNearby(btn);
             const d = findDogByCall(call);
             renderTile(tile, photoForDog(d));
           }
           return;
         }
 
-        if(!card._rcRowClick){
-          card.classList.add("rc-row-click");
-          card.addEventListener("click",(e)=>{
+        const container = findClickableContainer(btn);
+        if(!container) return;
+
+        // Make row clickable
+        if(!container._rcRowClick){
+          container.classList.add("rc-row-click");
+          container.addEventListener("click",(e)=>{
             if(isInsideControl(e.target)) return;
             btn.click();
           });
-          card._rcRowClick = true;
+          container._rcRowClick = true;
         }
 
+        // Wrap + tile
         const parent = btn.parentNode;
+        if(!parent) return;
         const wrap=document.createElement("span");
         wrap.className="rc-openwrap";
         parent.insertBefore(wrap, btn);
@@ -1702,7 +1723,7 @@
         const tile=document.createElement("div");
         tile.className="rc-tile";
 
-        const call = getCallNameFromCard(card);
+        const call = getCallNameFromNearby(btn);
         const d = findDogByCall(call);
         renderTile(tile, photoForDog(d));
 
@@ -1721,7 +1742,7 @@
 
   document.addEventListener("DOMContentLoaded", ()=>{
     enhance();
-    setInterval(enhance, 1200);
+    setInterval(enhance, 1000);
   });
 })();
 </script>
