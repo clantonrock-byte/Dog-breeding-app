@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Breeder Pro – Rocks Corner</title>
-
 <style>
   body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:#0e0f14;color:#eaeaea;}
   header{padding:12px;background:#12131a;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,0.08);}
@@ -22,7 +21,6 @@
   button.ghost{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);}
   button:active{transform:translateY(1px);}
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-
   .photo-tile{
     width:66px;height:54px;border-radius:12px;border:1px solid rgba(255,255,255,0.18);
     background:rgba(255,255,255,0.06);overflow:hidden;display:flex;align-items:center;justify-content:center;
@@ -33,9 +31,7 @@
   .photo-tile.big img{border-radius:14px;}
   .photo-tile .cam{font-size:16px;display:block;}
   .photo-tile .txt{font-size:11px;opacity:.9;margin-top:2px;display:block;}
-
   .divider{height:1px;background:rgba(255,255,255,0.10);margin:14px 0;border-radius:999px;}
-  .section-title{font-weight:900;margin:0 0 8px 0;}
   .field{margin-top:10px;}
   .label{font-size:12px;opacity:.8;margin-bottom:6px;}
   input{
@@ -44,16 +40,14 @@
     background:rgba(255,255,255,0.06);
     color:#f2f2f2;font-size:16px;
   }
-
+  code{background:rgba(0,0,0,0.35);padding:2px 6px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);}
   #rcToastLite{
     position:fixed;left:12px;right:12px;bottom:18px;z-index:999999;
-    display:none;background:rgba(0,0,0,0.78);color:#f2f2f2;
-    border:1px solid rgba(255,255,255,0.18);
+    display:none;background:rgba(0,0,0,0.78);color:#f2f2f2;border:1px solid rgba(255,255,255,0.18);
     border-radius:14px;padding:10px 12px;font-size:14px;
   }
 </style>
 </head>
-
 <body>
 <header><h1>Breeder Pro – Rocks Corner</h1></header>
 
@@ -61,62 +55,47 @@
 <div id="viewHome" class="section"></div>
 <div id="viewDogs" class="section" style="display:none;"></div>
 <div id="viewDogProfile" class="section" style="display:none;"></div>
+<div id="viewInventory" class="section" style="display:none;"></div>
 
 <div id="rcToastLite"></div>
 
 <script>
-/* =========================
-   STORAGE KEYS
-========================= */
-const CLEAN_KEY = "breederPro_dogs_v_clean_v2";
-const MIGRATION_DONE = "bp_migration_done_v1";
+const CLEAN_KEY="breederPro_dogs_v_clean_v2";
+const MIGRATION_DONE="bp_migration_done_v1";
+const INV_KEY="bp_inventory_v1";
 
-/* =========================
-   UTIL
-========================= */
 function toast(msg){
   const el=document.getElementById("rcToastLite");
-  el.textContent=msg;
+  el.textContent=String(msg||"");
   el.style.display="block";
   clearTimeout(el._t);
   el._t=setTimeout(()=>el.style.display="none",1600);
 }
 function isArchived(status){
-  return (status||"").toLowerCase().includes("archived") ||
-         (status||"").toLowerCase().includes("deceased");
+  const s=(status||"").toLowerCase();
+  return s.includes("archived") || s.includes("deceased");
 }
 
-/* =========================
-   LOAD LEGACY DOGS (ASSUME BOTH)
-========================= */
 function findLegacyDogs(){
-  const keys = Object.keys(localStorage);
+  const keys=Object.keys(localStorage);
   for(const k of keys){
     try{
-      const raw = JSON.parse(localStorage.getItem(k));
-      if(Array.isArray(raw) && raw.length && raw[0].callName){
-        return { key:k, dogs:raw };
-      }
-      if(raw && Array.isArray(raw.dogs) && raw.dogs.length){
-        return { key:k, dogs:raw.dogs };
-      }
+      const raw=JSON.parse(localStorage.getItem(k));
+      if(Array.isArray(raw) && raw.length) return {key:k, dogs:raw};
+      if(raw && Array.isArray(raw.dogs) && raw.dogs.length) return {key:k, dogs:raw.dogs};
     }catch(e){}
   }
   return null;
 }
 
-/* =========================
-   MIGRATION UI
-========================= */
 function showMigration(found){
   const el=document.getElementById("viewMigration");
   el.style.display="block";
   document.getElementById("viewHome").style.display="none";
-
   el.innerHTML=`
     <div class="card">
-      <div class="title">Existing dog data found</div>
-      <div class="sub">${found.dogs.length} dogs detected from <code>${found.key}</code></div>
+      <div class="title">Existing data found</div>
+      <div class="sub">${found.dogs.length} records detected from <code>${found.key}</code></div>
       <div class="divider"></div>
       <div class="sub">A backup will be created before migration.</div>
       <div class="btnrow">
@@ -127,15 +106,10 @@ function showMigration(found){
   `;
 }
 
-/* =========================
-   MIGRATION LOGIC
-========================= */
 function runMigration(){
   const found=findLegacyDogs();
   if(!found){ skipMigration(); return; }
-
-  const backupKey="bp_backup_dogs_"+Date.now();
-  localStorage.setItem(backupKey, JSON.stringify(found));
+  localStorage.setItem("bp_backup_dogs_"+Date.now(), JSON.stringify(found));
 
   const migrated = found.dogs.map(d=>({
     id: d.id || d.dogId || crypto.randomUUID(),
@@ -143,69 +117,54 @@ function runMigration(){
     sex: d.sex || "Unknown",
     status: d.status || "Active",
     photo: d.photo || d.photoDataUrl || null,
-    microchips: d.microchips || [],
+    microchips: Array.isArray(d.microchips)?d.microchips:[],
     rabiesOnFile: !!d.rabiesOnFile
   }));
 
   localStorage.setItem(CLEAN_KEY, JSON.stringify(migrated));
   localStorage.setItem(MIGRATION_DONE,"true");
-
   toast("Migration complete");
-  setTimeout(()=>location.reload(),800);
+  setTimeout(()=>location.reload(), 600);
 }
-
 function skipMigration(){
   localStorage.setItem(MIGRATION_DONE,"true");
   toast("Migration skipped");
-  setTimeout(()=>location.reload(),800);
+  setTimeout(()=>location.reload(), 600);
 }
 
-/* =========================
-   APP STATE
-========================= */
 let dogs = JSON.parse(localStorage.getItem(CLEAN_KEY)) || [];
 let activeDogId=null;
+let inventory = JSON.parse(localStorage.getItem(INV_KEY)) || [];
 
-/* =========================
-   HOME
-========================= */
-function renderHome(){
+function saveDogs(){ localStorage.setItem(CLEAN_KEY, JSON.stringify(dogs)); }
+function saveInventory(){ localStorage.setItem(INV_KEY, JSON.stringify(inventory)); }
+
+function showOnly(id){
+  ["viewMigration","viewHome","viewDogs","viewDogProfile","viewInventory"].forEach(v=>{
+    document.getElementById(v).style.display = (v===id) ? "block" : "none";
+  });
+}
+
+function goHome(){
+  showOnly("viewHome");
   document.getElementById("viewHome").innerHTML=`
     <div class="card">
       <div class="title">What is our goal today?</div>
       <div class="btnrow">
         <button onclick="goDogs()">Dogs</button>
+        <button onclick="goInventory()">Inventory (Edible)</button>
       </div>
     </div>
   `;
 }
-function goHome(){
-  document.getElementById("viewMigration").style.display="none";
-  document.getElementById("viewDogs").style.display="none";
-  document.getElementById("viewDogProfile").style.display="none";
-  document.getElementById("viewHome").style.display="block";
-  renderHome();
-}
 
-/* =========================
-   DOG LIST
-========================= */
 function goDogs(){
-  document.getElementById("viewHome").style.display="none";
-  document.getElementById("viewDogProfile").style.display="none";
-  document.getElementById("viewDogs").style.display="block";
-
+  showOnly("viewDogs");
   const el=document.getElementById("viewDogs");
   el.innerHTML=`<button class="secondary" onclick="goHome()">← Back</button>`;
-
   dogs.forEach(d=>{
-    const tile = d.photo
-      ? `<img src="${d.photo}">`
-      : `<span class="cam">📷</span><span class="txt">Profile</span>`;
-
-    const badge = isArchived(d.status)
-      ? `<span class="badge warn">${d.status}</span>` : "";
-
+    const tile=d.photo?`<img src="${d.photo}">`:`<span class="cam">📷</span><span class="txt">Profile</span>`;
+    const badge=isArchived(d.status)?`<span class="badge warn">${d.status}</span>`:"";
     const card=document.createElement("div");
     card.className="card";
     card.onclick=()=>openProfile(d.id);
@@ -223,27 +182,15 @@ function goDogs(){
   });
 }
 
-/* =========================
-   PROFILE
-========================= */
 function openProfile(id){
   activeDogId=id;
   const d=dogs.find(x=>x.id===id);
   if(!d) return;
+  showOnly("viewDogProfile");
 
-  document.getElementById("viewDogs").style.display="none";
-  const el=document.getElementById("viewDogProfile");
-  el.style.display="block";
-
-  const tile = d.photo
-    ? `<img src="${d.photo}">`
-    : `<span class="cam">📷</span><span class="txt">${d.callName} · Add photo</span>`;
-
-  const badge = isArchived(d.status)
-    ? `<span class="badge warn">${d.status}</span>`
-    : `<span class="badge ok">${d.status}</span>`;
-
-  el.innerHTML=`
+  const badge=isArchived(d.status)?`<span class="badge warn">${d.status}</span>`:`<span class="badge ok">${d.status}</span>`;
+  const tile=d.photo?`<img src="${d.photo}">`:`<span class="cam">📷</span><span class="txt">${d.callName} · Add photo</span>`;
+  document.getElementById("viewDogProfile").innerHTML=`
     <button class="secondary" onclick="goDogs()">← Back</button>
     <div class="card">
       <div class="title">${d.callName}</div>
@@ -257,8 +204,8 @@ function openProfile(id){
 
 function pickPhoto(){
   const d=dogs.find(x=>x.id===activeDogId);
-  if(!d || isArchived(d.status)){ toast("Photo locked"); return; }
-
+  if(!d) return;
+  if(isArchived(d.status)){ toast("Photo locked"); return; }
   const input=document.createElement("input");
   input.type="file"; input.accept="image/*";
   input.onchange=()=>{
@@ -267,19 +214,134 @@ function pickPhoto(){
     const r=new FileReader();
     r.onload=()=>{
       d.photo=r.result;
-      localStorage.setItem(CLEAN_KEY, JSON.stringify(dogs));
-      openProfile(d.id);
-      goDogs();
+      saveDogs();
       toast("Photo saved");
+      openProfile(d.id);
     };
     r.readAsDataURL(file);
   };
   input.click();
 }
 
-/* =========================
-   INIT
-========================= */
+/* ===== Inventory ===== */
+function goInventory(){
+  showOnly("viewInventory");
+  renderInventory(false);
+}
+function renderInventory(showArchived){
+  const el=document.getElementById("viewInventory");
+  const items = inventory.filter(i => !!i.archived === !!showArchived)
+                         .sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  el.innerHTML=`
+    <button class="secondary" onclick="goHome()">← Back</button>
+    <div class="card">
+      <div class="title">Inventory (Edible)</div>
+      <div class="sub">Add items and track quantities. No deletes — archive only.</div>
+      <div class="btnrow">
+        <button onclick="openInvAdd()">Add item</button>
+        <button class="ghost" onclick="renderInventory(${showArchived ? "false" : "true"})">${showArchived ? "Show active" : "Show archived"}</button>
+      </div>
+    </div>
+    <div id="invList"></div>
+    ${renderInvDialog()}
+  `;
+  const list=document.getElementById("invList");
+  if(!items.length){
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`<div class="sub muted">No items ${showArchived?"archived":"yet"}.</div>`;
+    list.appendChild(c);
+    return;
+  }
+  items.forEach(it=>{
+    const c=document.createElement("div");
+    c.className="card";
+    c.innerHTML=`
+      <div class="row">
+        <div style="flex:1;min-width:0;">
+          <div class="title">${it.name}</div>
+          <div class="sub">On hand: <b>${Number(it.qty||0)}</b> ${it.unit||""}</div>
+          ${it.barcode?`<div class="sub"><span class="muted">Barcode:</span> <code>${it.barcode}</code></div>`:""}
+          ${it.archived?`<span class="badge warn">Archived</span>`:""}
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="ghost" onclick="adjQty('${it.id}', +1)">+1</button>
+        <button class="ghost" onclick="adjQty('${it.id}', -1)">-1</button>
+        ${it.archived?`<button class="ghost" onclick="unarchiveItem('${it.id}')">Unarchive</button>`:`<button class="ghost" onclick="archiveItem('${it.id}')">Archive</button>`}
+      </div>
+    `;
+    list.appendChild(c);
+  });
+}
+function renderInvDialog(){
+  return `
+    <dialog id="dlgInv" style="border:none;border-radius:16px;padding:14px;background:#161821;color:#f2f2f2;width:min(520px,96vw);">
+      <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Add inventory item</div>
+      <div class="field">
+        <div class="label">Name</div>
+        <input id="invName" autocomplete="off" />
+      </div>
+      <div class="field">
+        <div class="label">Unit (optional)</div>
+        <input id="invUnit" autocomplete="off" placeholder="bags, lbs, cans..." />
+      </div>
+      <div class="field">
+        <div class="label">Barcode (optional)</div>
+        <input id="invBarcode" inputmode="numeric" autocomplete="off" />
+      </div>
+      <div class="btnrow" style="justify-content:flex-end;">
+        <button class="secondary" onclick="closeInvAdd()">Cancel</button>
+        <button onclick="saveInvAdd()">Save</button>
+      </div>
+    </dialog>
+  `;
+}
+function openInvAdd(){
+  const dlg=document.getElementById("dlgInv");
+  document.getElementById("invName").value="";
+  document.getElementById("invUnit").value="";
+  document.getElementById("invBarcode").value="";
+  dlg.showModal();
+}
+function closeInvAdd(){ document.getElementById("dlgInv").close(); }
+function saveInvAdd(){
+  const name=(document.getElementById("invName").value||"").trim();
+  const unit=(document.getElementById("invUnit").value||"").trim();
+  const barcode=(document.getElementById("invBarcode").value||"").trim();
+  if(!name){ toast("Name required"); return; }
+  inventory.push({id: crypto.randomUUID(), name, unit, barcode, qty:0, archived:false});
+  saveInventory();
+  toast("Item added");
+  closeInvAdd();
+  renderInventory(false);
+}
+function adjQty(id, delta){
+  const it=inventory.find(x=>x.id===id);
+  if(!it) return;
+  it.qty=Math.max(0, Number(it.qty||0)+Number(delta||0));
+  saveInventory();
+  toast("Saved");
+  renderInventory(false);
+}
+function archiveItem(id){
+  const it=inventory.find(x=>x.id===id);
+  if(!it) return;
+  it.archived=true;
+  saveInventory();
+  toast("Archived");
+  renderInventory(false);
+}
+function unarchiveItem(id){
+  const it=inventory.find(x=>x.id===id);
+  if(!it) return;
+  it.archived=false;
+  saveInventory();
+  toast("Unarchived");
+  renderInventory(true);
+}
+
+/* Init */
 (function init(){
   if(!localStorage.getItem(MIGRATION_DONE)){
     const found=findLegacyDogs();
