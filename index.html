@@ -57,6 +57,7 @@
 <div id="viewDogProfile" class="section" style="display:none;"></div>
 <div id="viewInventory" class="section" style="display:none;"></div>
 <div id="viewStock" class="section" style="display:none;"></div>
+<div id="viewScanner" class="section" style="display:none;"></div>
 
 <div id="rcToastLite"></div>
 
@@ -138,13 +139,15 @@ let dogs = JSON.parse(localStorage.getItem(CLEAN_KEY)) || [];
 let activeDogId=null;
 let inventory = JSON.parse(localStorage.getItem(INV_KEY)) || [];
 let stock = JSON.parse(localStorage.getItem(STOCK_KEY)) || [];
+let scannerMode = "inventory"; // inventory|stock
+let scannerAction = "add"; // add|reduce
 
 function saveDogs(){ localStorage.setItem(CLEAN_KEY, JSON.stringify(dogs)); }
 function saveInventory(){ localStorage.setItem(INV_KEY, JSON.stringify(inventory)); }
 function saveStock(){ localStorage.setItem(STOCK_KEY, JSON.stringify(stock)); }
 
 function showOnly(id){
-  ["viewMigration","viewHome","viewDogs","viewDogProfile","viewInventory","viewStock"].forEach(v=>{
+  ["viewMigration","viewHome","viewDogs","viewDogProfile","viewInventory","viewStock","viewScanner"].forEach(v=>{
     document.getElementById(v).style.display = (v===id) ? "block" : "none";
   });
 }
@@ -158,6 +161,7 @@ function goHome(){
         <button onclick="goDogs()">Dogs</button>
         <button onclick="goInventory()">Inventory (Edible)</button>
         <button onclick="goStock()">Stock (Inedible)</button>
+        <button onclick="goScanner()">Scanner</button>
       </div>
     </div>
   `;
@@ -238,6 +242,87 @@ function goStock(){
   showOnly("viewStock");
   renderStock(false);
 }
+
+function goScanner(){
+  showOnly("viewScanner");
+  renderScanner();
+}
+
+function renderScanner(){
+  const el=document.getElementById("viewScanner");
+  const modeLabel = (scannerMode==="inventory") ? "Inventory (Edible)" : "Stock (Inedible)";
+  const actionLabel = (scannerAction==="add") ? "Add +1" : "Reduce -1";
+  el.innerHTML=`
+    <button class="secondary" onclick="goHome()">← Back</button>
+    <div class="card">
+      <div class="title">Scanner</div>
+      <div class="sub">Mode: <b>${modeLabel}</b> • Action: <b>${actionLabel}</b></div>
+      <div class="btnrow">
+        <button class="ghost" onclick="setScanMode('inventory')">Inventory</button>
+        <button class="ghost" onclick="setScanMode('stock')">Stock</button>
+        <button class="ghost" onclick="setScanAction('add')">Add +1</button>
+        <button class="ghost" onclick="setScanAction('reduce')">Reduce -1</button>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <div class="label">Barcode</div>
+        <input id="scanCode" inputmode="numeric" autocomplete="off" placeholder="Enter or paste barcode"/>
+      </div>
+      <div class="btnrow" style="justify-content:flex-end;">
+        <button onclick="scanApply()">Done</button>
+      </div>
+      <div class="divider"></div>
+      <div class="sub muted">Camera scanning can be added later. This is stable and phone-proof.</div>
+    </div>
+  `;
+}
+
+function setScanMode(m){
+  scannerMode = (m==="stock") ? "stock" : "inventory";
+  toast("Scanner mode: " + (scannerMode==="inventory" ? "Inventory" : "Stock"));
+  renderScanner();
+}
+
+function setScanAction(a){
+  scannerAction = (a==="reduce") ? "reduce" : "add";
+  toast("Scanner action: " + (scannerAction==="add" ? "Add +1" : "Reduce -1"));
+  renderScanner();
+}
+
+function scanApply(){
+  const code=(document.getElementById("scanCode").value||"").trim();
+  if(!code){ toast("Enter barcode"); return; }
+
+  if(scannerMode==="inventory"){
+    // find item by barcode
+    let it = inventory.find(i => (i.barcode||"")===code && !i.archived);
+    if(!it){
+      it = {id: crypto.randomUUID(), name: "Inventory item " + code, unit:"", barcode:code, qty:0, archived:false};
+      inventory.push(it);
+      saveInventory();
+      toast("New inventory item created");
+    }
+    it.qty = (scannerAction==="add") ? (Number(it.qty||0)+1) : Math.max(0, Number(it.qty||0)-1);
+    saveInventory();
+    toast("Saved");
+    goInventory();
+    return;
+  }
+
+  // stock mode
+  let it = stock.find(i => (i.barcode||"")===code && !i.archived);
+  if(!it){
+    it = {id: crypto.randomUUID(), name: "Stock item " + code, unit:"", barcode:code, qty:0, archived:false};
+    stock.push(it);
+    saveStock();
+    toast("New stock item created");
+  }
+  it.qty = (scannerAction==="add") ? (Number(it.qty||0)+1) : Math.max(0, Number(it.qty||0)-1);
+  saveStock();
+  toast("Saved");
+  goStock();
+}
+
 
 function renderStock(showArchived){
   const el=document.getElementById("viewStock");
