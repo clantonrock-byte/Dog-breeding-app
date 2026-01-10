@@ -66,7 +66,20 @@
     }
     /* Scan video */
     #scanVideo{ width:100%; border-radius:12px; border:1px solid var(--border); }
-  </style>
+  
+/* RC Dog list thumb tile (baseline-v2-clean) */
+.dog-thumb-btn{
+  width:64px;height:64px;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto; cursor:pointer;
+}
+.dog-thumb-btn img{width:100%;height:100%;object-fit:cover;display:block;}
+.dog-thumb-placeholder{font-size:18px;opacity:.8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.dog-thumb-text{font-size:10px;opacity:.65;}
+
+</style>
 
   <!-- NAV defined immediately -->
   <script>
@@ -798,7 +811,7 @@
     document.getElementById("dogsListMeta").textContent=`Dogs shown: ${list.length}`;
     document.getElementById("dogsList").innerHTML=list.length?list.map(d=>`
       <div class="timeline-item">
-        <div class="row" style="justify-content:space-between; gap:10px;">
+        <div class="row" style="justify-content:space-between; gap:10px;" onclick="_openDog('${d.dogId}')">
           <div>
             <div><strong>${esc(d.callName)}</strong></div>
             <div class="muted small">Breed: ${esc(d.breed||"")} • Sex: ${esc(d.sex||"(unknown)")} • Status: ${esc(d.status||"")}</div>
@@ -815,7 +828,7 @@
         .slice().sort((a,b)=>(a.callName||"").localeCompare(b.callName||""))
         .map(d=>`
           <div class="timeline-item">
-            <div class="row" style="justify-content:space-between; gap:10px;">
+            <div class="row" style="justify-content:space-between; gap:10px;" onclick="_openDog('${d.dogId}')">
               <div>
                 <div><strong>${esc(d.callName)}</strong></div>
                 <div class="muted small">Archived • ${esc(d.status)} • ${d.archivedAt?fmt(d.archivedAt):""}</div>
@@ -833,7 +846,7 @@
       document.getElementById("dogsUnassignedMeta").textContent=`Needs sex set: ${un.length}`;
       document.getElementById("dogsUnassignedList").innerHTML=un.length?un.map(d=>`
         <div class="timeline-item">
-          <div class="row" style="justify-content:space-between; gap:10px;">
+          <div class="row" style="justify-content:space-between; gap:10px;" onclick="_openDog('${d.dogId}')">
             <div>
               <div><strong>${esc(d.callName)}</strong></div>
               <div class="muted small">Sex: (unknown) • Status: ${esc(d.status||"")}</div>
@@ -1583,295 +1596,5 @@
 
 
 
-
-<script id="rcDogListPatchV3">
-/* RC Dog List Patch v3 (structure-agnostic)
-   - Finds ALL buttons with text "Open" inside the Dogs view
-   - Replaces each with a tile:
-       * dog.photoDataUrl thumbnail (from breederPro_dogs_store_v3) if present
-       * 📷 Add photo placeholder otherwise
-   - Makes the nearest reasonable container clickable to open (clicks the existing Open button)
-   - Does not modify dog data
-*/
-(function(){
-  const DOG_STORE_KEY = "breederPro_dogs_store_v3";
-
-  function norm(s){ return (s||"").toString().trim().toLowerCase(); }
-
-  function loadDogs(){
-    try{
-      const raw = localStorage.getItem(DOG_STORE_KEY);
-      if(!raw) return [];
-      const obj = JSON.parse(raw);
-      if(Array.isArray(obj)) return obj;
-      if(obj && Array.isArray(obj.dogs)) return obj.dogs;
-    }catch(e){}
-    return [];
-  }
-
-  function findDogByCall(call){
-    const key = norm(call);
-    if(!key) return null;
-    const dogs = loadDogs();
-    return dogs.find(d => norm(d.callName||d.name) === key) || null;
-  }
-
-  function photoForDog(d){
-    if(!d) return "";
-    return d.photoDataUrl || "";
-  }
-
-  function injectCSS(){
-    if(document.getElementById("rcDogListCssV3")) return;
-    const st=document.createElement("style");
-    st.id="rcDogListCssV3";
-    st.textContent=`
-      .rc-openwrap{display:flex;align-items:center;gap:10px;}
-      .rc-tile{
-        width:66px;height:54px;border-radius:12px;
-        border:1px solid rgba(255,255,255,0.18);
-        background:rgba(255,255,255,0.06);
-        overflow:hidden;flex:0 0 auto;
-        display:flex;align-items:center;justify-content:center;
-        padding:0;text-align:center;line-height:1.05;
-        color:rgba(242,242,242,0.9);
-      }
-      .rc-tile img{width:100%;height:100%;object-fit:cover;display:block;}
-      .rc-tile .ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;}
-      .rc-tile .cam{font-size:16px;line-height:1;}
-      .rc-tile .txt{font-size:10px;opacity:.9;}
-      .rc-tile:active{transform:translateY(1px);}
-      .rc-row-click{cursor:pointer;}
-    `;
-    document.head.appendChild(st);
-  }
-
-  function isInsideControl(el){
-    try{ return !!el.closest("button,a,input,select,textarea,label,.rc-tile"); }catch(e){ return false; }
-  }
-
-  function getCallNameFromNearby(btn){
-    // find nearest container and pick first strong/h/title text
-    const host = btn.closest(".card") || btn.closest(".dog-card") || btn.closest("li") || btn.closest("section") || btn.parentElement;
-    if(!host) return "";
-    const nameEl = host.querySelector(".h") || host.querySelector("strong") || host.querySelector(".title") || host.querySelector("h3");
-    if(nameEl && nameEl.textContent) return nameEl.textContent.trim();
-    // fallback: first non-empty line of text
-    const lines=(host.innerText||host.textContent||"").split("
-").map(s=>s.trim()).filter(Boolean);
-    return lines.length ? lines[0] : "";
-  }
-
-  function renderTile(tile, photo){
-    tile.innerHTML = "";
-    if(photo){
-      const img=document.createElement("img");
-      img.src = photo;
-      tile.appendChild(img);
-    }else{
-      tile.innerHTML = `<div class="ph"><div class="cam">📷</div><div class="txt">Add photo</div></div>`;
-    }
-  }
-
-  function findClickableContainer(btn){
-    // prefer a card-like container
-    return btn.closest(".card") || btn.closest(".dog-card") || btn.closest("li") || btn.closest("div") || btn.parentElement;
-  }
-
-  function enhance(){
-    try{
-      injectCSS();
-      const dogsView = document.getElementById("viewDogs") || document.body;
-
-      const openBtns = Array.from(dogsView.querySelectorAll("button"))
-        .filter(b => (b.textContent||"").trim().toLowerCase() === "open");
-
-      openBtns.forEach(btn=>{
-        if(btn._rcDone){
-          // refresh photo
-          const container = findClickableContainer(btn);
-          const tile = container ? container.querySelector(".rc-tile") : null;
-          if(tile){
-            const call = getCallNameFromNearby(btn);
-            const d = findDogByCall(call);
-            renderTile(tile, photoForDog(d));
-          }
-          return;
-        }
-
-        const container = findClickableContainer(btn);
-        if(!container) return;
-
-        // Make row clickable
-        if(!container._rcRowClick){
-          container.classList.add("rc-row-click");
-          container.addEventListener("click",(e)=>{
-            if(isInsideControl(e.target)) return;
-            btn.click();
-          });
-          container._rcRowClick = true;
-        }
-
-        // Wrap + tile
-        const parent = btn.parentNode;
-        if(!parent) return;
-        const wrap=document.createElement("span");
-        wrap.className="rc-openwrap";
-        parent.insertBefore(wrap, btn);
-        wrap.appendChild(btn);
-
-        const tile=document.createElement("div");
-        tile.className="rc-tile";
-
-        const call = getCallNameFromNearby(btn);
-        const d = findDogByCall(call);
-        renderTile(tile, photoForDog(d));
-
-        wrap.insertBefore(tile, btn);
-        btn.style.display="none";
-
-        tile.addEventListener("click",(e)=>{
-          e.preventDefault(); e.stopPropagation();
-          btn.click();
-        });
-
-        btn._rcDone = true;
-      });
-    }catch(e){}
-  }
-
-  document.addEventListener("DOMContentLoaded", ()=>{
-    enhance();
-    setInterval(enhance, 1000);
-  });
-})();
-</script>
-<script id="rc-doglist-stabilize">
-/*
-  RC Dog List Stabilizer (no hunting required)
-  - Wraps renderDogs() if present
-  - Replaces the "Open" button with a thumbnail tile (profile photoDataUrl)
-  - Uses getDog(dogId) as source of truth (no localStorage guessing)
-*/
-
-(function(){
-  function cssOnce(){
-    if(document.getElementById("rcDogListStableCss")) return;
-    const st=document.createElement("style");
-    st.id="rcDogListStableCss";
-    st.textContent=`
-      .rcDogTile{
-        width:66px;height:54px;border-radius:12px;
-        border:1px solid rgba(255,255,255,0.18);
-        background:rgba(255,255,255,0.06);
-        overflow:hidden;display:flex;align-items:center;justify-content:center;
-        flex:0 0 auto;
-      }
-      .rcDogTile img{width:100%;height:100%;object-fit:cover;display:block;}
-      .rcDogTile .ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;}
-      .rcDogTile .cam{font-size:16px;line-height:1;}
-      .rcDogTile .txt{font-size:10px;opacity:.9;}
-      .rcRowClick{cursor:pointer;}
-    `;
-    document.head.appendChild(st);
-  }
-
-  function extractDogIdFromOpenBtn(btn){
-    // button has onclick like: _openDog('abc123')
-    const on = btn.getAttribute("onclick") || "";
-    const m = on.match(/_openDog\(\s*'([^']+)'\s*\)/);
-    return m ? m[1] : "";
-  }
-
-  function buildTile(dog){
-    const tile=document.createElement("div");
-    tile.className="rcDogTile";
-    const photo = (dog && dog.photoDataUrl) ? dog.photoDataUrl : "";
-    if(photo){
-      const img=document.createElement("img");
-      img.src = photo;
-      tile.appendChild(img);
-    }else{
-      tile.innerHTML = `<div class="ph"><div class="cam">📷</div><div class="txt">Add photo</div></div>`;
-    }
-    return tile;
-  }
-
-  function patchDogsList(){
-    cssOnce();
-
-    // Only target the Dogs view list container
-    const listEl = document.getElementById("dogsList");
-    if(!listEl) return;
-
-    const openBtns = Array.from(listEl.querySelectorAll("button"))
-      .filter(b => (b.textContent||"").trim().toLowerCase()==="open");
-
-    openBtns.forEach(btn=>{
-      if(btn._rcPatched) return;
-
-      const dogId = extractDogIdFromOpenBtn(btn);
-      if(!dogId) return;
-
-      const dog = (typeof window.getDog === "function") ? window.getDog(dogId) : null;
-
-      // Make the entire timeline item clickable
-      const item = btn.closest(".timeline-item") || btn.closest(".row") || btn.parentElement;
-      if(item && !item._rcRowClick){
-        item.classList.add("rcRowClick");
-        item.addEventListener("click", (e)=>{
-          // don’t double-trigger if user taps tile area
-          if(e.target.closest(".rcDogTile")) return;
-          if(typeof window.__openDog === "function") window.__openDog(dogId);
-          else if(typeof window._openDog === "function") window._openDog(dogId);
-        });
-        item._rcRowClick = true;
-      }
-
-      // Replace the button with the tile
-      const tile = buildTile(dog);
-      tile.addEventListener("click", (e)=>{
-        e.preventDefault(); e.stopPropagation();
-        if(typeof window.__openDog === "function") window.__openDog(dogId);
-        else if(typeof window._openDog === "function") window._openDog(dogId);
-      });
-
-      btn.parentNode.insertBefore(tile, btn);
-      btn.remove();
-      btn._rcPatched = true;
-    });
-  }
-
-  function wrapRenderDogs(){
-    if(typeof window.renderDogs !== "function") return false;
-    if(window.renderDogs._rcWrapped) return true;
-
-    const orig = window.renderDogs;
-    window.renderDogs = function(){
-      const res = orig.apply(this, arguments);
-      // Patch immediately after every render
-      try{ patchDogsList(); }catch(e){}
-      return res;
-    };
-    window.renderDogs._rcWrapped = true;
-
-    // Also patch once right now
-    try{ patchDogsList(); }catch(e){}
-    return true;
-  }
-
-  document.addEventListener("DOMContentLoaded", ()=>{
-    // Wrap once DOM is ready
-    wrapRenderDogs();
-    // Safety: sometimes renderDogs is defined after load, so retry a few times
-    let tries = 0;
-    const t = setInterval(()=>{
-      tries++;
-      wrapRenderDogs();
-      if(tries >= 15) clearInterval(t);
-    }, 400);
-  });
-})();
-</script>
 </body>
 </html>
