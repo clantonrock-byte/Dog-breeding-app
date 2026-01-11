@@ -1,0 +1,30 @@
+/* inventory_lowstock_onhand_settings_patch.css */
+
+.inv-low-badge {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: #b42318;
+  align-self: center;
+}
+
+.inv-onhand-line { margin-top: 8px; }
+
+.bp-item-list { margin-top: 10px; }
+
+.bp-item-row {
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.bp-item-row.is-low {
+  border-color: #b42318;
+  background: rgba(180, 35, 24, 0.08);
+}
+
+.bp-item-min { width: 100%; }

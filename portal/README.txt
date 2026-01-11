@@ -1,25 +1,34 @@
-SETTINGS UX + LOW STOCK ALERTS
+LOW STOCK (ON HAND) + SETTINGS ITEM LISTS
 
 WHAT YOU ASKED FOR
-1) Settings should have "buttons to direct the user to what they need to alter"
-   - Adds Settings shortcuts: Transfer locations / Low stock alerts
-2) Users should set an alert at X low level to prompt reorder
-   - Adds per-item minQty + default minQty per kind
-   - Highlights LOW items in Available list
-   - Optional once-per-day low-stock popup when opening Available list
+- Low prompt should be based on "On hand" per item (not total).
+- Inventory and Stock should list items separately.
+- When a new item is added, it appears in Settings to set its low prompt.
 
-INSTALL (root index is entrypoint)
+WHAT THIS DOES
+- Uses DEFAULT SOURCE bucket (settings) as "On hand" and checks:
+  locs[defaultSource] <= minOnHand
+- Adds per-item minOnHand editor inside Settings:
+  - Inventory items list
+  - Stock items list
+- LOW badge added to Available cards
+- Optional once-per-day alert when opening Available list (per kind)
+
+INSTALL
 1) Upload into /portal/:
-   - portal/inventory_settings_lowstock_patch.js
-   - portal/inventory_settings_lowstock_patch.css
+   - portal/inventory_lowstock_onhand_settings_patch.js
+   - portal/inventory_lowstock_onhand_settings_patch.css
 
 2) In root index.html:
    - In <head>:
-     <link rel="stylesheet" href="portal/inventory_settings_lowstock_patch.css" />
-
+     <link rel="stylesheet" href="portal/inventory_lowstock_onhand_settings_patch.css" />
    - At bottom (right before </body>), load AFTER inventory_settings_kindfix.js:
-     <script src="portal/inventory_settings_lowstock_patch.js"></script>
+     <script src="portal/inventory_lowstock_onhand_settings_patch.js"></script>
 
-NOTES
-- Per-item threshold stored as item.minQty
-- Default per-kind stored in breederPro_inventory_settings_v1
+IMPORTANT
+- Disable/remove older low-stock patches to avoid conflicts:
+  - inventory_settings_lowstock_patch.js
+
+DATA FIELDS
+- item.minOnHand (number)
+- settings: breederPro_inventory_settings_v2
