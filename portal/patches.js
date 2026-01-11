@@ -1,23 +1,36 @@
 // portal/patches/patches.js
-console.log("✅ portal patches loaded");
+console.log("✅ patches.js loaded");
 
 (function () {
-  const PATCH_DIR = "patches/";
+  /**
+   * This loader injects patch scripts AFTER the app loads.
+   * All paths here are relative to portal/index.html (NOT the patches folder).
+   */
 
-  function load(file) {
+  function loadScript(src) {
     const s = document.createElement("script");
-    s.src = PATCH_DIR + file;
+    s.src = src;
     s.defer = true;
-    s.onload = () => console.log("✅ loaded", file);
-    s.onerror = () => console.error("❌ failed to load", file);
+    s.onload = () => console.log("✅ loaded", src);
+    s.onerror = () => console.error("❌ failed", src);
     document.body.appendChild(s);
   }
 
-  // Load your patch files (use the exact filenames in /portal/patches/)
-  load("rc_clear_dog.js");
-  load("rc_clear_bug.js");
-  load("rc_dog_ui.js");
-  load("rc_inventory_.js");
-  load("dog_ui_patch.js");
-  load("dogs_viewall_.js");
+  // --- Pick your patches (order matters) ---
+  // Debug (optional)
+  loadScript("rc_debug.js");
+
+  // Dogs
+  loadScript("dogs_viewall_fix.js");
+  loadScript("dog_ui_patch.js");        // dog list thumbnails/route etc (if this is your hotpatch)
+  loadScript("dog_row_click.js");       // if this exists to improve row click
+  loadScript("dog_photo_open.js");      // if used
+  loadScript("photo_bind_per_dog.js");  // if used
+
+  // Microchip fixes (if used)
+  loadScript("microchip_patch.js");
+
+  // If you have one-off dog patches, add them here when needed:
+  // loadScript("dog_id_migrate.js");
+  // loadScript("disable_list_photos.js");
 })();
