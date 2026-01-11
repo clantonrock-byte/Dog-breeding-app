@@ -1,0 +1,14 @@
+/* inventory_settings_kindfix.css */
+
+.transfer-kind-pill {
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+#btnBpSettings {
+  margin-left: 10px;
+}
+
+textarea {
+  width: 100%;
+}
