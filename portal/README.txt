@@ -1,26 +1,18 @@
-INVENTORY/STOCK: A–D PATCH (Seed tools + True transfer + Export/Import + Scanner fallback)
-
-FILES
-- inventory_a_to_d_patch.js
-- inventory_a_to_d_patch.css
+TRANSFER: SELECTABLE SOURCE + DESTINATION TEXT
 
 INSTALL (root index is entrypoint)
-1) Upload both files into /portal/:
-   - portal/inventory_a_to_d_patch.js
-   - portal/inventory_a_to_d_patch.css
+1) Upload:
+   portal/inventory_transfer_source_patch.js
 
-2) In root index.html:
-   - Add CSS in <head>:
-     <link rel="stylesheet" href="portal/inventory_a_to_d_patch.css" />
+2) In root index.html, include AFTER your inventory patches:
+   <script src="portal/inventory_transfer_source_patch.js"></script>
 
-   - Add JS at the VERY bottom (right before </body>), AFTER inventory_ui_patch.js and after transfer destination patch:
-     <script src="portal/inventory_a_to_d_patch.js"></script>
+USAGE
+- Go to Transfer
+- Pick Source location (dropdown)
+- Enter Destination (text)
+- Done -> moves qty from Source -> Destination bucket (does NOT reduce total)
 
 NOTES
-- True transfer uses location buckets per item:
-  item.locs = { "On hand": 10, "Freezer": 3, ... }
-  Total qty is sum of buckets and remains consistent.
-- Transfer moves qty from "On hand" to destination bucket when a destination is provided.
-- Add/Use apply to "On hand" bucket.
-- Export/Import saves: Dogs + Inventory + Activity to a JSON file.
-- Scanner fallback loads ZXing from jsdelivr if BarcodeDetector is missing.
+- If Destination is blank, Transfer behaves like legacy (subtract qty via original applyTransfer).
+- Source options are generated from existing non-zero location buckets for that item.
