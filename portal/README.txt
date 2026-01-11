@@ -1,18 +1,19 @@
+LOW SHOPPING LIST – TXT / SHARE / DOCX / PDF
 
-LOW SHOPPING LIST (EXPORT + SHARE)
+WHAT THIS IS
+- A single script that adds 4 buttons on the Available screen:
+  - Export TXT
+  - Share
+  - Export DOCX
+  - Export PDF
 
-WHAT THIS ADDS
-- Inventory Available / Stock Available:
-  - Export LOW list (downloads a checklist .txt)
-  - Share LOW list (uses Web Share API if available)
-
-INSTALL
+INSTALL (root index is entrypoint)
 1) Upload into /portal/:
-   portal/inventory_low_shopping_list_patch.js
+   portal/inventory_low_shopping_list_allformats.js
 
 2) In root index.html, load AFTER inventory_lowstock_onhand_settings_patch.js:
-   <script src="portal/inventory_low_shopping_list_patch.js"></script>
+   <script src="portal/inventory_low_shopping_list_allformats.js"></script>
 
 NOTES
-- Uses on-hand bucket + per-item low prompt to build the list.
-- Inventory and Stock are separate; list exports based on current mode.
+- DOCX + PDF require a one-time CDN load (docx + jsPDF).
+- Inventory vs Stock remain separate (based on current mode).
