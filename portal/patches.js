@@ -33,4 +33,5 @@ alert("HELLO FROM PATCHES");
   // If you have one-off dog patches, add them here when needed:
   // loadScript("dog_id_migrate.js");
   // loadScript("disable_list_photos.js");
+load("../dogs_male_female_fix.js");
 })();
