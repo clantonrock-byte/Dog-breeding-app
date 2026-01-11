@@ -1,0 +1,15 @@
+/* inventory_settings_lowstock_patch.css */
+
+.inv-low-badge {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: #b42318;
+  align-self: center;
+}
+
+.bp-settings-nav { margin-top: 10px; }
+.locs-min-wrap { margin-top: 10px; }
