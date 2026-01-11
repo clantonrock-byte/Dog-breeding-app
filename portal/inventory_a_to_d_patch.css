@@ -1,0 +1,14 @@
+/* inventory_a_to_d_patch.css */
+
+.bp-test-tools .big-code { font-size: 14px; }
+
+.inv-locs { margin-top: 8px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.inv-loc-chip {
+  display:inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.04);
+  font-size: 12px;
+}
+.inv-loc-more { opacity: 0.7; font-size: 12px; }
