@@ -1593,10 +1593,16 @@
   setInterval(bind, 800);
 })();
 </script>
+<link rel="stylesheet" href="portal/dogs_filters_polish.css" />
+<link rel="stylesheet" href="portal/dog_ui_patch.css" />
+
+<!-- Base dog UI patch FIRST (if you still need it) -->
+<script src="portal/dog_ui_patch.js"></script>
+
+<!-- Then the "final dog renderer" -->
 <script src="portal/dogs_filters_polish.js"></script>
-<link rel="stylesheet" href="dog_ui_patch.css" />
-<script src="dog_ui_patch.js"></
-<script src="portal/patches/patches.js"></script>
+
+<!-- Then button behavior fixes LAST -->
 <script src="portal/dogs_male_female_fix.js"></script>
 <script src="portal/dogs_unassigned_fix.js"></script>
 </body>
