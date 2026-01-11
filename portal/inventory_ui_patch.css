@@ -1,0 +1,32 @@
+/* inventory_ui_patch.css */
+
+.inv-tools { margin-top: 12px; }
+
+.inv-card { }
+.inv-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.inv-card-title { font-weight: 900; font-size: 16px; }
+.inv-qty { font-size: 22px; font-weight: 900; min-width: 44px; text-align: right; }
+
+.inv-actions { display:flex; gap:10px; margin-top: 10px; }
+.inv-actions .btn { flex: 1; }
+
+.inv-activity.cardish {
+  margin-top: 14px;
+  border: 1px solid var(--border, #e2e2e2);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--card, #fff);
+}
+
+.inv-activity-h {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.inv-activity-item {
+  border-top: 1px solid var(--border, #e2e2e2);
+  padding-top: 10px;
+  margin-top: 10px;
+}

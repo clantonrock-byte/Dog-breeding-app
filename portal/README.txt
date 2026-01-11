@@ -1,24 +1,27 @@
+INVENTORY/STOCK UI PATCH + ACTIVITY LOG
 
-DOGS UNIFIED v4 (ROW CLICK FIX)
+FILES
+- inventory_ui_patch.js
+- inventory_ui_patch.css
 
 INSTALL (root index is entrypoint)
-1) Upload into /portal/:
-   - portal/dogs_unified_v4.js
-   - portal/dogs_unified_v4.css
+1) Upload both files into /portal/:
+   - portal/inventory_ui_patch.js
+   - portal/inventory_ui_patch.css
 
 2) In root index.html:
-   - In <head>:
-     <link rel="stylesheet" href="portal/dogs_unified_v4.css" />
+   - Add CSS in <head>:
+     <link rel="stylesheet" href="portal/inventory_ui_patch.css" />
 
-   - At bottom (right before </body>), LOAD LAST:
-     <script src="portal/dogs_unified_v4.js"></script>
+   - Add JS at the VERY bottom (right before </body>), load AFTER your app scripts:
+     <script src="portal/inventory_ui_patch.js"></script>
 
-3) Remove/comment older dog scripts:
-   - portal/dogs_unified_v3.js / v2
-   - portal/dogs_filters_polish.js
-   - portal/dogs_male_female_fix.js
-   - portal/dogs_unassigned_fix.js
-   - portal/dog_ui_patch.js (if it overrides dog list rendering)
+WHAT YOU GET
+- Available list becomes cards with quick actions (Add / Use / Transfer)
+- Search box on Available view
+- Recent activity log (last 20 actions per kind)
+- Auto-refresh after create/add/use/transfer/scan
 
-VERIFY
-- Tap any dog row -> opens Dog Profile
+NOTES
+- Activity is stored in localStorage key: breederPro_inventory_activity_v1
+- This patch overrides window.renderInv.
