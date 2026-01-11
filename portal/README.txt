@@ -1,26 +1,33 @@
-USER-DEFINED DESTINATION DROPDOWN (Transfer)
+INVENTORY/STOCK: A–C (Source presets + Remember last + Locations editor)
 
-FILES
-- inventory_destination_presets_patch.js
-- inventory_destination_presets_patch.css
+WHAT THIS ADDS
+A) User-defined SOURCE dropdown (per kind) + Manage dialog
+B) Remembers last used Source/Destination per kind
+C) Locations editor per item (edit buckets)
 
 INSTALL (root index is entrypoint)
 1) Upload into /portal/:
-   - portal/inventory_destination_presets_patch.js
-   - portal/inventory_destination_presets_patch.css
+   - portal/inventory_locations_ui_patch.js
+   - portal/inventory_locations_ui_patch.css
 
 2) In root index.html:
    - In <head>:
-     <link rel="stylesheet" href="portal/inventory_destination_presets_patch.css" />
+     <link rel="stylesheet" href="portal/inventory_locations_ui_patch.css" />
 
    - At bottom (right before </body>), load AFTER other inventory patches:
-     <script src="portal/inventory_destination_presets_patch.js"></script>
+     <script src="portal/inventory_locations_ui_patch.js"></script>
 
 USAGE
-- Go to Transfer
-- Use "Saved destinations" dropdown to fill Destination text field
-- Tap "Manage" to add/remove destinations
-- Destinations are stored per kind (Inventory vs Stock) in localStorage
+- Transfer:
+  - Saved sources/destinations dropdowns fill Source/Destination
+  - "Manage locations" lets user edit presets (separate Inventory vs Stock)
+  - Last-used source/dest auto-fills next time
+
+- Inventory Available:
+  - Each card gets a "Locations" button
+  - Opens editor to add/remove locations and adjust quantities (buckets)
+  - Totals auto-recompute
 
 STORAGE
-- breederPro_transfer_destinations_v1
+- Presets: breederPro_transfer_locations_presets_v1
+- Last used: breederPro_transfer_last_v1

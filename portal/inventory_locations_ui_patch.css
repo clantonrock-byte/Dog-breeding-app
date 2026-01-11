@@ -1,0 +1,43 @@
+/* inventory_locations_ui_patch.css */
+
+.loc-list {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.loc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.04);
+  font-size: 12px;
+}
+
+.loc-x {
+  border: 0;
+  background: transparent;
+  font-weight: 900;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.loc-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 44px;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.loc-name { font-weight: 800; }
+.loc-qty { width: 100%; }
+
+.btn-locs { flex: 1; }
+.transfer-presets-wrap select { width: 100%; }
