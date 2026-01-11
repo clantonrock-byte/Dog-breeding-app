@@ -1593,17 +1593,17 @@
   setInterval(bind, 800);
 })();
 </script>
+<!-- Dog list styles (polish) -->
 <link rel="stylesheet" href="portal/dogs_filters_polish.css" />
+
+<!-- If you still need this CSS, keep it; otherwise remove it -->
 <link rel="stylesheet" href="portal/dog_ui_patch.css" />
 
-<!-- Base dog UI patch FIRST (if you still need it) -->
+<!-- If dog_ui_patch.js changes behavior you still need, load it BEFORE polish.
+     Otherwise remove it. -->
 <script src="portal/dog_ui_patch.js"></script>
 
-<!-- Then the "final dog renderer" -->
+<!-- THIS should be last dog renderer -->
 <script src="portal/dogs_filters_polish.js"></script>
-
-<!-- Then button behavior fixes LAST -->
-<script src="portal/dogs_male_female_fix.js"></script>
-<script src="portal/dogs_unassigned_fix.js"></script>
 </body>
 </html>
