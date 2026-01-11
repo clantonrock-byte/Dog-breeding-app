@@ -1,6 +1,23 @@
+/* === Combined Dogs Patch Styles === */
 
-.dog-row{display:flex;align-items:center;gap:10px}
-.dog-thumb{width:44px;height:44px;border-radius:10px;object-fit:cover}
-.dog-thumb.placeholder{background:#444}
-.route-pill{border:1px solid #666;border-radius:999px;padding:6px 10px;background:#222;color:#fff}
-.route-pill.is-empty{opacity:.6}
+.dog-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.dog-row-left { flex: 0 0 auto; }
+.dog-row-mid { flex: 1 1 auto; min-width: 0; }
+.dog-row-right { flex: 0 0 auto; display: flex; align-items: center; }
+
+.dog-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; display: block; }
+.dog-thumb.placeholder { width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.08); }
+
+.dog-row-title { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+
+.route-pill {
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.route-pill.is-empty { cursor: default; opacity: 0.7; }
