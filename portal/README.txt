@@ -1,18 +1,26 @@
-TRANSFER: SELECTABLE SOURCE + DESTINATION TEXT
+USER-DEFINED DESTINATION DROPDOWN (Transfer)
+
+FILES
+- inventory_destination_presets_patch.js
+- inventory_destination_presets_patch.css
 
 INSTALL (root index is entrypoint)
-1) Upload:
-   portal/inventory_transfer_source_patch.js
+1) Upload into /portal/:
+   - portal/inventory_destination_presets_patch.js
+   - portal/inventory_destination_presets_patch.css
 
-2) In root index.html, include AFTER your inventory patches:
-   <script src="portal/inventory_transfer_source_patch.js"></script>
+2) In root index.html:
+   - In <head>:
+     <link rel="stylesheet" href="portal/inventory_destination_presets_patch.css" />
+
+   - At bottom (right before </body>), load AFTER other inventory patches:
+     <script src="portal/inventory_destination_presets_patch.js"></script>
 
 USAGE
 - Go to Transfer
-- Pick Source location (dropdown)
-- Enter Destination (text)
-- Done -> moves qty from Source -> Destination bucket (does NOT reduce total)
+- Use "Saved destinations" dropdown to fill Destination text field
+- Tap "Manage" to add/remove destinations
+- Destinations are stored per kind (Inventory vs Stock) in localStorage
 
-NOTES
-- If Destination is blank, Transfer behaves like legacy (subtract qty via original applyTransfer).
-- Source options are generated from existing non-zero location buckets for that item.
+STORAGE
+- breederPro_transfer_destinations_v1
