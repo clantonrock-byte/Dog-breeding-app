@@ -1,103 +1,89 @@
-// Portal v6 — working tabs + content (keeps it usable)
-const TAB_TO_VIEW = {
-  dash: "viewDash",
-  dogs: "viewDogs",
-  inv_edible: "viewInvEdible",
-  stock_inedible: "viewStockInedible",
-  history: "viewHistory",
-};
 
-function esc(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
+// === Dog List Patch ===
+// Adds profile photo thumbnails + clickable route pill
+// Drop-in replacement helpers + renderDogs()
+
+const DOG_KEY = window.DOG_KEY || "breederPro_dogs_store_v3";
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function loadDogsStore(){
+  try{const r=localStorage.getItem(DOG_KEY);return r?JSON.parse(r):{dogs:[]};}
+  catch{return {dogs:[]};}
 }
 
-function loadAny(keys){
-  for(const k of keys){
-    const raw = localStorage.getItem(k);
-    if(raw) { try{return JSON.parse(raw);}catch{} }
-  }
-  return null;
+function ensureDog(d){
+  if(!d) return d;
+  d.immunizationEvents ||= [];
+  d.microchip ||= {value:"",locked:false,lockedAt:null};
+  d.photoDataUrl ||= "";
+  return d;
 }
 
-function getDogs(){
-  const obj = loadAny(["breederPro_dogs_store_v3","breeder_dogs_v1","breederPro_dogs_store_v1"]);
-  if(!obj) return [];
-  if(Array.isArray(obj)) return obj;
-  return obj.dogs || [];
+function getDogPhotoUrl(d){
+  return typeof d?.photoDataUrl==="string"?d.photoDataUrl.trim():"";
 }
 
-function getInv(){
-  const obj = loadAny(["breederPro_inventory_store_v1","breederPro_inventory_store_v3","breeder_inventory_v1"]);
-  if(!obj) return [];
-  if(Array.isArray(obj)) return obj;
-  return obj.inventory || [];
+function isPrintable(v){
+  if(v==null) return false;
+  if(typeof v==="string") return v.trim()&&v.length<80;
+  if(typeof v==="number") return Number.isFinite(v);
+  return false;
 }
 
-function getEvents(){
-  const ev = loadAny(["rc_events_v1","breeder_events_v1"]);
-  if(!ev) return [];
-  return Array.isArray(ev) ? ev : [];
+function detectRouteKey(dogs){
+  if(window.__routeKey) return window.__routeKey;
+  const score={};
+  dogs.slice(0,200).forEach(d=>{
+    Object.entries(d||{}).forEach(([k,v])=>{
+      if(!isPrintable(v)) return;
+      let s=0,kl=k.toLowerCase();
+      if(/route|run|pen|truck|kennel|area|zone|location/.test(kl)) s+=5;
+      if(/name|note|breed|sex|status|photo|id/.test(kl)) s-=2;
+      score[k]=(score[k]||0)+s;
+    });
+  });
+  let best="",bs=0;
+  Object.entries(score).forEach(([k,s])=>{if(s>bs){bs=s;best=k}});
+  window.__routeKey=bs>0?best:"";
+  return window.__routeKey;
 }
 
-function invKind(i){
-  const k=String(i.kind||"").toLowerCase();
-  return k==="inedible" ? "inedible" : "edible";
-}
-
-function renderDash(){
-  const dogs=getDogs();
-  const inv=getInv();
-  document.getElementById('viewDash').innerHTML = `
-    <div class="list">
-      <div class="item"><div class="h">Dogs</div><div class="sub">Total: <b>${dogs.length}</b></div></div>
-      <div class="item"><div class="h">Items</div><div class="sub">Total: <b>${inv.length}</b> (edible+inedible)</div></div>
-      <div class="item"><div class="h">Tip</div><div class="sub">Use tabs to drill down. Portal reads this device’s app data.</div></div>
-    </div>`;
+function openRoute(route){
+  window.dogsRouteFilter=route;
+  _go("Dogs");
+  renderDogs();
 }
 
 function renderDogs(){
-  const dogs=getDogs();
-  const el=document.getElementById('viewDogs');
-  el.innerHTML = `<div class="list">${
-    dogs.map(d=>`<div class="item"><div class="row"><div><div class="h">${esc(d.callName||d.name||'(unnamed)')}</div><div class="sub">Sex: ${esc(d.sex||'Unknown')} • Status: ${esc(d.status||'')}</div></div><span class="pill">${esc(d.status||'')}</span></div></div>`).join('')
-    || '<div class="sub">No dogs found.</div>'
-  }</div>`;
+  const store=loadDogsStore();
+  const all=(store.dogs||[]).map(ensureDog);
+  let list=all.filter(d=>!d.archived);
+
+  if(window.dogsViewMode==="Males") list=list.filter(d=>sexCategory(d.sex)==="male");
+  if(window.dogsViewMode==="Females") list=list.filter(d=>sexCategory(d.sex)==="female");
+  if(window.dogsViewMode==="Unassigned") list=list.filter(d=>sexCategory(d.sex)==="unknown");
+
+  const rk=detectRouteKey(all);
+  if(window.dogsRouteFilter)
+    list=list.filter(d=>(d[rk]||"").toLowerCase()===window.dogsRouteFilter.toLowerCase());
+
+  const el=document.getElementById("dogsList");
+  if(!el) return;
+
+  el.innerHTML=list.map(d=>{
+    const photo=getDogPhotoUrl(d);
+    const route=rk?d[rk]:"";
+    return `
+    <div class="timeline-item dog-row" onclick="_openDog('${esc(d.dogId)}')">
+      <div>${photo?`<img class="dog-thumb" src="${esc(photo)}">`:`<div class="dog-thumb placeholder"></div>`}</div>
+      <div class="dog-row-mid">
+        <strong>${esc(d.callName||"")}</strong>
+        <div class="muted small">${esc(d.breed||"")}</div>
+      </div>
+      <div>
+        ${route?`<button class="route-pill" onclick="event.stopPropagation();openRoute('${esc(route)}')">${esc(route)}</button>`:`<span class="route-pill is-empty">No route</span>`}
+      </div>
+    </div>`;
+  }).join("");
 }
-
-function renderInv(kind){
-  const inv=getInv().filter(i=>invKind(i)===kind && !i.archived);
-  const el=document.getElementById(kind==='edible'?'viewInvEdible':'viewStockInedible');
-  el.innerHTML = `<div class="list">${
-    inv.map(i=>`<div class="item"><div class="row"><div><div class="h">${esc(i.name||'(unnamed item)')}</div><div class="sub">Qty: <b>${Number(i.qty||0)}</b> • <code>${esc(i.identifierValue||'')}</code></div></div><span class="pill">${kind}</span></div></div>`).join('')
-    || '<div class="sub">No items found.</div>'
-  }</div>`;
-}
-
-function renderHistory(){
-  const ev=getEvents().slice().reverse().slice(0,50);
-  const el=document.getElementById('viewHistory');
-  el.innerHTML = `<div class="list">${
-    ev.map(e=>`<div class="item"><div class="h">${esc(e.type||'event')}</div><div class="sub">${esc(e.atLocal||e.atUtc||'')}</div><div class="sub">${esc(e.note||'')}</div></div>`).join('')
-    || '<div class="sub">No history found.</div>'
-  }</div>`;
-}
-
-function setTab(tab){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('.view').forEach(v=>v.classList.add('hide'));
-  const id = TAB_TO_VIEW[tab] || "viewDash";
-  const el = document.getElementById(id);
-  if(el) el.classList.remove('hide');
-
-  if(tab==='dash') renderDash();
-  if(tab==='dogs') renderDogs();
-  if(tab==='inv_edible') renderInv('edible');
-  if(tab==='stock_inedible') renderInv('inedible');
-  if(tab==='history') renderHistory();
-}
-
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=>setTab(b.dataset.tab)));
-setTab('dash');
