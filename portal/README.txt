@@ -1,20 +1,22 @@
-DOGS: NEEDS SEX SET FIX
 
-WHAT THIS FIXES
-- "Needs sex set" shows all dogs instead of filtering.
-
-WHY
-- Your list renderer is reading window.dogsViewMode,
-  but the existing "Needs sex set" handler updates a local dogsViewMode.
+DOGS UNIFIED v2 (Fix View All + Thumbnails)
 
 INSTALL (root index is entrypoint)
-1) Upload dogs_unassigned_fix.js to /portal/
-   /portal/dogs_unassigned_fix.js
+1) Upload both files into /portal/
+   - portal/dogs_unified_v2.js
+   - portal/dogs_unified_v2.css
 
-2) Add to the bottom of ROOT index.html (right before </body>):
-   <script src="portal/dogs_unassigned_fix.js"></script>
+2) In root index.html:
+   - Add CSS in <head>:
+     <link rel="stylesheet" href="portal/dogs_unified_v2.css" />
 
-(If you have a patch loader, you can load it there instead.)
+   - Add JS at the VERY bottom (right before </body>), and ensure it loads LAST:
+     <script src="portal/dogs_unified_v2.js"></script>
 
-VERIFY
-- Tap "Needs sex set" -> only dogs with unknown sex show in main list
+3) Remove or comment out older dog patches that also override renderDogs or bind dog buttons:
+   - portal/dogs_filters_polish.js
+   - portal/dogs_male_female_fix.js
+   - portal/dogs_unassigned_fix.js
+   - portal/dog_ui_patch.js (only if it changes dog list rendering)
+
+This script takes ownership of window.renderDogs.
