@@ -68,7 +68,7 @@
     } catch (_) {}
   };
 
-  function dogCardHtml(d, archived) {
+  function dogCardHtml(d,d.archived===true) {
     const photo = (d.photoDataUrl || "").trim();
     const thumb = photo
       ? `<img class="dog-thumb" src="${esc(photo)}" />`
