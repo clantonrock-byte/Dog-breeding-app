@@ -1,34 +1,20 @@
-LOW STOCK (ON HAND) + SETTINGS ITEM LISTS
+LOW BADGES ON HOME + OPTIONAL NOTIFICATIONS
 
-WHAT YOU ASKED FOR
-- Low prompt should be based on "On hand" per item (not total).
-- Inventory and Stock should list items separately.
-- When a new item is added, it appears in Settings to set its low prompt.
-
-WHAT THIS DOES
-- Uses DEFAULT SOURCE bucket (settings) as "On hand" and checks:
-  locs[defaultSource] <= minOnHand
-- Adds per-item minOnHand editor inside Settings:
-  - Inventory items list
-  - Stock items list
-- LOW badge added to Available cards
-- Optional once-per-day alert when opening Available list (per kind)
+WHAT YOU PICKED
+1) Show LOW (n) badge on Home buttons for Inventory and Stock
+3) Optional notifications (best-effort) via browser Notification API
 
 INSTALL
 1) Upload into /portal/:
-   - portal/inventory_lowstock_onhand_settings_patch.js
-   - portal/inventory_lowstock_onhand_settings_patch.css
+   - portal/inventory_low_badge_notify_patch.js
+   - portal/inventory_low_badge_notify_patch.css
 
 2) In root index.html:
    - In <head>:
-     <link rel="stylesheet" href="portal/inventory_lowstock_onhand_settings_patch.css" />
-   - At bottom (right before </body>), load AFTER inventory_settings_kindfix.js:
-     <script src="portal/inventory_lowstock_onhand_settings_patch.js"></script>
+     <link rel="stylesheet" href="portal/inventory_low_badge_notify_patch.css" />
+   - At bottom (right before </body>), load AFTER inventory_lowstock_onhand_settings_patch.js:
+     <script src="portal/inventory_low_badge_notify_patch.js"></script>
 
-IMPORTANT
-- Disable/remove older low-stock patches to avoid conflicts:
-  - inventory_settings_lowstock_patch.js
-
-DATA FIELDS
-- item.minOnHand (number)
-- settings: breederPro_inventory_settings_v2
+NOTES
+- Notifications require permission and typically HTTPS.
+- This patch adds a Notifications section in ⚙️ Settings (if Settings dialog exists).

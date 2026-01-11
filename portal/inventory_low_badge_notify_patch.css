@@ -1,0 +1,15 @@
+/* inventory_low_badge_notify_patch.css */
+
+.bp-low-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+  background: #b42318;
+}
+
+.bp-low-badge.hide { display: none; }
