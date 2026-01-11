@@ -1,18 +1,24 @@
 
-DOGS – STRONG ARCHIVED VISUALS
+DOGS UNIFIED v4 (ROW CLICK FIX)
 
-If you already installed dogs_unified_v3.js:
-- You only need to replace the CSS file with this one.
+INSTALL (root index is entrypoint)
+1) Upload into /portal/:
+   - portal/dogs_unified_v4.js
+   - portal/dogs_unified_v4.css
 
-INSTALL
-1) Upload:
-   - portal/dogs_unified_v3.css
-   - (dogs_unified_v3.js only if not already installed)
+2) In root index.html:
+   - In <head>:
+     <link rel="stylesheet" href="portal/dogs_unified_v4.css" />
 
-2) Ensure root index.html loads:
-   <link rel="stylesheet" href="portal/dogs_unified_v3.css" />
-   <script src="portal/dogs_unified_v3.js"></script>
+   - At bottom (right before </body>), LOAD LAST:
+     <script src="portal/dogs_unified_v4.js"></script>
 
-RESULT
-- Archived dogs have a RED 'ARCHIVED' pill
-- Card has red border + tinted background
+3) Remove/comment older dog scripts:
+   - portal/dogs_unified_v3.js / v2
+   - portal/dogs_filters_polish.js
+   - portal/dogs_male_female_fix.js
+   - portal/dogs_unassigned_fix.js
+   - portal/dog_ui_patch.js (if it overrides dog list rendering)
+
+VERIFY
+- Tap any dog row -> opens Dog Profile
