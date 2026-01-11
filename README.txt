@@ -1,19 +1,25 @@
-UPLOAD INSTRUCTIONS (HOT PATCH)
+DOGS: (A) Needs sex set as a true filter + (B) list polish
 
-1) Copy BOTH files into your repo next to index.html:
-   - dog_ui_patch.js
-   - dog_ui_patch.css
+FILES
+- dogs_filters_polish.js
+- dogs_filters_polish.css
 
-2) Edit index.html and add these TWO tags near the bottom (after your existing CSS/JS is fine):
-   <link rel="stylesheet" href="dog_ui_patch.css" />
-   <script src="dog_ui_patch.js"></script>
+INSTALL (root index is entrypoint)
+1) Upload both files into /portal/
+   /portal/dogs_filters_polish.js
+   /portal/dogs_filters_polish.css
 
-3) Refresh the app (hard refresh).
+2) Add CSS to root index.html <head> (or your main css imports):
+   <link rel="stylesheet" href="portal/dogs_filters_polish.css" />
 
-WHY THIS WORKS
-- Your app appears to define renderDogs() inline inside index.html.
-- This patch overrides renderDogs() at runtime so you don't have to move code around.
+3) Add JS to the bottom of root index.html (right before </body>):
+   <script src="portal/dogs_filters_polish.js"></script>
 
-If nothing changes after install:
-- Make sure index.html actually includes dog_ui_patch.js (no 404)
-- In browser console run: typeof renderDogs
+RESULT
+- "Needs sex set" behaves like All/Males/Females (filters main list)
+- Dog rows are tappable with chevron
+- Badges: Male/Female/Needs sex, Intact/Altered, Status, Route (best-effort)
+
+NOTES
+- This patch replaces window.renderDogs at runtime to standardize behavior.
+- It does not modify stored dog data.
