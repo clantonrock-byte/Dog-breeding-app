@@ -1,6 +1,6 @@
 // portal/patches/patches.js
 console.log("✅ patches.js loaded");
-
+alert("HELLO FROM PATCHES");
 (function () {
   /**
    * This loader injects patch scripts AFTER the app loads.
