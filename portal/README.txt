@@ -1,23 +1,20 @@
-DOGS: VIEW MALES / VIEW FEMALES FIX
+DOGS: NEEDS SEX SET FIX
 
 WHAT THIS FIXES
-- "View all dogs" works, but "View males" / "View females" don't filter correctly.
+- "Needs sex set" shows all dogs instead of filtering.
 
 WHY
-- Some versions of renderDogs() read window.dogsViewMode.
-- Your "View males/females" buttons may only update a local dogsViewMode variable.
+- Your list renderer is reading window.dogsViewMode,
+  but the existing "Needs sex set" handler updates a local dogsViewMode.
 
-INSTALL (ROOT index is entrypoint)
-Option A (recommended): Use your patch loader
-- Put dogs_male_female_fix.js in /portal/
-- Add this line to portal/patches/patches.js:
-  load("../dogs_male_female_fix.js");
-  (or whatever your loader function is)
+INSTALL (root index is entrypoint)
+1) Upload dogs_unassigned_fix.js to /portal/
+   /portal/dogs_unassigned_fix.js
 
-Option B: Direct include (quick)
-- Add to the bottom of the index.html that actually runs:
-  <script src="portal/dogs_male_female_fix.js"></script>
+2) Add to the bottom of ROOT index.html (right before </body>):
+   <script src="portal/dogs_unassigned_fix.js"></script>
+
+(If you have a patch loader, you can load it there instead.)
 
 VERIFY
-- Tap View males -> list shows only Male dogs
-- Tap View females -> list shows only Female dogs
+- Tap "Needs sex set" -> only dogs with unknown sex show in main list
