@@ -1,0 +1,4 @@
+/* portal/inventory.bundle.css */
+/* Minimal styling for new bits (reorder button + pending line) */
+.btn-reorder{flex:1}
+.inv-pending-line{margin-top:8px}
