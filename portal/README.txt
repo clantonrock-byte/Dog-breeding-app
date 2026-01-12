@@ -1,30 +1,18 @@
+DOGS: BITCH IN HEAT ALERTS (HEAT + SOON)
 
-A–D BUNDLE (Stabilize + Reorder + Backup)
+Install (bundles setup):
+1) Upload into /portal/:
+   - portal/dogs_heat_alert_patch.js
+   - portal/dogs_heat_alert_patch.css
 
-WHAT THIS ZIP GIVES YOU
-- portal/dogs.bundle.js + portal/dogs.bundle.css
-  - Unified Dogs renderer that "wins" after legacy re-renders
-- portal/inventory.bundle.js + portal/inventory.bundle.css
-  - Loads existing inventory patches in correct order
-  - Adds Reorder workflow (Pending) + Backup/Restore/Reset inside Settings
+2) In root index.html <head>:
+   <link rel="stylesheet" href="portal/dogs_heat_alert_patch.css" />
 
-INSTALL
-1) Upload these 4 files into /portal/:
-   - portal/dogs.bundle.js
-   - portal/dogs.bundle.css
-   - portal/inventory.bundle.js
-   - portal/inventory.bundle.css
+3) At the bottom, load AFTER dogs.bundle.js:
+   <script src="portal/dogs_heat_alert_patch.js"></script>
 
-2) Update root index.html:
-   In <head> add:
-     <link rel="stylesheet" href="portal/dogs.bundle.css" />
-     <link rel="stylesheet" href="portal/inventory.bundle.css" />
-
-   At the bottom (right before </body>) keep ONLY:
-     <script src="portal/inventory.bundle.js"></script>
-     <script src="portal/dogs.bundle.js"></script>
-
-IMPORTANT
-- Do NOT delete the existing inventory patch files yet; inventory.bundle.js loads them.
-- After you confirm everything works for a day, we can create a true single-file inventory bundle and then delete:
-    inventory_ui_patch.js, inventory_a_to_d_patch.js, inventory_destination_presets_patch.js, etc.
+Usage:
+- Dog Profile (female): set Currently in heat + Heat start date + notes.
+- Dog list: HEAT badge if in heat; SOON if predicted next heat within warn days.
+- Dogs view: once per day popup summary when any are in heat or due soon.
+- Settings: Heat alerts section (cycle days, heat duration days, warn days).
