@@ -1,19 +1,18 @@
-SETTINGS TABS PATCH v2
+SETTINGS TABS PATCH v3 (AUTO-DETECT DIALOG)
 
-WHY v2
-- Your Settings sections are injected at different times by different patches/bundles.
-- v2 re-applies tab layout after the dialog exists and on dialog open.
+Use this if v2 doesn't show tabs reliably.
+v3 doesn't depend on #dlgBpSettings; it detects the Settings dialog automatically.
 
 INSTALL
 1) Upload into /portal/:
-   - portal/settings_tabs_patch_v2.js
-   - portal/settings_tabs_patch.css
+   - portal/settings_tabs_patch_v3.js
+   - portal/settings_tabs_patch.css   (same CSS file name)
 
-2) In root index.html:
+2) root index.html:
    <head>:
      <link rel="stylesheet" href="portal/settings_tabs_patch.css" />
-   bottom (right before </body>), load AFTER inventory.bundle.js:
-     <script src="portal/settings_tabs_patch_v2.js"></script>
+   footer (load last):
+     <script src="portal/settings_tabs_patch_v3.js"></script>
 
-3) Hard refresh (Samsung cache bust):
-   add ?v=999 to the URL
+3) Remove the v2 script include to avoid double-loading:
+   - portal/settings_tabs_patch_v2.js
