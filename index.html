@@ -172,6 +172,16 @@
     <div class="brand-sub">Phase 1</div>
   </div>
   <button id="btnTalk" class="btn">🎙️ Talk</button>
+<button id="btnSettings" class="btn" type="button"
+  onclick="(function(){
+    var dlg=document.getElementById('dlgBpSettings');
+    if(dlg && dlg.showModal){ try{ dlg.showModal(); return; }catch(e){} }
+    if(window.__go){ try{ __go('Home'); }catch(e){} }
+    alert('Settings dialog not available yet.');
+  })();">
+  ⚙️ Settings
+</button>
+
 </header>
 
 <main class="shell">
