@@ -1,0 +1,8 @@
+/* dogs_unified_v5.css */
+.dog-card{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;user-select:none}
+.dog-card-left{flex:0 0 auto}
+.dog-card-mid{flex:1 1 auto;min-width:0}
+.dog-card-right{flex:0 0 auto;font-size:26px;line-height:1;opacity:.65;padding-left:6px}
+.dog-card-title{font-weight:900;font-size:18px}
+.dog-thumb{width:46px;height:46px;border-radius:12px;object-fit:cover;display:block}
+.dog-thumb.placeholder{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.08)}
