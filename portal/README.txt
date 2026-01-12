@@ -1,23 +1,20 @@
-AUTO LOGOUT AFTER INACTIVITY (10 MINUTES)
+SETTINGS TABS PATCH (Professional Settings UX)
 
-WHAT THIS DOES
-- Logs the user out after 10 minutes of no interaction
-- Forces Portal PIN screen to reappear
-- Prevents phone-back / idle screen from staying unlocked
+Adds tabs inside Settings dialog:
+- Access | Dogs | Inventory | Data
 
-REQUIRES
-- portal_pin_multiuser_v2.js installed and working
+Also moves Backup/Restore (import/export) into the Data tab automatically if #bpBackupWrap exists.
 
-INSTALL
+INSTALL (bundles setup)
 1) Upload into /portal/:
-   portal/portal_auto_logout.js
+   - portal/settings_tabs_patch.js
+   - portal/settings_tabs_patch.css
 
-2) In root index.html, load AFTER portal_pin_multiuser_v2.js:
-   <script src="portal/portal_auto_logout.js"></script>
+2) In root index.html:
+   In <head>:
+     <link rel="stylesheet" href="portal/settings_tabs_patch.css" />
+   At bottom (right before </body>), load AFTER inventory.bundle.js:
+     <script src="portal/settings_tabs_patch.js"></script>
 
-CHANGE TIMEOUT
-- Edit TIMEOUT_MINUTES inside the file (default = 10)
-
-BEHAVIOR
-- Any touch, tap, scroll, or keypress resets the timer
-- After timeout, PIN screen returns
+NOTES
+- This patch only rearranges existing Settings sections; it does not change underlying logic.
