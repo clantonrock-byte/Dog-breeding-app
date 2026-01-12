@@ -1,13 +1,14 @@
-SETTINGS BUTTON FIX
+SETTINGS DIALOG BOOTSTRAP
 
-Adds a guaranteed ⚙️ Settings button so you don't lose access to settings after patch cleanup.
+If your Settings button says "Settings dialog not available yet", this fixes it by
+creating the <dialog id="dlgBpSettings"> at runtime.
 
 INSTALL
 1) Upload into /portal/:
-   portal/settings_button_patch.js
+   portal/settings_dialog_bootstrap.js
 
-2) Add to root index.html footer (near the end, after bundles):
-   <script src="portal/settings_button_patch.js"></script>
+2) Add to root index.html footer (after bundles is fine):
+   <script src="portal/settings_dialog_bootstrap.js"></script>
 
 3) Hard refresh:
-   add ?v=4000 to your URL
+   ?v=8000
