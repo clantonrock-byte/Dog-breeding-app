@@ -1,18 +1,17 @@
-DOGS: BITCH IN HEAT ALERTS (HEAT + SOON)
+MULTI-USER PORTAL PIN GATE (client-side)
 
-Install (bundles setup):
+Install:
 1) Upload into /portal/:
-   - portal/dogs_heat_alert_patch.js
-   - portal/dogs_heat_alert_patch.css
+   - portal/portal_pin_multiuser.js
+   - portal/portal_pin_multiuser.css
 
-2) In root index.html <head>:
-   <link rel="stylesheet" href="portal/dogs_heat_alert_patch.css" />
+2) root index.html:
+   <head>:
+     <link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
+   bottom (AFTER dogs.bundle.js):
+     <script src="portal/portal_pin_multiuser.js"></script>
 
-3) At the bottom, load AFTER dogs.bundle.js:
-   <script src="portal/dogs_heat_alert_patch.js"></script>
-
-Usage:
-- Dog Profile (female): set Currently in heat + Heat start date + notes.
-- Dog list: HEAT badge if in heat; SOON if predicted next heat within warn days.
-- Dogs view: once per day popup summary when any are in heat or due soon.
-- Settings: Heat alerts section (cycle days, heat duration days, warn days).
+First-time setup:
+- Open site -> lock screen -> tap "Admin setup"
+- Create Admin name + PIN
+- Unlock, then ⚙️ Settings -> Portal access -> Add users and set PINs

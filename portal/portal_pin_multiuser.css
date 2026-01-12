@@ -1,0 +1,16 @@
+
+/* portal_pin_multiuser.css */
+.bp-portal-locked body{overflow:hidden}
+#portalPinOverlay{position:fixed;inset:0;z-index:999999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px}
+.bp-pin-card{width:min(520px,96vw);border-radius:16px;background:#fff;padding:14px;border:1px solid rgba(0,0,0,.15)}
+.bp-pin-title{font-weight:900;font-size:18px}
+.bp-pin-sub{margin-top:4px;font-size:13px;color:#555}
+.bp-pin-label{display:block;margin-top:10px;font-size:12px;color:#666}
+.bp-pin-card input,.bp-pin-card select{width:100%;padding:10px;border-radius:10px;border:1px solid #cfcfcf;margin-top:6px}
+.bp-pin-remember{margin-top:10px;font-size:13px;display:flex;gap:10px;align-items:center;color:#333}
+.bp-pin-btn{margin-top:12px;width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2d6cdf;background:#2d6cdf;color:#fff;font-weight:900}
+.bp-pin-msg{margin-top:10px;font-size:13px;color:#b42318;min-height:16px}
+.bp-pin-footer{margin-top:10px;display:flex;justify-content:flex-end}
+.bp-pin-link{border:0;background:transparent;color:#2d6cdf;font-weight:800;padding:6px 8px}
+.bp-user-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(0,0,0,.12);border-radius:12px;padding:10px;margin-top:10px}
+.bp-user-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
