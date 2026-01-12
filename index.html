@@ -1608,6 +1608,22 @@
   document.addEventListener("DOMContentLoaded", bind);
   setInterval(bind, 800);
 })();
+<!-- SETTINGS DIALOG (required for tabs + portal access + data tools) -->
+<dialog id="dlgBpSettings">
+  <form method="dialog" class="dlg-card">
+    <div class="dlg-h">
+      <h2>Settings</h2>
+      <button class="btn" value="cancel" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Settings content will be injected here by your patches -->
+
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Close</button>
+      <button class="btn primary" id="btnBpSaveSettings" value="ok">Save</button>
+    </div>
+  </form>
+</dialog>
 </script>
 <!-- Dog list styles (polish) -->
   <!-- If you still need this CSS, keep it; otherwise remove it -->
