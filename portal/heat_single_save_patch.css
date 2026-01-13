@@ -1,0 +1,3 @@
+/* heat_single_save_patch.css */
+/* Ensure the heat-block save button is hidden even if DOM is rebuilt */
+#btnSaveHeat { display: none !important; }

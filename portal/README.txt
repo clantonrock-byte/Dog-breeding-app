@@ -1,24 +1,22 @@
-HEAT NAME BADGES v3 (PHASE-AWARE)
+HEAT SINGLE SAVE PATCH
 
-Requested behavior:
-- RED "HEAT" while in standing heat
-- YELLOW only when coming into or coming out of heat:
-  - "HEAT SOON" (within 14 days before predicted heat)
-  - "HEAT ENDING" (within last 5 days of heat window)
+Fixes: Two save buttons on Dog Profile.
+- Hides the Heat card "Save" button.
+- Use only the bottom "Save & Done".
 
-Install:
+REQUIRES
+- dog_status_heat_unify_patch.js installed (so Save & Done persists heat fields)
+- dog_profile_polish_patch_v2.js installed
+
+INSTALL
 1) Upload into /portal/:
-   - portal/dogs_heat_name_badge_v3.js
-   - portal/dogs_heat_name_badge.css
+   portal/heat_single_save_patch.js
+   portal/heat_single_save_patch.css
 
 2) In root index.html:
    <head>:
-     <link rel="stylesheet" href="portal/dogs_heat_name_badge.css" />
-   footer (after dogs_heat_cycle_per_dog.js):
-     <script src="portal/dogs_heat_name_badge_v3.js"></script>
+     <link rel="stylesheet" href="portal/heat_single_save_patch.css" />
+   footer (after dog_profile_polish_patch_v2.js and dogs_heat_cycle_per_dog.js):
+     <script src="portal/heat_single_save_patch.js"></script>
 
-3) Remove older badge scripts:
-   - dogs_heat_name_badge_v2.js
-   - dogs_heat_name_badge.js
-
-Hard refresh: ?v=9401
+Hard refresh: ?v=9803
