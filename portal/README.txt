@@ -1,12 +1,17 @@
-DOG FORCE PERSIST: STATUS + HEAT
+PROFILE SAVE + AUTOFILL FIX
 
-Use this if Breed saves but Status (Adult/Puppy) or Heat keeps reverting after refresh.
+Fixes:
+- Chrome password manager popping up on Notes inputs
+- Status (Puppy/Adult) + Heat not sticking after refresh
 
 Install:
 1) Upload into /portal/:
-   portal/dog_force_persist_status_heat.js
+   portal/profile_save_and_autofill_fix.js
 
-2) Add to root index.html footer AFTER dogs.bundle.js and dog_profile_polish_patch_v2.js:
-   <script src="portal/dog_force_persist_status_heat.js"></script>
+2) Add to root index.html footer AFTER:
+   - dogs.bundle.js
+   - dog_profile_polish_patch_v2.js
+   - dogs_heat_cycle_per_dog.js (if used)
+   <script src="portal/profile_save_and_autofill_fix.js"></script>
 
-Hard refresh: ?v=9810
+Hard refresh: ?v=9905
