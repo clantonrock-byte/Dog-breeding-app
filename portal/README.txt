@@ -1,22 +1,12 @@
-HEAT SINGLE SAVE PATCH
+DOG FORCE PERSIST: STATUS + HEAT
 
-Fixes: Two save buttons on Dog Profile.
-- Hides the Heat card "Save" button.
-- Use only the bottom "Save & Done".
+Use this if Breed saves but Status (Adult/Puppy) or Heat keeps reverting after refresh.
 
-REQUIRES
-- dog_status_heat_unify_patch.js installed (so Save & Done persists heat fields)
-- dog_profile_polish_patch_v2.js installed
-
-INSTALL
+Install:
 1) Upload into /portal/:
-   portal/heat_single_save_patch.js
-   portal/heat_single_save_patch.css
+   portal/dog_force_persist_status_heat.js
 
-2) In root index.html:
-   <head>:
-     <link rel="stylesheet" href="portal/heat_single_save_patch.css" />
-   footer (after dog_profile_polish_patch_v2.js and dogs_heat_cycle_per_dog.js):
-     <script src="portal/heat_single_save_patch.js"></script>
+2) Add to root index.html footer AFTER dogs.bundle.js and dog_profile_polish_patch_v2.js:
+   <script src="portal/dog_force_persist_status_heat.js"></script>
 
-Hard refresh: ?v=9803
+Hard refresh: ?v=9810
