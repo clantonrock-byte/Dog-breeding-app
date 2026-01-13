@@ -1,11 +1,24 @@
-.heat-name-badge {
-  margin-left: 8px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  vertical-align: middle;
+/* dogs_heat_name_badge.css (v3)
+ * Red: HEAT
+ * Yellow: HEAT SOON / HEAT ENDING
+ */
+
+.heat-name-badge{
+  margin-left:8px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:0.08em;
+  vertical-align:middle;
 }
-.heat-name-badge.heat-now { background: #b42318; color: #fff; }
-.heat-name-badge.heat-soon { background: #f59e0b; color: #000; }
+
+.heat-name-badge.heat-now{
+  background:#b42318;
+  color:#fff;
+}
+
+.heat-name-badge.heat-warn{
+  background:#f59e0b;
+  color:#000;
+}
