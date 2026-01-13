@@ -1,16 +1,14 @@
-DOGS HEAT ALERT v2 (INTACT FEMALES ONLY)
+DOGS HEAT ALERT v3 (INTACT FEMALES ONLY + PROFILE BADGE)
 
-WHAT CHANGED
-- Heat block and badges show ONLY for Female (intact) dogs.
-- Spayed females do NOT show heat tracking.
+Change from v2:
+- Adds HEAT/SOON badge on the Dog Profile header/title.
 
-INSTALL
+Install:
 1) Upload into /portal/:
-   - portal/dogs_heat_alert_patch_v2.js
-   - portal/dogs_heat_alert_patch.css  (same css file name)
-2) In root index.html footer, replace old heat script:
-   <script src="portal/dogs_heat_alert_patch_v2.js"></script>
-3) Keep css in <head>:
-   <link rel="stylesheet" href="portal/dogs_heat_alert_patch.css" />
+   - portal/dogs_heat_alert_patch_v3.js
+   - portal/dogs_heat_alert_patch.css (unchanged)
 
-Hard refresh: ?v=9001
+2) In root index.html footer, replace v2:
+   <script src="portal/dogs_heat_alert_patch_v3.js"></script>
+
+3) Hard refresh: ?v=9002
