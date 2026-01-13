@@ -1,14 +1,16 @@
-SETTINGS DIALOG BOOTSTRAP
+DOGS HEAT ALERT v2 (INTACT FEMALES ONLY)
 
-If your Settings button says "Settings dialog not available yet", this fixes it by
-creating the <dialog id="dlgBpSettings"> at runtime.
+WHAT CHANGED
+- Heat block and badges show ONLY for Female (intact) dogs.
+- Spayed females do NOT show heat tracking.
 
 INSTALL
 1) Upload into /portal/:
-   portal/settings_dialog_bootstrap.js
+   - portal/dogs_heat_alert_patch_v2.js
+   - portal/dogs_heat_alert_patch.css  (same css file name)
+2) In root index.html footer, replace old heat script:
+   <script src="portal/dogs_heat_alert_patch_v2.js"></script>
+3) Keep css in <head>:
+   <link rel="stylesheet" href="portal/dogs_heat_alert_patch.css" />
 
-2) Add to root index.html footer (after bundles is fine):
-   <script src="portal/settings_dialog_bootstrap.js"></script>
-
-3) Hard refresh:
-   ?v=8000
+Hard refresh: ?v=9001
