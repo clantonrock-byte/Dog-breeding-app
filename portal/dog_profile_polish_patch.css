@@ -1,0 +1,29 @@
+/* dog_profile_polish_patch.css */
+
+/* Keep space at bottom so action bar doesn't cover inputs */
+#viewDogProfile {
+  padding-bottom: 84px;
+}
+
+/* Sticky action bar */
+.bp-dog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin-top: 14px;
+  padding: 12px 0 0 0;
+  backdrop-filter: blur(8px);
+}
+
+.bp-dog-save {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* Ensure the hidden "More" toggle doesn't reserve space */
+#btnMoreDog.hide {
+  display: none !important;
+}

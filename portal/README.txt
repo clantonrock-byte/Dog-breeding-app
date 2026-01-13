@@ -1,17 +1,18 @@
-HEAT NAME BADGES v2
+DOG PROFILE POLISH PATCH
+
+Changes:
+- Removes "More" toggle: always shows more fields
+- Adds ONE bottom button: "Save & Done" (sticky)
 
 Install:
 1) Upload into /portal/:
-   - portal/dogs_heat_name_badge_v2.js
-   - portal/dogs_heat_name_badge.css
+   - portal/dog_profile_polish_patch.js
+   - portal/dog_profile_polish_patch.css
 
 2) In root index.html:
    <head>:
-     <link rel="stylesheet" href="portal/dogs_heat_name_badge.css" />
-   footer (AFTER dogs_heat_cycle_per_dog.js):
-     <script src="portal/dogs_heat_name_badge_v2.js"></script>
+     <link rel="stylesheet" href="portal/dog_profile_polish_patch.css" />
+   footer (AFTER dogs.bundle.js):
+     <script src="portal/dog_profile_polish_patch.js"></script>
 
-3) Remove old badge script include if present:
-   - dogs_heat_name_badge.js
-
-Hard refresh: ?v=9301
+Hard refresh: ?v=9700
