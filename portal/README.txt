@@ -1,14 +1,14 @@
-DOGS HEAT ALERT v3 (INTACT FEMALES ONLY + PROFILE BADGE)
+DOGS HEAT ALERT v4 (INTACT FEMALES ONLY + PROFILE BADGE + ROBUST INSERTION)
 
-Change from v2:
-- Adds HEAT/SOON badge on the Dog Profile header/title.
+Fix:
+- Heat section now inserts even if your profile page doesn't have #secStatus.
 
 Install:
 1) Upload into /portal/:
-   - portal/dogs_heat_alert_patch_v3.js
+   - portal/dogs_heat_alert_patch_v4.js
    - portal/dogs_heat_alert_patch.css (unchanged)
 
-2) In root index.html footer, replace v2:
-   <script src="portal/dogs_heat_alert_patch_v3.js"></script>
+2) Replace your heat script include with:
+   <script src="portal/dogs_heat_alert_patch_v4.js"></script>
 
-3) Hard refresh: ?v=9002
+3) Hard refresh: ?v=9004
