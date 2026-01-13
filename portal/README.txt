@@ -1,15 +1,18 @@
-HEAT VISUAL BADGES v2 (COMPUTED FROM DATA)
+HEAT NAME BADGES (RELIABLE)
 
-Fix: If you didn't see badges before, v2 computes directly from localStorage dog data.
+Shows HEAT / HEAT SOON next to the dog's NAME (list + profile).
 
-Install:
+This avoids photo DOM issues and is the most reliable placement.
+
+INSTALL
 1) Upload into /portal/:
-   - portal/dogs_heat_visual_badges_v2.js
-   - portal/dogs_heat_visual_badges.css
+   - portal/dogs_heat_name_badge.js
+   - portal/dogs_heat_name_badge.css
 
 2) In root index.html:
-   <head>: <link rel="stylesheet" href="portal/dogs_heat_visual_badges.css" />
-   footer: load AFTER dogs_heat_cycle_per_dog.js:
-     <script src="portal/dogs_heat_visual_badges_v2.js"></script>
+   <head>:
+     <link rel="stylesheet" href="portal/dogs_heat_name_badge.css" />
+   footer (AFTER dogs_heat_cycle_per_dog.js):
+     <script src="portal/dogs_heat_name_badge.js"></script>
 
-Hard refresh: ?v=9201
+Hard refresh: ?v=9300
