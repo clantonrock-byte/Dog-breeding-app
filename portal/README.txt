@@ -1,14 +1,15 @@
-DOGS HEAT ALERT v4 (INTACT FEMALES ONLY + PROFILE BADGE + ROBUST INSERTION)
 
-Fix:
-- Heat section now inserts even if your profile page doesn't have #secStatus.
+DOG HEAT: PER-DOG + SIX-MONTH FORECAST (NO GLOBAL SETTINGS)
 
 Install:
 1) Upload into /portal/:
-   - portal/dogs_heat_alert_patch_v4.js
-   - portal/dogs_heat_alert_patch.css (unchanged)
+   - portal/dogs_heat_cycle_per_dog.js
+   - portal/dogs_heat_cycle_per_dog.css
 
-2) Replace your heat script include with:
-   <script src="portal/dogs_heat_alert_patch_v4.js"></script>
+2) In root index.html:
+   - In <head>:
+     <link rel="stylesheet" href="portal/dogs_heat_cycle_per_dog.css" />
+   - In footer, remove older heat scripts and add:
+     <script src="portal/dogs_heat_cycle_per_dog.js"></script>
 
-3) Hard refresh: ?v=9004
+Hard refresh: ?v=9100
