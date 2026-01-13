@@ -1,5 +1,3 @@
-/* dogs_heat_name_badge.css */
-
 .heat-name-badge {
   margin-left: 8px;
   padding: 2px 8px;
@@ -9,13 +7,5 @@
   letter-spacing: 0.06em;
   vertical-align: middle;
 }
-
-.heat-name-badge.heat-now {
-  background: #b42318;
-  color: #fff;
-}
-
-.heat-name-badge.heat-soon {
-  background: #f59e0b;
-  color: #000;
-}
+.heat-name-badge.heat-now { background: #b42318; color: #fff; }
+.heat-name-badge.heat-soon { background: #f59e0b; color: #000; }
