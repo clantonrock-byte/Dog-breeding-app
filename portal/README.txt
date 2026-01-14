@@ -1,18 +1,16 @@
-DOG PROFILE CLEANUP (Status lock + remove heat notes)
+DOG STATUS REDUNDANCY FIX
 
-Changes:
-1) Once dog status is set to non-Puppy (e.g., Adult), it becomes locked (can't revert to Puppy).
-2) Removes the Heat block "Notes (optional)" field (use main Dog Notes below instead).
+Removes extra "Set Puppy/Set Adult" buttons and prevents reverting Adult -> Puppy.
 
-INSTALL
+Install:
 1) Upload into /portal/:
-   - portal/dog_profile_status_heat_cleanup.js
-   - portal/dog_profile_status_heat_cleanup.css
+   - portal/dog_status_redundancy_fix.js
+   - portal/dog_status_redundancy_fix.css
 
 2) In root index.html:
    <head>:
-     <link rel="stylesheet" href="portal/dog_profile_status_heat_cleanup.css" />
+     <link rel="stylesheet" href="portal/dog_status_redundancy_fix.css" />
    footer (after dogs.bundle.js):
-     <script src="portal/dog_profile_status_heat_cleanup.js"></script>
+     <script src="portal/dog_status_redundancy_fix.js"></script>
 
-Hard refresh: ?v=9950
+Hard refresh: ?v=9960
