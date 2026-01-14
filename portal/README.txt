@@ -1,20 +1,20 @@
-STATUS vs DISPOSITION (Retired is Disposition)
+STATUS vs DISPOSITION SPLIT – SAFE v2
 
-This patch:
-- Keeps Life Stage Status dropdown to Puppy/Adult only.
-- Ensures Disposition includes Retired.
-- Removes legacy "Life status" card that references transfer/deceased under Status.
-- Hides life-stage dropdown once Adult.
+What it does:
+- Life Stage Status (#dogStatus): ONLY Puppy, Adult
+- Disposition (#dogDisposition): Active, For sale, Retired, Transferred, Deceased
+- No broad hiding; only manipulates these two selects
 
-INSTALL
+Install:
 1) Upload into /portal/:
-   - portal/dog_status_disposition_split_patch.js
-   - portal/dog_status_disposition_split_patch.css
+   - portal/dog_status_disposition_split_safe_v2.js
+   - portal/dog_status_disposition_split_safe_v2.css (optional, minimal)
 
-2) Add to root index.html:
-   <head>:
-     <link rel="stylesheet" href="portal/dog_status_disposition_split_patch.css" />
-   footer (after dogs.bundle.js and after dog_disposition_patch.js):
-     <script src="portal/dog_status_disposition_split_patch.js"></script>
+2) index.html:
+   <head> (optional):
+     <link rel=\"stylesheet\" href=\"portal/dog_status_disposition_split_safe_v2.css\" />
+   footer (AFTER dog_disposition_patch.js):
+     <script src=\"portal/dog_status_disposition_split_safe_v2.js\"></script>
 
-Hard refresh: ?v=10500
+3) Keep your prior “status vs disposition split” script commented out.
+4) Hard refresh: ?v=10510
