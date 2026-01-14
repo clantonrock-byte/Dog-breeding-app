@@ -1,21 +1,20 @@
-DOG DISPOSITION PATCH (SECOND STATUS)
+DOG LIFE-STAGE PROMOTE PATCH
 
 Goal:
-- Keep Puppy/Adult as the life stage.
-- Add a separate "Disposition" status for: For sale | Transferred | Deceased.
+- Remove redundancy of the Status dropdown.
+- Show ONE-way "Promote to Adult" only when status is Puppy.
+- Hide the Puppy/Adult selector once Adult (or other non-Puppy status) is set.
+- Keep Disposition selector for For sale / Transferred / Deceased.
 
 Install:
 1) Upload into /portal/:
-   - portal/dog_disposition_patch.js
-   - portal/dog_disposition_patch.css
+   - portal/dog_lifestage_promote_patch.js
+   - portal/dog_lifestage_promote_patch.css
 
 2) In root index.html:
    <head>:
-     <link rel="stylesheet" href="portal/dog_disposition_patch.css" />
-   footer (after dogs.bundle.js and after dog_profile_polish_patch_v2.js):
-     <script src="portal/dog_disposition_patch.js"></script>
+     <link rel="stylesheet" href="portal/dog_lifestage_promote_patch.css" />
+   footer (after dogs.bundle.js):
+     <script src="portal/dog_lifestage_promote_patch.js"></script>
 
-Hard refresh: ?v=9970
-
-Notes:
-- Disposition "Transferred" or "Deceased" auto-archives the dog.
+Hard refresh: ?v=9990
