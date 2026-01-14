@@ -1,17 +1,18 @@
-PROFILE SAVE + AUTOFILL FIX
+DOG PROFILE CLEANUP (Status lock + remove heat notes)
 
-Fixes:
-- Chrome password manager popping up on Notes inputs
-- Status (Puppy/Adult) + Heat not sticking after refresh
+Changes:
+1) Once dog status is set to non-Puppy (e.g., Adult), it becomes locked (can't revert to Puppy).
+2) Removes the Heat block "Notes (optional)" field (use main Dog Notes below instead).
 
-Install:
+INSTALL
 1) Upload into /portal/:
-   portal/profile_save_and_autofill_fix.js
+   - portal/dog_profile_status_heat_cleanup.js
+   - portal/dog_profile_status_heat_cleanup.css
 
-2) Add to root index.html footer AFTER:
-   - dogs.bundle.js
-   - dog_profile_polish_patch_v2.js
-   - dogs_heat_cycle_per_dog.js (if used)
-   <script src="portal/profile_save_and_autofill_fix.js"></script>
+2) In root index.html:
+   <head>:
+     <link rel="stylesheet" href="portal/dog_profile_status_heat_cleanup.css" />
+   footer (after dogs.bundle.js):
+     <script src="portal/dog_profile_status_heat_cleanup.js"></script>
 
-Hard refresh: ?v=9905
+Hard refresh: ?v=9950
