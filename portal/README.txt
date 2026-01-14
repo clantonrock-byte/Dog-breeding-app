@@ -1,25 +1,20 @@
-DOG PROFILE – COMBINED PATCH
-============================
+STATUS vs DISPOSITION (Retired is Disposition)
 
-This bundle combines the following fixes:
-
-1) dog-profile-final-cleanup
-   - Removes redundant profile controls
-   - Single Save / Save & Done flow
-   - Profile-level persistence cleanup
-   - Notes autofill suppression
-
-2) dog-sex-dropdown-filter-v2
-   - Once a sex is selected, opposite-sex options are hidden
-   - If spayed/neutered is selected, all other sex options are locked out
-   - Enforces: intact -> fixed only (no cross-sex switching)
-
-NOT INCLUDED (parked intentionally):
-- dog-lifestage-no-dropdown (as requested)
+This patch:
+- Keeps Life Stage Status dropdown to Puppy/Adult only.
+- Ensures Disposition includes Retired.
+- Removes legacy "Life status" card that references transfer/deceased under Status.
+- Hides life-stage dropdown once Adult.
 
 INSTALL
--------
-• Copy the JS files into /portal/
-• Ensure these scripts load AFTER dogs.bundle.js in index.html
+1) Upload into /portal/:
+   - portal/dog_status_disposition_split_patch.js
+   - portal/dog_status_disposition_split_patch.css
 
-This bundle is safe to apply on top of your current state.
+2) Add to root index.html:
+   <head>:
+     <link rel="stylesheet" href="portal/dog_status_disposition_split_patch.css" />
+   footer (after dogs.bundle.js and after dog_disposition_patch.js):
+     <script src="portal/dog_status_disposition_split_patch.js"></script>
+
+Hard refresh: ?v=10500
