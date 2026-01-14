@@ -154,7 +154,7 @@
       <div class="timeline-item" style="margin-top:12px;">
         <strong>Disposition</strong>
         <div class="muted small" style="margin-top:6px;">
-          Active / For sale / Retired / Transferred / Deceased (separate from life stage).
+          Active / For sale / Retired / Transferred / Deceased (Retired/Transferred/Deceased auto-archive).
         </div>
         <label class="label">Disposition</label>
         <select id="bpDisposition"></select>
@@ -277,7 +277,7 @@
 
         d.disposition = $("bpDisposition").value;
 
-        if (d.disposition === "Transferred" || d.disposition === "Deceased") {
+        if (d.disposition === "Transferred" || d.disposition === "Deceased" || d.disposition === "Retired") {
           d.archived = true;
           d.archivedAt = d.archivedAt || nowISO();
         } else {

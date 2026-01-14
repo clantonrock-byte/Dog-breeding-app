@@ -3,7 +3,7 @@ DOG PROFILE REBUILD v2 (below photo)
 This replaces the entire Dog Profile form BELOW the photo with a clean stable UI:
 - One Save & Done
 - One-way Puppy -> Adult
-- Disposition with Retired
+- Disposition with Retired (auto-archives on Retired/Transferred/Deceased)
 - Sex filtering + fixed lock
 - Heat tracking only for Adult + Female (intact)
 
