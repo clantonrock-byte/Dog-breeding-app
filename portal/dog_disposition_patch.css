@@ -1,0 +1,4 @@
+/* dog_disposition_patch.css */
+#bpDispositionWrap select {
+  width: 100%;
+}
