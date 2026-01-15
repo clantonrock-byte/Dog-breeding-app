@@ -1,20 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <!-- Core app styles -->
-  <link rel="stylesheet" href="portal/dog_profile_toggles.css" />
-  <link rel="stylesheet" href="style.css" />
-<!--  <link rel="stylesheet" href="portal/dogs.bundle.css" />-->
-  <link rel="stylesheet" href="portal/inventory.bundle.css" />
+<link rel="stylesheet" href="style.css" />
 
-  <!-- Access / settings -->
-  <link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
-  <link rel="stylesheet" href="portal/settings_polish.css" />
-  <link rel="stylesheet" href="portal/dogs_list_thumb_rowclick_patch_v2.css" />
-  <link rel="stylesheet" href="portal/dogs_list_thumbs.css" />
-  <!-- ✅ SINGLE profile owner (V3) -->
-  <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_5.css" />
-  <link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
+<link rel="stylesheet" href="portal/dogs.bundle.css" />
+<link rel="stylesheet" href="portal/inventory.bundle.css" />
+
+<link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
+<link rel="stylesheet" href="portal/settings_polish.css" />
+
+<link rel="stylesheet" href="portal/dogs_list_thumb_rowclick_patch_v2.css" />
+<link rel="stylesheet" href="portal/dogs_list_thumbs.css" />
+
+<link rel="stylesheet" href="portal/dog_profile_rebuild_v3_5.css" />
+<link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
 
 <meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
@@ -1601,17 +1600,20 @@
   </form>
 </dialog>
 </script>
-<!-- Core bundles -->
-  <script src="portal/inventory.bundle.js"></script>
-  <script src="portal/dogs.bundle.js"></script>
-  <script src="portal/dogs_bundle_profile_disable_v3.js"></script>
-  <script src="portal/dogs_list_thumb_rowclick_patch_v1.js"></script>
-  <!-- Navigation / access -->
-  <script src="portal/back_button_history_patch.js"></script>
-  <script src="portal/portal_pin_multiuser_v2.js"></script>
+<!-- bundles -->
+<script src="portal/inventory.bundle.js"></script>
+<script src="portal/dogs.bundle.js"></script>
 
-  <!-- ✅ SINGLE profile owner (V3) -->
-  <script src="portal/dog_profile_rebuild_v3_5.js"></script>
+<!-- keep dogs list; disable legacy profile resets; restore list row click + thumbs -->
+<script src="portal/dogs_bundle_profile_disable_v3.js"></script>
+<script src="portal/dogs_list_thumb_rowclick_patch_v2.js"></script>
+
+<!-- nav / access -->
+<script src="portal/back_button_history_patch.js"></script>
+<script src="portal/portal_pin_multiuser_v2.js"></script>
+
+<!-- ✅ profile owner (must be last) -->
+<script src="portal/dog_profile_rebuild_v3_5.js"></script>
 </body>
 </html>
 
