@@ -1,0 +1,18 @@
+.bp-profile-v33 { padding-bottom: 84px; }
+.bp-v33-title { font-weight: 900; font-size: 18px; margin-bottom: 10px; }
+.bp-savebar { position: sticky; bottom: 0; z-index: 10; margin-top: 14px; padding: 12px 0 0 0; backdrop-filter: blur(8px); }
+.bp-savebtn { width: 100%; min-height: 54px; border-radius: 16px; font-size: 16px; font-weight: 900; }
+.bp-promote { width: 100%; border-radius: 16px; min-height: 48px; font-weight: 900; }
+.bp-hide-legacy-profile { display: none !important; }
+.bp-v33-badge {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  z-index: 9999;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-weight: 900;
+  font-size: 12px;
+}

@@ -1,22 +1,21 @@
-DOG PROFILE REBUILD v3.2 (FORCE INSERT + DEBUG BADGE)
+DOG PROFILE REBUILD v3.3 (RESOLVE DOG ID)
 
-Use this if your profile ends at Rabies / you don't see the rebuilt panel.
-This version:
-- Forces insertion near the top of #viewDogProfile (no photo anchor required)
-- Shows a small "V3.2" badge bottom-right to confirm script loaded
-- Hides legacy Done/Notes/More and legacy ids (dogStatus/dogSexInline etc)
+You saw: "currentDogId is not set yet" with v3.2.
+This v3.3 resolves the dogId using:
+1) window.currentDogId (if set)
+2) Fallback: match Dog Profile title text to store.dogs[].callName (must be unique)
 
 Install:
 1) Upload to /portal/:
-   - portal/dog_profile_rebuild_v3_2.js
-   - portal/dog_profile_rebuild_v3_2.css
+   - portal/dog_profile_rebuild_v3_3.js
+   - portal/dog_profile_rebuild_v3_3.css
 
 2) index.html:
    <head>:
-     <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_2.css" />
+     <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_3.css" />
    footer (after dogs.bundle.js):
-     <script src="portal/dog_profile_rebuild_v3_2.js"></script>
+     <script src="portal/dog_profile_rebuild_v3_3.js"></script>
 
-3) Remove other rebuild scripts (v3/v3.1) while testing.
+3) Remove other rebuild scripts while testing (v3/v3.1/v3.2).
 
-Hard refresh: ?v=12032
+Hard refresh: ?v=12033
