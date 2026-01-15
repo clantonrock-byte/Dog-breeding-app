@@ -1,0 +1,17 @@
+
+.toggle-group {
+  display: flex;
+  gap: 8px;
+}
+.toggle {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  text-align: center;
+}
+.toggle.active {
+  background: var(--primary);
+  color: #fff;
+}
