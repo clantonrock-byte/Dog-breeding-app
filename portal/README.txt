@@ -1,30 +1,29 @@
-DOG PROFILE REBUILD v3.4 (AUTOSAVE INTERACTIONS)
+DOGS.BUNDLE PROFILE DISABLE PATCH
 
-Fixes:
-- Heat checkbox "flicking off" (caused by re-render before Save & Done)
-- Promote to Adult "not sticking" (same cause)
+You proved it: when portal/dogs.bundle.js is commented out, heat stops flicking off.
+That means dogs.bundle.js is still controlling (and resetting) the legacy profile UI.
 
-Changes:
-- No continuous interval re-render; only a short retry loop on profile open
-- Auto-saves on:
-  - Sex change
-  - Disposition change
-  - Promote to Adult
-  - Heat today / ended
-  - In-heat checkbox toggle
-  - Heat start date change
+This patch keeps dogs.bundle.js for the Dogs list, BUT disables its Dog Profile renderer.
 
-Install:
-1) Upload to /portal/:
-   - portal/dog_profile_rebuild_v3_4.js
-   - portal/dog_profile_rebuild_v3_4.css
+INSTALL
+1) Upload this file to /portal/:
+   - portal/dogs_bundle_profile_disable.js
 
-2) index.html:
-   <head>:
-     <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_4.css" />
-   footer (after dogs.bundle.js):
-     <script src="portal/dog_profile_rebuild_v3_4.js"></script>
+2) In root index.html footer, order MUST be:
 
-3) Remove other rebuild scripts while testing (v3.2/v3.3).
+<script src="portal/inventory.bundle.js"></script>
+<script src="portal/dogs.bundle.js"></script>
+<script src="portal/dogs_bundle_profile_disable.js"></script>
+<script src="portal/back_button_history_patch.js"></script>
+<script src="portal/portal_pin_multiuser_v2.js"></script>
+<script src="portal/dog_profile_rebuild_v3_5.js"></script>
 
-Hard refresh: ?v=12034
+(Your rebuild must be last. Remove any other profile scripts.)
+
+3) Hard refresh with cache buster:
+?v=13001
+
+EXPECTED RESULT
+- Dogs list still works (because dogs.bundle is loaded)
+- Opening a dog profile no longer flicks off heat / resets Adult/Puppy
+- Rebuild UI owns the profile completely
