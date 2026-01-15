@@ -1,19 +1,22 @@
-DOG PROFILE UI POLISH (CSS ONLY)
+DOG PROFILE REBUILD v3.6 (FULL)
 
-This patch improves layout + navigation for the rebuilt profile panel (v3.5),
-without changing any saving logic.
-
-WHAT IT DOES
-- Sticky section tabs (Basics/Repro/Heat/Notes) with blur background
-- Better spacing + touch targets
-- Safer sticky Save & Done (respects iOS safe-area inset)
-- Slightly larger inputs + consistent rounding
+This replaces the broken v3.5 stub with the full rebuilt profile panel:
+- Inserts after the Photo block
+- Autosaves sex/disposition/promotion/heat toggles
+- Includes sections + jump buttons
+- Shows badge V3.6
 
 INSTALL
-1) Upload to /portal/:
-   - portal/dog_profile_ui_polish.css
+1) Upload to /portal:
+   - dog_profile_rebuild_v3_6.js
+   - dog_profile_rebuild_v3_6.css
 
-2) Add to root index.html <head> AFTER dog_profile_rebuild_v3_5.css:
-   <link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
+2) index.html:
+   <head> add:
+     <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_6.css" />
+   footer (last):
+     <script src="portal/dog_profile_rebuild_v3_6.js"></script>
 
-Hard refresh: ?v=17001
+3) Remove old rebuild scripts (v3.2/v3.3/v3.4/v3.5).
+
+Hard refresh: ?v=21001

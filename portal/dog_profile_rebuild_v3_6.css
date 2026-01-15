@@ -1,0 +1,21 @@
+.bp-profile-v36 { padding-bottom: 92px; }
+.bp-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin-bottom: 10px; }
+.bp-title { font-weight: 900; font-size: 18px; }
+.bp-tabs { display:flex; gap:8px; margin: 10px 0 14px 0; position: sticky; top: 64px; z-index: 9;
+  padding: 8px 0; backdrop-filter: blur(10px);
+  background: linear-gradient(to bottom, rgba(11,11,13,0.75), rgba(11,11,13,0.25));
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.bp-tab { flex:1; padding:10px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.05); font-weight: 800; min-height:44px; font-size: 14px; }
+.bp-acc { border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 8px 10px; background: rgba(255,255,255,0.03); margin-top: 10px; }
+.bp-acc summary { list-style:none; cursor:pointer; font-weight: 900; font-size: 16px; display:flex; align-items:center; justify-content:space-between; padding: 10px 4px; }
+.bp-acc summary::-webkit-details-marker { display:none; }
+.bp-acc[open] summary { border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 8px; }
+.bp-body { padding: 6px 2px 10px 2px; }
+.bp-savebar { position: sticky; bottom: 0; z-index: 10; margin-top: 14px; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); backdrop-filter: blur(12px);
+  background: linear-gradient(to top, rgba(11,11,13,0.85), rgba(11,11,13,0.20)); border-top: 1px solid rgba(255,255,255,0.08); }
+.bp-savebtn { width: 100%; min-height: 56px; border-radius: 18px; font-size: 16px; font-weight: 900; }
+.bp-hide-legacy-profile { display: none !important; }
+.bp-v36-badge { position: fixed; right: 10px; bottom: 10px; z-index: 9999; padding: 6px 10px; border-radius: 999px;
+  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.15); font-weight: 900; font-size: 12px; opacity: 0.65; }
