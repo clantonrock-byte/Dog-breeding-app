@@ -1,29 +1,40 @@
-DOGS.BUNDLE PROFILE DISABLE PATCH
+DOG LIST + PROFILE PHOTO RESTORE (V2)
 
-You proved it: when portal/dogs.bundle.js is commented out, heat stops flicking off.
-That means dogs.bundle.js is still controlling (and resetting) the legacy profile UI.
+Symptoms you reported:
+- Dogs list shows "full image" instead of thumbnail
+- Dog profile shows NO image
 
-This patch keeps dogs.bundle.js for the Dogs list, BUT disables its Dog Profile renderer.
+Root cause:
+- The previous profile-disable patch blocked the legacy renderDogProfile, which also bound the photo.
+- The list thumbnail patch relies on CSS to size images; if CSS doesn't load or is overridden, it can expand.
+
+Fixes:
+1) dogs_bundle_profile_disable_v3.js
+   - Disables legacy profile DOM updates BUT still binds photo block (dogPhotoImg/placeholder/View photo)
+
+2) dogs_list_thumb_rowclick_patch_v2.js + .css
+   - Keeps thumbnail at 64x64 using CSS + inline fallback so it cannot blow up to full size
 
 INSTALL
-1) Upload this file to /portal/:
-   - portal/dogs_bundle_profile_disable.js
 
-2) In root index.html footer, order MUST be:
+1) Upload to /portal:
+- dogs_bundle_profile_disable_v3.js
+- dogs_list_thumb_rowclick_patch_v2.js
+- dogs_list_thumb_rowclick_patch_v2.css
 
+2) Root index.html HEAD:
+<link rel="stylesheet" href="portal/dogs_list_thumb_rowclick_patch_v2.css" />
+
+3) Root index.html FOOTER (order):
 <script src="portal/inventory.bundle.js"></script>
 <script src="portal/dogs.bundle.js"></script>
-<script src="portal/dogs_bundle_profile_disable.js"></script>
+
+<script src="portal/dogs_bundle_profile_disable_v3.js"></script>
+<script src="portal/dogs_list_thumb_rowclick_patch_v2.js"></script>
+
 <script src="portal/back_button_history_patch.js"></script>
 <script src="portal/portal_pin_multiuser_v2.js"></script>
+
 <script src="portal/dog_profile_rebuild_v3_5.js"></script>
 
-(Your rebuild must be last. Remove any other profile scripts.)
-
-3) Hard refresh with cache buster:
-?v=13001
-
-EXPECTED RESULT
-- Dogs list still works (because dogs.bundle is loaded)
-- Opening a dog profile no longer flicks off heat / resets Adult/Puppy
-- Rebuild UI owns the profile completely
+Hard refresh: ?v=15001
