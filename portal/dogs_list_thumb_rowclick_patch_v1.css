@@ -1,0 +1,8 @@
+.dog-thumb-btn{
+  width:64px;height:64px;border-radius:12px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.06);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;margin-right:10px;
+}
+.dog-thumb-btn img{width:100%;height:100%;object-fit:cover;}
