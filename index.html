@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Core app styles -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="portal/dogs.bundle.css" />
+  <link rel="stylesheet" href="portal/inventory.bundle.css" />
 
-<link rel="stylesheet" href="portal/dogs.bundle.css" />
-<link rel="stylesheet" href="portal/inventory.bundle.css" />
-<link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
-<link rel="stylesheet" href="portal/settings_polish.css" />
-<link rel="stylesheet" href="portal/dog_profile_rebuild_v2.css" />
-  
+  <!-- Access / settings -->
+  <link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
+  <link rel="stylesheet" href="portal/settings_polish.css" />
+
+  <!-- ✅ SINGLE profile owner (V3) -->
+  <link rel="stylesheet" href="portal/dog_profile_rebuild_v3.css" />
+
 <meta name="theme-color" content="#0b0b0d">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -1625,11 +1630,18 @@
   </form>
 </dialog>
 </script>
-<script src="portal/inventory.bundle.js"></script>
-<script src="portal/dogs.bundle.js"></script>
-<script src="portal/dog_profile_rebuild_v2.js"></script>
-<script src="portal/back_button_history_patch.js"></script>
-<script src="portal/portal_pin_multiuser_v2.js"></script>
+<!-- Core bundles -->
+  <script src="portal/inventory.bundle.js"></script>
+  <script src="portal/dogs.bundle.js"></script>
+
+  <!-- Navigation / access -->
+  <script src="portal/back_button_history_patch.js"></script>
+  <script src="portal/portal_pin_multiuser_v2.js"></script>
+
+  <!-- ✅ SINGLE profile owner (V3) -->
+  <script src="portal/dog_profile_rebuild_v3.js"></script>
+</body>
+</html>
 
 
 
