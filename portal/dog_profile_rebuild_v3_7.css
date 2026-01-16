@@ -1,143 +1,214 @@
-.bp-profile-v37 { padding-bottom: 92px; }
-.bp-head { display:flex; justify-content:space-between; align-items:flex-end; gap:10px; margin-bottom: 10px; }
-.bp-title { font-weight: 900; font-size: 18px; }
-.bp-tabs { display:flex; gap:8px; margin: 10px 0 14px 0; position: sticky; top: 64px; z-index: 9;
-  padding: 8px 0; backdrop-filter: blur(10px);
-  background: linear-gradient(to bottom, rgba(11,11,13,0.75), rgba(11,11,13,0.25));
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.bp-tab { flex:1; padding:10px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.05); font-weight: 800; min-height:44px; font-size: 14px; }
-.bp-section { border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; padding: 12px 12px; background: rgba(255,255,255,0.03); margin-top: 12px; }
-.bp-section h3 { margin: 0 0 10px 0; font-size: 16px; }
-.bp-savebar { position: sticky; bottom: 0; z-index: 10; margin-top: 14px; padding: 10px 0 calc(10px + env(safe-area-inset-bottom)); backdrop-filter: blur(12px);
-  background: linear-gradient(to top, rgba(11,11,13,0.85), rgba(11,11,13,0.20)); border-top: 1px solid rgba(255,255,255,0.08); }
-.bp-savebtn { width: 100%; min-height: 56px; border-radius: 18px; font-size: 16px; font-weight: 900; }
-.bp-hide-legacy-profile { display: none !important; }
-.bp-v37-badge { position: fixed; right: 10px; bottom: 10px; z-index: 9999; padding: 6px 10px; border-radius: 999px;
-  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.15); font-weight: 900; font-size: 12px; opacity: 0.65; }
-/* =========================================================
-   Breeder Pro — Dog Profile (Rebuilt) Final Polish
-   Paste at END of dog_profile_rebuild_v3_7*.css
-   Goal:
-   - Remove "ghost" floating tabs
-   - Make layout readable on mobile
-   - Keep Save button usable without covering content
-   ========================================================= */
-
-/* Scope everything to rebuilt profile wrapper */
+<!DOCTYPE html>
+<html lang="en">
 <head>
-   <style>.bp-profile-v37 {
-  max-width: 720px;
-  margin: 0 auto;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dog Profile v3.7</title>
 
-/* Title spacing */
-.bp-profile-v37 .bp-head {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
+  <!-- =========================
+       Profile v3.7 Styles ONLY
+       ========================= -->
+  <style>
+    /* Hard reset for legacy profile UI */
+    #viewDogProfile,
+    #viewDogProfile * {
+      display: none !important;
+      pointer-events: none !important;
+    }
 
-.bp-profile-v37 .bp-title {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-}
+    /* Prevent any sticky / ghost elements */
+    .sticky,
+    .fixed,
+    [style*="position: fixed"],
+    [style*="position: sticky"] {
+      position: static !important;
+    }
 
-/* Tabs: NO sticky, NO translucency, no weird overlay */
-.bp-profile-v37 .bp-tabs {
-  position: static !important;
-  top: auto !important;
-  z-index: auto !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+    /* Profile container */
+    .bp-profile {
+      max-width: 720px;
+      margin: 16px auto;
+      padding: 16px;
+      background: #0b0b0d;
+      border-radius: 18px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+    }
 
-  display: flex;
-  gap: 10px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  padding: 8px 2px 10px 2px;
-  margin: 6px 0 12px 0;
+    .bp-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
+    .bp-sub {
+      font-size: 12px;
+      opacity: 0.65;
+      margin-bottom: 14px;
+    }
 
-/* Tab buttons */
-.bp-profile-v37 .bp-tab {
-  flex: 0 0 auto;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.85);
-  font-weight: 700;
-  line-height: 1;
-}
+    /* Tabs */
+    .bp-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
 
-.bp-profile-v37 .bp-tab:active {
-  transform: translateY(1px);
-}
+    .bp-tab {
+      flex: 1;
+      padding: 10px;
+      border-radius: 999px;
+      border: none;
+      background: #1c1c22;
+      color: #bbb;
+      font-weight: 600;
+    }
 
-/* Active tab (if you add aria-current or data-active later, this helps) */
-.bp-profile-v37 .bp-tab[aria-current="true"],
-.bp-profile-v37 .bp-tab[data-active="1"] {
-  background: rgba(66,133,244,0.22);
-  border-color: rgba(66,133,244,0.45);
-  color: #fff;
-}
+    .bp-tab.active {
+      background: #2f6fed;
+      color: #fff;
+    }
 
-/* Sections feel like cards */
-.bp-profile-v37 .bp-section {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
-  padding: 14px;
-  margin: 14px 0;
-}
+    /* Sections */
+    .bp-section {
+      margin-top: 14px;
+      padding: 14px;
+      background: #141419;
+      border-radius: 14px;
+    }
 
-/* Section headings */
-.bp-profile-v37 .bp-section h3 {
-  margin: 0 0 10px 0;
-  font-size: 18px;
-  font-weight: 800;
-}
+    label {
+      display: block;
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 10px;
+    }
 
-/* Inputs/textarea spacing consistency */
-.bp-profile-v37 .label {
-  margin-top: 10px;
-}
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border-radius: 10px;
+      border: none;
+      background: #1f1f26;
+      color: #fff;
+    }
 
-.bp-profile-v37 input,
-.bp-profile-v37 select,
-.bp-profile-v37 textarea {
-  margin-top: 8px;
-}
+    .bp-save {
+      margin-top: 18px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 14px;
+      border: none;
+      background: #2f6fed;
+      color: #fff;
+    }
 
-/* Notes textarea: comfortable height */
-.bp-profile-v37 textarea {
-  min-height: 120px;
-}
-
-/* Save bar: make it part of flow (no overlap) */
-.bp-profile-v37 .bp-savebar {
-  position: static !important;
-  inset: auto !important;
-  padding: 14px 0 6px 0;
-  background: transparent !important;
-}
-
-/* Make Save button full width, not gigantic */
-.bp-profile-v37 .bp-savebtn {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 16px;
-  font-size: 18px;
-  font-weight: 900;
-}
-
-/* If anything legacy is still present, keep it invisible */
-.bp-hide-legacy-profile {
-  display: none !important;
-}</style>
+    .bp-version {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+  </style>
 </head>
+
+<body>
+
+  <!-- =========================
+       Dog Profile v3.7 ONLY
+       ========================= -->
+  <section class="bp-profile" id="bpProfile">
+
+    <div class="bp-title">Profile</div>
+    <div class="bp-sub">Basics • Repro • Heat • Notes</div>
+
+    <div class="bp-tabs">
+      <button class="bp-tab active">Basics</button>
+      <button class="bp-tab">Repro</button>
+      <button class="bp-tab">Heat</button>
+      <button class="bp-tab">Notes</button>
+    </div>
+
+    <div class="bp-section">
+      <label>Call name</label>
+      <input id="bpCallName" />
+
+      <label>Breed</label>
+      <input id="bpBreed" />
+
+      <label>Nicknames</label>
+      <input id="bpNicknames" />
+    </div>
+
+    <div class="bp-section">
+      <label>Sex</label>
+      <select id="bpSex"></select>
+
+      <label>Disposition</label>
+      <select id="bpDisposition"></select>
+    </div>
+
+    <div class="bp-section">
+      <label>Heat start date</label>
+      <input type="date" id="bpHeatStart" />
+    </div>
+
+    <div class="bp-section">
+      <label>Notes</label>
+      <textarea rows="5" id="bpNotes"></textarea>
+    </div>
+
+    <button class="bp-save" id="bpSave">Save &amp; Done</button>
+
+  </section>
+
+  <div class="bp-version">v3.7</div>
+
+  <!-- =========================
+       Profile v3.7 Logic
+       ========================= -->
+  <script>
+    console.log("Dog Profile v3.7 loaded cleanly");
+
+    // Minimal example wiring (safe)
+    const SEX_OPTIONS = [
+      "(unknown)",
+      "Male (intact)",
+      "Male (neutered)",
+      "Female (intact)",
+      "Female (spayed)"
+    ];
+
+    const DISPOSITIONS = [
+      "Active",
+      "For sale",
+      "Retired",
+      "Transferred",
+      "Deceased"
+    ];
+
+    function fillSelect(id, options) {
+      const sel = document.getElementById(id);
+      sel.innerHTML = "";
+      options.forEach(o => {
+        const opt = document.createElement("option");
+        opt.textContent = o;
+        sel.appendChild(opt);
+      });
+    }
+
+    fillSelect("bpSex", SEX_OPTIONS);
+    fillSelect("bpDisposition", DISPOSITIONS);
+
+    document.getElementById("bpSave").addEventListener("click", () => {
+      alert("Saved (v3.7 stub)");
+    });
+  </script>
+
+</body>
+</html>
