@@ -26,7 +26,7 @@
    ========================================================= */
 
 /* Scope everything to rebuilt profile wrapper */
-.bp-profile-v37 {
+<head>.bp-profile-v37 {
   max-width: 720px;
   margin: 0 auto;
 }
@@ -139,3 +139,4 @@
 .bp-hide-legacy-profile {
   display: none !important;
 }
+</head>
