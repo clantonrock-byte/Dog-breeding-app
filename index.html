@@ -1,12 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  /* Absolute kill-switch for any legacy sticky profile UI */
-#viewDogProfile > * {
-  display: none !important;
-}
 <link rel="stylesheet" href="style.css" />
-
 <link rel="stylesheet" href="portal/dogs.bundle.css" />
 <link rel="stylesheet" href="style.css" />
 
@@ -248,7 +243,10 @@
 
   <!-- DOG PROFILE (placeholder only; rebuilt UI mounts here)-->
   <section id="viewDogProfile" class="card hide"></section>>
-  
+    /* Absolute kill-switch for any legacy sticky profile UI */
+#viewDogProfile > * {
+  display: none !important;
+}
 
   <!-- HEALTH: IMMUNIZATIONS -->
   <section id="viewHealthImmunizations" class="card hide">
