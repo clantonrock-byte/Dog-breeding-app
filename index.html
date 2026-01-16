@@ -1497,22 +1497,23 @@
   </form>
 </dialog>
 </script>
-<!-- core bundles -->
+<!-- Core bundles first -->
 <script src="portal/inventory.bundle.js"></script>
+<!-- Keep dogs.bundle.js ONLY if your dogs list needs it (filters/render). -->
 <script src="portal/dogs.bundle.js"></script>
 
-<!-- STOP dogs.bundle from owning DogProfile -->
+<!-- Patch dogs.bundle so it DOES NOT touch the DogProfile page -->
 <script src="portal/dogs_bundle_profile_disable_v4.js"></script>
 
-<!-- keep the list clickable + thumbnails -->
+<!-- Restore: row click + thumbnails for dogs list -->
 <script src="portal/dogs_list_thumb_rowclick_patch_v2.js"></script>
 
-<!-- navigation / access -->
+<!-- Access / navigation helpers -->
 <script src="portal/back_button_history_patch.js"></script>
 <script src="portal/portal_pin_multiuser_v2.js"></script>
 
-<!-- ✅ SINGLE profile owner (MUST BE LAST) -->
-<script src="portal/dog_profile_rebuild_v3_7_1.js"></script>
+<!-- Dog Profile rebuild MUST be last -->
+<script src="portal/dog_profile_rebuild_v3_7_1.js"></script>>
 </body>
 </html>
 
