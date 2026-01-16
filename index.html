@@ -141,6 +141,10 @@
       });
     })();
   </script>
+  <style>    /* Absolute kill-switch for any legacy sticky profile UI */
+#viewDogProfile > * {
+  display: none !important;
+}</style>
 </head>
 <body>
 
@@ -241,12 +245,11 @@
     </div>
   </section>
 
-  <!-- DOG PROFILE (placeholder only; rebuilt UI mounts here)-->
-  <section id="viewDogProfile" class="card hide"></section>>
-    /* Absolute kill-switch for any legacy sticky profile UI */
-#viewDogProfile > * {
-  display: none !important;
-}
+<!-- DOG PROFILE (legacy shell kept for navigation; rebuilt UI mounts here) -->
+<section id="viewDogProfile" class="card hide">
+  <h2 id="dogProfileTitle" class="hide"></h2>
+</section>>
+
 
   <!-- HEALTH: IMMUNIZATIONS -->
   <section id="viewHealthImmunizations" class="card hide">
