@@ -10,6 +10,18 @@
 
 <!-- profile rebuild styles -->
 <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_7.css" />
+  /* Stop the floating "ghost" tabs */
+.bp-tabs {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+  backdrop-filter: none !important;
+}
+
+/* Optional: keep Save bar from covering content */
+.bp-savebar {
+  position: static !important;
+}
 <link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
 
 <!-- settings/access styles -->
