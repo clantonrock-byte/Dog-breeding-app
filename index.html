@@ -141,8 +141,6 @@
       });
     })();
   </script>
-  <style>    /* Absolute kill-switch for any legacy sticky profile UI */
-<#viewDogProfile > * { display: none !important;}</style>
 </head>
 <body>
 
@@ -246,6 +244,22 @@
 <!-- DOG PROFILE (legacy shell kept for navigation; rebuilt UI mounts here) -->
 <section id="viewDogProfile" class="card hide">
   <h2 id="dogProfileTitle" class="hide"></h2>
+  <h2 id="dogProfileTitle">Dog Profile</h2>
+
+<div class="nav-row">
+  <button class="btn" onclick="__back()">Back</button>
+  <button class="btn" onclick="__home()">Home</button>
+</div>
+
+<!-- Photo block ONLY -->
+<div class="timeline-item">
+  <div><strong>Photo</strong></div>
+  <div id="dogPhotoTap">
+    <div id="dogPhotoPlaceholder"></div>
+    <img id="dogPhotoImg" />
+  </div>
+  <button id="btnViewPhoto">View photo</button>
+</div>
 </section>>
 
 
