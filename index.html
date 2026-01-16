@@ -1,6 +1,39 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <style>
+/* --- Hide legacy Dog Profile chrome (keep section for navigation) --- */
+#viewDogProfile > h2,
+#viewDogProfile > .nav-row {
+  display: none !important;
+}
+
+/* --- Keep the legacy PHOTO image area, but hide its label/help/button row --- */
+#viewDogProfile .timeline-item:first-of-type > div:first-child,   /* the "Photo" title */
+#viewDogProfile .timeline-item:first-of-type > .muted.small,      /* the help text */
+#viewDogProfile .timeline-item:first-of-type .row {               /* the "View photo" button row */
+  display: none !important;
+}
+
+/* --- Optional: if you still see any legacy inline blocks below photo, hide them --- */
+#viewDogProfile #dogStatusPill,
+#viewDogProfile #dogStatusTimestamps,
+#viewDogProfile #dogCallNameDisplay,
+#viewDogProfile #dogBreedInline,
+#viewDogProfile #dogDobInline,
+#viewDogProfile #dogNotes,
+#viewDogProfile #btnDoneDog,
+#viewDogProfile #btnNotesDog,
+#viewDogProfile #btnMoreDog,
+#viewDogProfile #btnSaveDog,
+#viewDogProfile #btnCancelDog,
+#viewDogProfile #btnMoreDogPanel,
+#viewDogProfile #statusNoteWrap,
+#viewDogProfile #microchipBlock,
+#viewDogProfile #rabiesBlock {
+  display: none !important;
+}
+  </style>
 <link rel="stylesheet" href="style.css" />
 <link rel="stylesheet" href="portal/dogs.bundle.css" />
 <link rel="stylesheet" href="style.css" />
