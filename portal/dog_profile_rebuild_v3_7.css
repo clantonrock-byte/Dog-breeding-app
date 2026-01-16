@@ -16,3 +16,126 @@
 .bp-hide-legacy-profile { display: none !important; }
 .bp-v37-badge { position: fixed; right: 10px; bottom: 10px; z-index: 9999; padding: 6px 10px; border-radius: 999px;
   background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.15); font-weight: 900; font-size: 12px; opacity: 0.65; }
+/* =========================================================
+   Breeder Pro — Dog Profile (Rebuilt) Final Polish
+   Paste at END of dog_profile_rebuild_v3_7*.css
+   Goal:
+   - Remove "ghost" floating tabs
+   - Make layout readable on mobile
+   - Keep Save button usable without covering content
+   ========================================================= */
+
+/* Scope everything to rebuilt profile wrapper */
+.bp-profile-v37 {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Title spacing */
+.bp-profile-v37 .bp-head {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.bp-profile-v37 .bp-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* Tabs: NO sticky, NO translucency, no weird overlay */
+.bp-profile-v37 .bp-tabs {
+  position: static !important;
+  top: auto !important;
+  z-index: auto !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 8px 2px 10px 2px;
+  margin: 6px 0 12px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Tab buttons */
+.bp-profile-v37 .bp-tab {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bp-profile-v37 .bp-tab:active {
+  transform: translateY(1px);
+}
+
+/* Active tab (if you add aria-current or data-active later, this helps) */
+.bp-profile-v37 .bp-tab[aria-current="true"],
+.bp-profile-v37 .bp-tab[data-active="1"] {
+  background: rgba(66,133,244,0.22);
+  border-color: rgba(66,133,244,0.45);
+  color: #fff;
+}
+
+/* Sections feel like cards */
+.bp-profile-v37 .bp-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 14px;
+  margin: 14px 0;
+}
+
+/* Section headings */
+.bp-profile-v37 .bp-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* Inputs/textarea spacing consistency */
+.bp-profile-v37 .label {
+  margin-top: 10px;
+}
+
+.bp-profile-v37 input,
+.bp-profile-v37 select,
+.bp-profile-v37 textarea {
+  margin-top: 8px;
+}
+
+/* Notes textarea: comfortable height */
+.bp-profile-v37 textarea {
+  min-height: 120px;
+}
+
+/* Save bar: make it part of flow (no overlap) */
+.bp-profile-v37 .bp-savebar {
+  position: static !important;
+  inset: auto !important;
+  padding: 14px 0 6px 0;
+  background: transparent !important;
+}
+
+/* Make Save button full width, not gigantic */
+.bp-profile-v37 .bp-savebtn {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* If anything legacy is still present, keep it invisible */
+.bp-hide-legacy-profile {
+  display: none !important;
+}
