@@ -198,12 +198,14 @@ function warnMissingView(name) {
     <button class="btn" onclick="__back()">Back</button>
     <button class="btn" onclick="__home()">Home</button>
   </div>
-
-  <div class="timeline-item">
-    <div class="muted small">
-      Dogs list will appear here.
-    </div>
+  <div class="row" style="margin-top:10px;">
+    <button class="btn primary" id="btnAddDog" type="button">+ Add dog</button>
   </div>
+
+  <div id="dogsMeta" class="muted small" style="margin-top:10px;"></div>
+
+  <div id="dogsList" style="margin-top:10px; display:flex; flex-direction:column; gap:10px;"></div>
+  
 </section>
     <!-- DOG PROFILE (single, valid) -->
     <section id="viewDogProfile" class="card hide">
