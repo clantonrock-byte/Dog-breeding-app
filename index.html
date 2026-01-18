@@ -6,14 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
 
-  <!-- base styles (ONCE) -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- dogs list styles -->
   <link rel="stylesheet" href="portal/dogs.bundle.css" />
   <link rel="stylesheet" href="portal/dogs_list_thumbs.css" />
-
-  <!-- dog profile rebuild styles -->
   <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_7.css" />
   <link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
 
@@ -29,7 +24,6 @@
     .brand-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
     .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; }
     h2{ margin:0 0 10px 0; font-size:18px; }
-    h3{ margin:10px 0 8px 0; font-size:16px; }
     .muted{ color:var(--muted); font-size:13px; }
     .small{ font-size:12px; }
     .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -37,29 +31,8 @@
     .nav-row .btn{ flex:1; }
     .btn{ padding:10px 12px; border-radius:10px; border:1px solid #cfcfcf; background:#fff; font-weight:700; }
     .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
-    .btn.danger{ background:var(--danger); border-color:var(--danger); color:#fff; }
-    .btn.ghost{ background:transparent; }
-    .goal-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; }
-    .timeline-item{ border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:10px; }
-    .label{ display:block; margin-top:10px; font-size:12px; color:var(--muted); }
-    input, select, textarea{ width:100%; padding:10px; border-radius:10px; border:1px solid #cfcfcf; background:#fff; }
-    textarea{ resize:vertical; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width:520px){ .grid2{ grid-template-columns:1fr; } }
-    .pill{ display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid #cfcfcf; font-size:12px; }
-    .action-row{ display:flex; gap:10px; margin-top:12px; }
-    .action-row .btn{ flex:1; }
-    .more-panel.hide{ display:none; }
 
-    /* Dog list thumb tile (baseline) */
-    .dog-thumb-btn{
-      width:64px;height:64px;border-radius:12px;
-      border:1px solid rgba(255,255,255,0.15);
-      background:rgba(255,255,255,0.06);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-      flex:0 0 auto; cursor:pointer;
-    }
-    .dog-thumb-btn img{width:100%;height:100%;object-fit:cover;display:block;}
+    .timeline-item{ border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:10px; }
 
     /* Keep legacy photo box visible; hide legacy inline profile controls below it */
     #viewDogProfile #dogStatusPill,
@@ -89,7 +62,6 @@
     }
   </style>
 
-  <!-- NAV defined immediately (OK to live in head) -->
   <script>
     (function () {
       const VIEWS = [
@@ -139,125 +111,73 @@
     })();
   </script>
 </head>
+
 <body>
-
-<!-- Rainbow overlay -->
-<div id="rainbowOverlay" aria-hidden="true">
-  <div id="rainbowArcWrap">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"  stop-color="#ff2a2a"/>
-          <stop offset="16%" stop-color="#ff8a00"/>
-          <stop offset="32%" stop-color="#ffd400"/>
-          <stop offset="48%" stop-color="#00b35a"/>
-          <stop offset="64%" stop-color="#006eff"/>
-          <stop offset="80%" stop-color="#4b00a8"/>
-          <stop offset="100%" stop-color="#d66bff"/>
-        </linearGradient>
-        <filter id="blur"><feGaussianBlur stdDeviation="1.4"/></filter>
-      </defs>
-      <g transform="translate(1200,0) scale(-1,1)">
-        <path id="rainbowPath"
-              d="M40 610 C220 260 480 120 680 105 C930 85 1120 240 1180 610"
-              fill="none" stroke="url(#g)" stroke-width="100" stroke-linecap="round"
-              filter="url(#blur)" opacity="0.92"/>
-        <path id="rainbowHighlight"
-              d="M70 612 C250 295 500 160 680 145 C900 125 1070 260 1140 612"
-              fill="none" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.10"/>
-      </g>
-    </svg>
-  </div>
-</div>
-
-<header class="topbar">
-  <div>
-    <div class="brand-title">Breeder Pro</div>
-    <div class="brand-sub">Phase 1</div>
-  </div>
-  <button id="btnTalk" class="btn">🎙️ Talk</button>
-<button id="btnSettings" class="btn" type="button"
-  onclick="(function(){
-    var dlg=document.getElementById('dlgBpSettings');
-    if(dlg && dlg.showModal){ try{ dlg.showModal(); return; }catch(e){} }
-    if(window.__go){ try{ __go('Home'); }catch(e){} }
-    alert('Settings dialog not available yet.');
-  })();">
-  ⚙️ Settings
-</button>
-
-</header>
-
-<main class="shell">
-  <!-- HOME -->
-  <section id="viewHome" class="card">
-    <h2>What is our goal today?</h2>
-    <div class="goal-grid">
-      <button class="btn primary" onclick="__go('Dogs')">Dogs</button>
-      <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
-      <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
-      <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
-      <button class="btn primary" onclick="rcSetKind('edible');__go('InventoryMenu')">Inventory (Edible)</button>
-      <button class="btn primary" onclick="rcSetKind('inedible');__go('StockMenu')">Stock (Inedible)</button>
-      <button class="btn primary" onclick="__go('Records')">Records</button>
+  <header class="topbar">
+    <div>
+      <div class="brand-title">Breeder Pro</div>
+      <div class="brand-sub">Phase 1</div>
     </div>
-  </section>
+    <button id="btnTalk" class="btn">🎙️ Talk</button>
+    <button id="btnSettings" class="btn" type="button"
+      onclick="(function(){
+        var dlg=document.getElementById('dlgBpSettings');
+        if(dlg && dlg.showModal){ try{ dlg.showModal(); return; }catch(e){} }
+        if(window.__go){ try{ __go('Home'); }catch(e){} }
+        alert('Settings dialog not available yet.');
+      })();">
+      ⚙️ Settings
+    </button>
+  </header>
 
-  <!-- DOGS -->
-  <section id="viewDogProfile" class="card hide">
-  <!-- Keep title element for resolver (can be hidden) -->
-  <h2 id="dogProfileTitle" class="hide">Dog Profile</h2>
+  <main class="shell">
+    <!-- HOME -->
+    <section id="viewHome" class="card">
+      <h2>What is our goal today?</h2>
+      <div class="goal-grid">
+        <button class="btn primary" onclick="__go('Dogs')">Dogs</button>
+        <button class="btn primary" onclick="__go('Feeding')">Feeding</button>
+        <button class="btn primary" onclick="__go('Care')">Care Timeline</button>
+        <button class="btn primary" onclick="__go('Helpers')">Helpers</button>
+        <button class="btn primary" onclick="rcSetKind('edible');__go('InventoryMenu')">Inventory (Edible)</button>
+        <button class="btn primary" onclick="rcSetKind('inedible');__go('StockMenu')">Stock (Inedible)</button>
+        <button class="btn primary" onclick="__go('Records')">Records</button>
+      </div>
+    </section>
 
-  <!-- Keep nav buttons (legacy), rebuild uses these too -->
-  <div class="nav-row">
-    <button class="btn" onclick="__back()">Back</button>
-    <button class="btn" onclick="__home()">Home</button>
-  </div>
+    <!-- DOG PROFILE (single, valid) -->
+    <section id="viewDogProfile" class="card hide">
+      <h2 id="dogProfileTitle" class="hide">Dog Profile</h2>
 
-  <!-- Keep archived banner element (harmless / optional) -->
-  <div id="dogArchivedBanner" class="timeline-item hide">
-    <div><strong id="dogArchivedBannerText">Archived</strong></div>
-    <div class="muted small" id="dogArchivedBannerMeta"></div>
-  </div>
+      <div class="nav-row">
+        <button class="btn" onclick="__back()">Back</button>
+        <button class="btn" onclick="__home()">Home</button>
+      </div>
 
-  <!-- Photo block ONLY (rebuild mounts AFTER this) -->
-  <div class="timeline-item" id="dogPhotoBlock">
-    <div><strong>Photo</strong></div>
-    <div class="muted small">Tap photo/placeholder to add or update (active). Archived is view-only.</div>
+      <div id="dogArchivedBanner" class="timeline-item hide">
+        <div><strong id="dogArchivedBannerText">Archived</strong></div>
+        <div class="muted small" id="dogArchivedBannerMeta"></div>
+      </div>
 
-    <div id="dogPhotoTap"
-         style="margin-top:10px; border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
-      <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
-      <img id="dogPhotoImg" alt="Dog photo"
-           style="display:none; max-width:100%; border-radius:12px;" />
-    </div>
+      <div class="timeline-item" id="dogPhotoBlock">
+        <div><strong>Photo</strong></div>
+        <div class="muted small">Tap photo/placeholder to add or update (active). Archived is view-only.</div>
 
-    <div class="row" style="margin-top:10px;">
-      <button class="btn" id="btnViewPhoto">View photo</button>
-    </div>
-  </div>
-  </section>
+        <div id="dogPhotoTap"
+             style="margin-top:10px; border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
+          <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
+          <img id="dogPhotoImg" alt="Dog photo"
+               style="display:none; max-width:100%; border-radius:12px;" />
+        </div>
 
-<!-- DOG PROFILE (legacy shell kept for navigation; rebuilt UI mounts here) -->
-<section id="viewDogProfile" class="card hide">
-  <h2 id="dogProfileTitle" class="hide"></h2>
-  <h2 id="dogProfileTitle">Dog Profile</h2>
-
-<div class="nav-row">
-  <button class="btn" onclick="__back()">Back</button>
-  <button class="btn" onclick="__home()">Home</button>
-</div>
-
-<!-- Photo block ONLY -->
-<div class="timeline-item">
-  <div><strong>Photo</strong></div>
-  <div id="dogPhotoTap">
-    <div id="dogPhotoPlaceholder"></div>
-    <img id="dogPhotoImg" />
-  </div>
-  <button id="btnViewPhoto">View photo</button>
-</div>
-</section>>
+        <div class="row" style="margin-top:10px;">
+          <button class="btn" id="btnViewPhoto">View photo</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
 
 
   <!-- HEALTH: IMMUNIZATIONS -->
