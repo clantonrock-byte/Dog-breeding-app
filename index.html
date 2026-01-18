@@ -195,17 +195,33 @@ function warnMissingView(name) {
   <h2>Dogs</h2>
 
   <div class="nav-row">
-    <button class="btn" onclick="__back()">Back</button>
-    <button class="btn" onclick="__home()">Home</button>
-  </div>
-  <div class="row" style="margin-top:10px;">
-    <button class="btn primary" id="btnAddDog" type="button">+ Add dog</button>
+    <button class="btn" type="button" onclick="__back()">Back</button>
+    <button class="btn" type="button" onclick="__home()">Home</button>
   </div>
 
-  <div id="dogsMeta" class="muted small" style="margin-top:10px;"></div>
+  <div class="row" style="margin-top:10px; justify-content:space-between;">
+    <span class="pill" id="dogsCurrentViewPill">All</span>
+    <button class="btn primary" type="button" id="btnAddDog">+ Add dog</button>
+  </div>
 
-  <div id="dogsList" style="margin-top:10px; display:flex; flex-direction:column; gap:10px;"></div>
-  
+  <div id="dogsListMeta" class="muted small" style="margin-top:10px;"></div>
+
+  <!-- where portal/dogs.bundle.js will render -->
+  <div id="dogsList" style="margin-top:10px;"></div>
+
+  <!-- optional: archived section if your renderer uses it -->
+  <div id="dogsArchivedWrap" class="hide" style="margin-top:12px;">
+    <h3 style="margin:0 0 8px 0;">Archived</h3>
+    <div id="dogsArchivedMeta" class="muted small" style="margin-bottom:8px;"></div>
+    <div id="dogsArchivedList"></div>
+  </div>
+
+  <!-- optional: unassigned section if your renderer uses it -->
+  <div id="dogsUnassignedWrap" class="hide" style="margin-top:12px;">
+    <h3 style="margin:0 0 8px 0;">Unassigned</h3>
+    <div id="dogsUnassignedMeta" class="muted small" style="margin-bottom:8px;"></div>
+    <div id="dogsUnassignedList"></div>
+  </div>
 </section>
     <!-- DOG PROFILE (single, valid) -->
     <section id="viewDogProfile" class="card hide">
