@@ -1445,6 +1445,18 @@
     });
   })();
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const v = "v-" + Date.now();
+    const el = document.createElement("div");
+    el.textContent = "DEPLOY CHECK: " + v + "  __go=" + (typeof window.__go);
+    el.style.cssText =
+      "position:fixed;left:8px;right:8px;bottom:8px;z-index:999999;" +
+      "padding:10px 12px;border-radius:12px;background:#fff;color:#111;" +
+      "border:2px solid #000;font:12px/1.4 system-ui";
+    document.body.appendChild(el);
+  });
+</script>
 </body>
 </html>
 
