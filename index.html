@@ -7,7 +7,21 @@
 #viewDogProfile > .nav-row {
   display: block !important;
 }
+<!-- DOG PROFILE (shell only; rebuild mounts AFTER photo block) -->
+<section id="viewDogProfile" class="card hide">
+  <h2 id="dogProfileTitle" class="hide">Dog Profile</h2>
 
+  <div class="timeline-item" id="dogPhotoBlock">
+    <div id="dogPhotoTap" style="border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
+      <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
+      <img id="dogPhotoImg" alt="Dog photo" style="display:none; max-width:100%; border-radius:12px;" />
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <button class="btn" id="btnViewPhoto">View photo</button>
+    </div>
+  </div>
+</section>
 /* --- Keep the legacy PHOTO image area, but hide its label/help/button row --- */
 #viewDogProfile .timeline-item:first-of-type > div:first-child,   /* the "Photo" title */
 #viewDogProfile .timeline-item:first-of-type > .muted.small,      /* the help text */
