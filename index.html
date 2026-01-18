@@ -1,68 +1,23 @@
-<!doctype html>
+<!<!doctype html>
 <html lang="en">
 <head>
-  <style>
-<!-- DOG PROFILE (shell only; rebuild mounts AFTER photo block) -->
-<section id="viewDogProfile" class="card hide">
-  <h2 id="dogProfileTitle" class="hide">Dog Profile</h2>
-
-  <div class="timeline-item" id="dogPhotoBlock">
-    <div id="dogPhotoTap" style="border:1px dashed #bbb; border-radius:12px; padding:12px; text-align:center;">
-      <div id="dogPhotoPlaceholder" class="muted small">Tap to add photo</div>
-      <img id="dogPhotoImg" alt="Dog photo" style="display:none; max-width:100%; border-radius:12px;" />
-    </div>
-
-    <div class="row" style="margin-top:10px;">
-      <button class="btn" id="btnViewPhoto">View photo</button>
-    </div>
-  </div>
-</section>
-/* --- Keep the legacy PHOTO image area, but hide its label/help/button row --- */
-#viewDogProfile .timeline-item:first-of-type > div:first-child,   /* the "Photo" title */
-#viewDogProfile .timeline-item:first-of-type > .muted.small,      /* the help text */
-#viewDogProfile .timeline-item:first-of-type .row {               /* the "View photo" button row */
-  
-}
-
-/* --- Optional: if you still see any legacy inline blocks below photo, hide them --- */
-#viewDogProfile #dogStatusPill,
-#viewDogProfile #dogStatusTimestamps,
-#viewDogProfile #dogCallNameDisplay,
-#viewDogProfile #dogBreedInline,
-#viewDogProfile #dogDobInline,
-#viewDogProfile #dogNotes,
-#viewDogProfile #btnDoneDog,
-#viewDogProfile #btnNotesDog,
-#viewDogProfile #btnMoreDog,
-#viewDogProfile #btnSaveDog,
-#viewDogProfile #btnCancelDog,
-#viewDogProfile #btnMoreDogPanel,
-#viewDogProfile #statusNoteWrap,
-#viewDogProfile #microchipBlock,
-#viewDogProfile #rabiesBlock {
-  display:
-}
-  </style>
-<link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="portal/dogs.bundle.css" />
-<link rel="stylesheet" href="style.css" />
-
-<!-- optional: list thumb styles -->
-<link rel="stylesheet" href="portal/dogs_list_thumbs.css" />
-
-<!-- profile rebuild styles -->
-<link rel="stylesheet" href="portal/dog_profile_rebuild_v3_7.css" />
-<link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
-
-<!-- settings/access styles -->
-<link rel="stylesheet" href="portal/portal_pin_multiuser.css" />
-<link rel="stylesheet" href="portal/settings_polish.css" />
-
-<meta name="theme-color" content="#0b0b0d">
+  <meta name="theme-color" content="#0b0b0d" />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breeder Pro</title>
- <style>
+
+  <!-- base styles (ONCE) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- dogs list styles -->
+  <link rel="stylesheet" href="portal/dogs.bundle.css" />
+  <link rel="stylesheet" href="portal/dogs_list_thumbs.css" />
+
+  <!-- dog profile rebuild styles -->
+  <link rel="stylesheet" href="portal/dog_profile_rebuild_v3_7.css" />
+  <link rel="stylesheet" href="portal/dog_profile_ui_polish.css" />
+
+  <style>
     :root { --border:#e2e2e2; --muted:#666; --bg:#f6f7f9; --card:#fff; --primary:#2d6cdf; --danger:#b42318; }
     *{ box-sizing:border-box; }
     body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:var(--bg); }
@@ -95,49 +50,46 @@
     .action-row{ display:flex; gap:10px; margin-top:12px; }
     .action-row .btn{ flex:1; }
     .more-panel.hide{ display:none; }
-    .dogs-menu{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-    .dogs-menu .btn{ flex:1; min-width:120px; }
-    .dogs-subtools{ display:flex; gap:10px; margin-top:10px; }
-    .dogs-subtools .btn{ flex:1; }
-    .big-code{ font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-               font-size:20px; font-weight:900; letter-spacing:0.5px; word-break:break-all; }
-    dialog{ border:none; border-radius:16px; width:min(520px, 96vw); padding:0; }
-    dialog::backdrop{ background:rgba(0,0,0,0.35); }
-    .dlg-card{ padding:14px; }
-    .dlg-h{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .dlg-h h3{ margin:0; font-size:16px; }
-    .dlg-f{ display:flex; gap:10px; margin-top:12px; }
-    .dlg-f .btn{ flex:1; }
-    /* Samsung-safe Deceased rainbow draw/erase */
-    #rainbowOverlay{ position:fixed; inset:0; pointer-events:none; z-index:9999;
-      display:none; align-items:center; justify-content:flex-end; background:transparent; }
-    #rainbowOverlay.on{ display:flex; }
-    #rainbowArcWrap{ width:140vw; height:72vh; opacity:0.82; }
-    .rainbowStrokeRun{ animation: drawErase 2900ms ease forwards; }
-    @keyframes drawErase{
-      0%   { stroke-dashoffset: var(--len); opacity: 0.0; }
-      18%  { opacity: 1.0; }
-      55%  { stroke-dashoffset: 0; opacity: 1.0; }
-      100% { stroke-dashoffset: calc(-1 * var(--len)); opacity: 0.0; }
+
+    /* Dog list thumb tile (baseline) */
+    .dog-thumb-btn{
+      width:64px;height:64px;border-radius:12px;
+      border:1px solid rgba(255,255,255,0.15);
+      background:rgba(255,255,255,0.06);
+      overflow:hidden;display:flex;align-items:center;justify-content:center;
+      flex:0 0 auto; cursor:pointer;
     }
-    /* Scan video */
-    #scanVideo{ width:100%; border-radius:12px; border:1px solid var(--border); }
-  
-/* RC Dog list thumb tile (baseline-v2-clean) */
-.dog-thumb-btn{
-  width:64px;height:64px;border-radius:12px;
-  border:1px solid rgba(255,255,255,0.15);
-  background:rgba(255,255,255,0.06);
-  overflow:hidden;display:flex;align-items:center;justify-content:center;
-  flex:0 0 auto; cursor:pointer;
-}
-.dog-thumb-btn img{width:100%;height:100%;object-fit:cover;display:block;}
-.dog-thumb-placeholder{font-size:18px;opacity:.8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
-.dog-thumb-text{font-size:10px;opacity:.65;}
+    .dog-thumb-btn img{width:100%;height:100%;object-fit:cover;display:block;}
 
-</style>
+    /* Keep legacy photo box visible; hide legacy inline profile controls below it */
+    #viewDogProfile #dogStatusPill,
+    #viewDogProfile #dogStatusTimestamps,
+    #viewDogProfile #dogCallNameDisplay,
+    #viewDogProfile #dogBreedInline,
+    #viewDogProfile #dogDobInline,
+    #viewDogProfile #dogDobEstimatedInline,
+    #viewDogProfile #dogNotes,
+    #viewDogProfile #btnDoneDog,
+    #viewDogProfile #btnNotesDog,
+    #viewDogProfile #btnMoreDog,
+    #viewDogProfile #btnSaveDog,
+    #viewDogProfile #btnCancelDog,
+    #viewDogProfile #btnMoreDogPanel,
+    #viewDogProfile #statusNoteWrap,
+    #viewDogProfile #microchipBlock,
+    #viewDogProfile #rabiesBlock {
+      display: none !important;
+    }
 
-  <!-- NAV defined immediately -->
+    /* Hide legacy Photo label/help/button row (keep the photo tap area + image) */
+    #viewDogProfile #dogPhotoBlock > div:first-child,
+    #viewDogProfile #dogPhotoBlock > .muted.small,
+    #viewDogProfile #dogPhotoBlock .row {
+      display: none !important;
+    }
+  </style>
+
+  <!-- NAV defined immediately (OK to live in head) -->
   <script>
     (function () {
       const VIEWS = [
@@ -146,9 +98,10 @@
         "InventoryMenu","StockMenu","InventoryAvailable","InventoryAdd","InventoryAddStock","InventoryReduceStock","InventoryTransfer",
         "Feeding","Care","Helpers","Records"
       ];
-      let current="Home";
-      const stack=[];
-      const queue=[];
+      let current = "Home";
+      const stack = [];
+      const queue = [];
+
       function show(name){
         VIEWS.forEach(v=>{
           const el=document.getElementById("view"+v);
@@ -157,6 +110,7 @@
         current=name;
         if(typeof window.__afterShow==="function"){ try{ window.__afterShow(name);}catch(_){ } }
       }
+
       window.__go=function(name){
         if(!name) return;
         if(!document.getElementById("viewHome")) return queue.push({t:"go", name});
@@ -172,6 +126,7 @@
         if(!document.getElementById("viewHome")) return queue.push({t:"home"});
         stack.length=0; show("Home");
       };
+
       document.addEventListener("DOMContentLoaded", ()=>{
         show("Home");
         while(queue.length){
