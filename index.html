@@ -25,11 +25,6 @@
     .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
     .timeline-item{ border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:10px; }
 
-    /* --- HARD OVERRIDE: prevent portal css from making Dog Profile black --- */
-    html, body { background: var(--bg) !important; color:#111 !important; }
-    #viewDogProfile { background:#fff !important; color:#111 !important; }
-    #viewDogProfile .card, #viewDogProfile .timeline-item { background:#fff !important; }
-
     /* If an overlay is covering content, keep it behind + non-interactive */
     #rainbowOverlay { pointer-events:none !important; z-index:0 !important; }
     .topbar, main.shell { position:relative; z-index:1; }
