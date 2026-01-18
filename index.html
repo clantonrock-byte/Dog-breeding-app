@@ -82,6 +82,71 @@
     z-index: 1;
   }
   </script>
+<script>
+  (function () {
+    const VIEWS = [
+      "Home",
+      "Dogs","DogProfile","HealthImmunizations",
+      "InventoryMenu","StockMenu","InventoryAvailable","InventoryAdd",
+      "InventoryAddStock","InventoryReduceStock","InventoryTransfer",
+      "Feeding","Care","Helpers","Records"
+    ];
+
+    let current = "Home";
+    const stack = [];
+    const queue = [];
+
+    function show(name) {
+      VIEWS.forEach(v => {
+        const el = document.getElementById("view" + v);
+        if (el) el.classList.toggle("hide", v !== name);
+      });
+      current = name;
+      if (typeof window.__afterShow === "function") {
+        try { window.__afterShow(name); } catch(e){}
+      }
+    }
+
+    window.__go = function(name) {
+      if (!name) return;
+      if (!document.getElementById("viewHome")) {
+        queue.push({ t: "go", name });
+        return;
+      }
+      if (name === current) return;
+      stack.push(current);
+      show(name);
+    };
+
+    window.__back = function() {
+      if (!document.getElementById("viewHome")) {
+        queue.push({ t: "back" });
+        return;
+      }
+      if (!stack.length) return show("Home");
+      show(stack.pop());
+    };
+
+    window.__home = function() {
+      if (!document.getElementById("viewHome")) {
+        queue.push({ t: "home" });
+        return;
+      }
+      stack.length = 0;
+      show("Home");
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      show("Home");
+      while (queue.length) {
+        const a = queue.shift();
+        if (a.t === "go") window.__go(a.name);
+        if (a.t === "back") window.__back();
+        if (a.t === "home") window.__home();
+      }
+    });
+  })();
+</script>
 </head>
 
 <body>
