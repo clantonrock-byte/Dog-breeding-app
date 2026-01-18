@@ -62,6 +62,23 @@
   border-top: none !important;
   padding-top: 0 !important;
 }
+    /* Remove the seam line above the first section (Basics) */
+#viewDogProfile .bp-section {
+  border-top: none !important;
+}
+
+#viewDogProfile .bp-section:first-of-type,
+#viewDogProfile #bpBasics,
+#viewDogProfile #bpBasics::before,
+#viewDogProfile #bpBasics::after {
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* If the line is an actual <hr> inside the rebuild */
+#viewDogProfile hr {
+  display: none !important;
+}
   </style>
 
   <script>
