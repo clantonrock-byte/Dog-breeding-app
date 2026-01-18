@@ -83,6 +83,7 @@
   }
   </script>
 <script>
+  
   (function () {
     const VIEWS = [
       "Home",
@@ -95,7 +96,15 @@
     let current = "Home";
     const stack = [];
     const queue = [];
-
+function warnMissingView(name) {
+  const id = "view" + name;
+  if (!document.getElementById(id)) {
+    alert("Missing section: #" + id + "\n\nYour button is navigating to a view that does not exist yet.");
+    console.warn("Missing view:", id);
+    return true;
+  }
+  return false;
+}
     function show(name) {
       VIEWS.forEach(v => {
         const el = document.getElementById("view" + v);
