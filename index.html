@@ -1148,7 +1148,7 @@
   };
 
   // Bindings
-  document.addEventListener("DOMContentLoaded", ()=>{
+    document.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("btnTalk").addEventListener("click", ()=>alert("Voice may be used at any time."));
 
     // Dogs page
@@ -1162,89 +1162,89 @@
     document.getElementById("btnToggleArchivedDogs").addEventListener("click", ()=>{ document.getElementById("dogsArchivedWrap").classList.toggle("hide"); renderDogs(); });
 
     // Dog profile actions
-    document.getElementById("btnDoneDog").addEventListener("click", ()=>saveDog(true));
-    document.getElementById("btnNotesDog").addEventListener("click", ()=>{
+      document.getElementById("btnDoneDog").addEventListener("click", ()=>saveDog(true));
+      document.getElementById("btnNotesDog").addEventListener("click", ()=>{
       document.getElementById("dogMorePanel").classList.remove("hide");
       document.getElementById("btnMoreDog").textContent="More ▴";
       document.getElementById("secNotes").scrollIntoView({behavior:"smooth", block:"start"});
       document.getElementById("dogNotes").focus();
     });
-    document.getElementById("btnMoreDog").addEventListener("click", ()=>{
+      document.getElementById("btnMoreDog").addEventListener("click", ()=>{
       const p=document.getElementById("dogMorePanel");
       const hidden=p.classList.contains("hide");
       p.classList.toggle("hide");
       document.getElementById("btnMoreDog").textContent=hidden?"More ▴":"More ▾";
     });
-    document.getElementById("btnReviewLifeStatus").addEventListener("click", ()=>{
+      document.getElementById("btnReviewLifeStatus").addEventListener("click", ()=>{
       document.getElementById("dogMorePanel").classList.remove("hide");
       document.getElementById("btnMoreDog").textContent="More ▴";
       document.getElementById("secStatus").scrollIntoView({behavior:"smooth", block:"start"});
       document.getElementById("dogStatus").focus();
     });
-    document.getElementById("btnSaveDog").addEventListener("click", ()=>saveDog(false));
-    document.getElementById("btnCancelDog").addEventListener("click", ()=>{ document.getElementById("dogSaveStatus").textContent=""; __back(); });
-    document.getElementById("dogStatus").addEventListener("change", ()=>toggleStatusNoteUI(document.getElementById("dogStatus").value));
+      document.getElementById("btnSaveDog").addEventListener("click", ()=>saveDog(false));
+      document.getElementById("btnCancelDog").addEventListener("click", ()=>{ document.getElementById("dogSaveStatus").textContent=""; __back(); });
+      document.getElementById("dogStatus").addEventListener("change", ()=>toggleStatusNoteUI(document.getElementById("dogStatus").value));
 
     // Microchip
-    document.getElementById("btnAddMicrochip").addEventListener("click", openMicrochipEntry);
-    document.getElementById("btnMicrochipNext").addEventListener("click", (e)=>{ e.preventDefault(); proceedMicrochipConfirm(); });
-    document.getElementById("btnMicrochipLock").addEventListener("click", (e)=>{ e.preventDefault(); lockMicrochip(); });
+      document.getElementById("btnAddMicrochip").addEventListener("click", openMicrochipEntry);
+      document.getElementById("btnMicrochipNext").addEventListener("click", (e)=>{ e.preventDefault(); proceedMicrochipConfirm(); });
+      document.getElementById("btnMicrochipLock").addEventListener("click", (e)=>{ e.preventDefault(); lockMicrochip(); });
 
     // Rabies tap -> health immunizations
-    document.getElementById("rabiesBlock").addEventListener("click", ()=>openImmunizationsForDog(currentDogId));
+      document.getElementById("rabiesBlock").addEventListener("click", ()=>openImmunizationsForDog(currentDogId));
 
     // Photo
-    document.getElementById("dogPhotoTap").addEventListener("click", ()=>{
+      document.getElementById("dogPhotoTap").addEventListener("click", ()=>{
       const d=getDog(currentDogId); if(!d) return;
       if(d.archived){ if(d.photoDataUrl) window.open(d.photoDataUrl,"_blank"); return; }
       document.getElementById("dlgPhotoChoice").showModal();
     });
-    document.getElementById("btnViewPhoto").addEventListener("click", ()=>{
+      document.getElementById("btnViewPhoto").addEventListener("click", ()=>{
       const d=getDog(currentDogId); if(d?.photoDataUrl) window.open(d.photoDataUrl,"_blank");
     });
-    document.getElementById("btnTakePhoto").addEventListener("click", ()=>document.getElementById("fileCamera").click());
-    document.getElementById("btnChoosePhoto").addEventListener("click", ()=>document.getElementById("fileGallery").click());
-    document.getElementById("fileCamera").addEventListener("change", async (e)=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return; await setDogPhoto(f); document.getElementById("dlgPhotoChoice").close(); });
-    document.getElementById("fileGallery").addEventListener("change", async (e)=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return; await setDogPhoto(f); document.getElementById("dlgPhotoChoice").close(); });
+      document.getElementById("btnTakePhoto").addEventListener("click", ()=>document.getElementById("fileCamera").click());
+      document.getElementById("btnChoosePhoto").addEventListener("click", ()=>document.getElementById("fileGallery").click());
+      document.getElementById("fileCamera").addEventListener("change", async (e)=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return; await setDogPhoto(f); document.getElementById("dlgPhotoChoice").close(); });
+      document.getElementById("fileGallery").addEventListener("change", async (e)=>{ const f=e.target.files?.[0]; e.target.value=""; if(!f) return; await setDogPhoto(f); document.getElementById("dlgPhotoChoice").close(); });
 
     // Health immunizations
-    document.getElementById("btnNewImmunization").addEventListener("click", openNewImmun);
-    document.getElementById("immAdminBy").addEventListener("change", ()=>{
+      document.getElementById("btnNewImmunization").addEventListener("click", openNewImmun);
+      document.getElementById("immAdminBy").addEventListener("change", ()=>{
       const v=document.getElementById("immAdminBy").value;
       document.getElementById("immAdminOtherWrap").classList.toggle("hide", v!=="Other");
     });
-    document.querySelectorAll(".immChk").forEach(ch=>ch.addEventListener("change", updateImmunDetailsVisibility));
-    document.getElementById("btnImmReview").addEventListener("click", (e)=>{ e.preventDefault(); reviewImmun(); });
-    document.getElementById("btnImmLock").addEventListener("click", (e)=>{ e.preventDefault(); lockImmun(); });
+      document.querySelectorAll(".immChk").forEach(ch=>ch.addEventListener("change", updateImmunDetailsVisibility));
+      document.getElementById("btnImmReview").addEventListener("click", (e)=>{ e.preventDefault(); reviewImmun(); });
+      document.getElementById("btnImmLock").addEventListener("click", (e)=>{ e.preventDefault(); lockImmun(); });
 
     // Inventory
-    document.getElementById("btnInvRefresh").addEventListener("click", renderInv);
-    document.getElementById("btnInvToggleArchived").addEventListener("click", ()=>document.getElementById("invArchived").classList.toggle("hide"));
-    document.getElementById("btnOpenAddDialog").addEventListener("click", openInvDialog);
-    document.getElementById("btnSaveInv").addEventListener("click", (e)=>{ e.preventDefault(); saveInvDef(); });
-    document.getElementById("btnScanForAdd").addEventListener("click", ()=>openScan("add"));
-    document.getElementById("btnScanAddStock").addEventListener("click", ()=>openScan("addstock"));
-    document.getElementById("btnScanReduce").addEventListener("click", ()=>openScan("reduce"));
-    document.getElementById("btnScanTransfer").addEventListener("click", ()=>openScan("transfer"));
-    document.getElementById("btnAddStockRefresh").addEventListener("click", populateInvSelects);
-    document.getElementById("btnReduceRefresh").addEventListener("click", populateInvSelects);
-    document.getElementById("btnTransferRefresh").addEventListener("click", populateInvSelects);
-    document.getElementById("addStockSearch").addEventListener("input", ()=>filterInvSelect("addStockSearch","addStockSelect"));
-    document.getElementById("reduceSearch").addEventListener("input", ()=>filterInvSelect("reduceSearch","reduceSelect"));
-    document.getElementById("transferSearch").addEventListener("input", ()=>filterInvSelect("transferSearch","transferSelect"));
-    document.getElementById("addStockSelect").addEventListener("change", e=>{ if(e.target.value) showAddStock(e.target.value); });
-    document.getElementById("reduceSelect").addEventListener("change", e=>{ if(e.target.value) showReduce(e.target.value); });
-    document.getElementById("transferSelect").addEventListener("change", e=>{ if(e.target.value) showTransfer(e.target.value); });
-    document.getElementById("btnAddStockConfirm").addEventListener("click", applyAddStock);
-    document.getElementById("btnReduceConfirm").addEventListener("click", applyReduce);
-    document.getElementById("btnTransferConfirm").addEventListener("click", applyTransfer);
-    document.getElementById("btnAddStockCancel").addEventListener("click", ()=>document.getElementById("addStockForm").classList.add("hide"));
-    document.getElementById("btnReduceCancel").addEventListener("click", ()=>document.getElementById("reduceForm").classList.add("hide"));
-    document.getElementById("btnTransferCancel").addEventListener("click", ()=>document.getElementById("transferForm").classList.add("hide"));
-    document.getElementById("btnRescan").addEventListener("click", startScan);
-    document.getElementById("btnConfirmScan").addEventListener("click", confirmScan);
-    document.getElementById("btnCloseScan").addEventListener("click", closeScan);
-    document.getElementById("dlgScan").addEventListener("close", stopScan);
+      document.getElementById("btnInvRefresh").addEventListener("click", renderInv);
+      document.getElementById("btnInvToggleArchived").addEventListener("click", ()=>document.getElementById("invArchived").classList.toggle("hide"));
+      document.getElementById("btnOpenAddDialog").addEventListener("click", openInvDialog);
+      document.getElementById("btnSaveInv").addEventListener("click", (e)=>{ e.preventDefault(); saveInvDef(); });
+      document.getElementById("btnScanForAdd").addEventListener("click", ()=>openScan("add"));
+      document.getElementById("btnScanAddStock").addEventListener("click", ()=>openScan("addstock"));
+      document.getElementById("btnScanReduce").addEventListener("click", ()=>openScan("reduce"));
+      document.getElementById("btnScanTransfer").addEventListener("click", ()=>openScan("transfer"));
+      document.getElementById("btnAddStockRefresh").addEventListener("click", populateInvSelects);
+      document.getElementById("btnReduceRefresh").addEventListener("click", populateInvSelects);
+      document.getElementById("btnTransferRefresh").addEventListener("click", populateInvSelects);
+      document.getElementById("addStockSearch").addEventListener("input", ()=>filterInvSelect("addStockSearch","addStockSelect"));
+      document.getElementById("reduceSearch").addEventListener("input", ()=>filterInvSelect("reduceSearch","reduceSelect"));
+      document.getElementById("transferSearch").addEventListener("input", ()=>filterInvSelect("transferSearch","transferSelect"));
+      document.getElementById("addStockSelect").addEventListener("change", e=>{ if(e.target.value) showAddStock(e.target.value); });
+      document.getElementById("reduceSelect").addEventListener("change", e=>{ if(e.target.value) showReduce(e.target.value); });
+      document.getElementById("transferSelect").addEventListener("change", e=>{ if(e.target.value) showTransfer(e.target.value); });
+      document.getElementById("btnAddStockConfirm").addEventListener("click", applyAddStock);
+      document.getElementById("btnReduceConfirm").addEventListener("click", applyReduce);
+      document.getElementById("btnTransferConfirm").addEventListener("click", applyTransfer);
+      document.getElementById("btnAddStockCancel").addEventListener("click", ()=>document.getElementById("addStockForm").classList.add("hide"));
+      document.getElementById("btnReduceCancel").addEventListener("click", ()=>document.getElementById("reduceForm").classList.add("hide"));
+      document.getElementById("btnTransferCancel").addEventListener("click", ()=>document.getElementById("transferForm").classList.add("hide"));
+      document.getElementById("btnRescan").addEventListener("click", startScan);
+      document.getElementById("btnConfirmScan").addEventListener("click", confirmScan);
+      document.getElementById("btnCloseScan").addEventListener("click", closeScan);
+      document.getElementById("dlgScan").addEventListener("close", stopScan);
 
     // Seed renders
     renderInv();
@@ -1408,9 +1408,8 @@
   <form method="dialog" class="dlg-card">
     <div class="dlg-h">
       <h2>Settings</h2>
-      <button class="btn" value="cancel" aria-label="Close">✕</button></div>
-
-      <!--Settings content will be injected here by your patches -->
+      <button class="btn" value="cancel" aria-label="Close">✕</button> </div>
+  <!--Settings content will be injected here by your patches -->
       <div class="dlg-f">
       <button class="btn" value="cancel">Close</button>
       <button class="btn primary" id="btnBpSaveSettings" value="ok">Save</button></div>
@@ -1433,7 +1432,7 @@
 <script src="portal/portal_pin_multiuser_v2.js"></script>
 
 <!-- Dog Profile rebuild MUST be last -->
-<script src="portal/dog_profile_rebuild_v3_7_1.js"></script>>
+<script src="portal/dog_profile_rebuild_v3_7_1.js"></script>
 </body>
 </html>
 
