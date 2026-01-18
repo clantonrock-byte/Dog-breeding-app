@@ -69,6 +69,18 @@
         console.log("#viewDogProfile computed background:", bg);
       }
     });
+    /* === FIX: allow buttons to receive taps on mobile === */
+  #rainbowOverlay {
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  .topbar,
+  .shell,
+  .card {
+    position: relative;
+    z-index: 1;
+  }
   </script>
 </head>
 
