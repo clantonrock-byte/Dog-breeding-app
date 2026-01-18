@@ -1,4 +1,4 @@
-<!<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta name="theme-color" content="#0b0b0d" />
@@ -15,26 +15,26 @@
   <style>
     :root { --border:#e2e2e2; --muted:#666; --bg:#f6f7f9; --card:#fff; --primary:#2d6cdf; --danger:#b42318; }
     *{ box-sizing:border-box; }
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:var(--bg); }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:var(--bg); color:#111; }
     .hide{ display:none !important; }
     .shell{ padding:12px; }
     .topbar{ position:sticky; top:0; z-index:10; background:var(--card); border-bottom:1px solid var(--border);
              display:flex; align-items:center; justify-content:space-between; padding:10px 12px; }
-    .brand-title{ font-weight:800; }
-    .brand-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
     .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px; }
-    h2{ margin:0 0 10px 0; font-size:18px; }
-    .muted{ color:var(--muted); font-size:13px; }
-    .small{ font-size:12px; }
-    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .nav-row{ display:flex; gap:10px; margin-top:10px; }
-    .nav-row .btn{ flex:1; }
     .btn{ padding:10px 12px; border-radius:10px; border:1px solid #cfcfcf; background:#fff; font-weight:700; }
     .btn.primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
-
     .timeline-item{ border:1px solid var(--border); border-radius:12px; padding:10px; margin-top:10px; }
 
-    /* Keep legacy photo box visible; hide legacy inline profile controls below it */
+    /* --- HARD OVERRIDE: prevent portal css from making Dog Profile black --- */
+    html, body { background: var(--bg) !important; color:#111 !important; }
+    #viewDogProfile { background:#fff !important; color:#111 !important; }
+    #viewDogProfile .card, #viewDogProfile .timeline-item { background:#fff !important; }
+
+    /* If an overlay is covering content, keep it behind + non-interactive */
+    #rainbowOverlay { pointer-events:none !important; z-index:0 !important; }
+    .topbar, main.shell { position:relative; z-index:1; }
+
+    /* Your existing hide rules */
     #viewDogProfile #dogStatusPill,
     #viewDogProfile #dogStatusTimestamps,
     #viewDogProfile #dogCallNameDisplay,
@@ -50,65 +50,25 @@
     #viewDogProfile #btnMoreDogPanel,
     #viewDogProfile #statusNoteWrap,
     #viewDogProfile #microchipBlock,
-    #viewDogProfile #rabiesBlock {
-      display: none !important;
-    }
+    #viewDogProfile #rabiesBlock { display:none !important; }
 
-    /* Hide legacy Photo label/help/button row (keep the photo tap area + image) */
     #viewDogProfile #dogPhotoBlock > div:first-child,
     #viewDogProfile #dogPhotoBlock > .muted.small,
-    #viewDogProfile #dogPhotoBlock .row {
-      display: none !important;
-    }
+    #viewDogProfile #dogPhotoBlock .row { display:none !important; }
   </style>
 
   <script>
-    (function () {
-      const VIEWS = [
-        "Home",
-        "Dogs","DogProfile","HealthImmunizations",
-        "InventoryMenu","StockMenu","InventoryAvailable","InventoryAdd","InventoryAddStock","InventoryReduceStock","InventoryTransfer",
-        "Feeding","Care","Helpers","Records"
-      ];
-      let current = "Home";
-      const stack = [];
-      const queue = [];
+    // Quick sanity checks you can leave in while debugging.
+    document.addEventListener("DOMContentLoaded", () => {
+      const dup = document.querySelectorAll("#viewDogProfile").length;
+      if (dup > 1) console.warn("Duplicate #viewDogProfile sections found:", dup);
 
-      function show(name){
-        VIEWS.forEach(v=>{
-          const el=document.getElementById("view"+v);
-          if(el) el.classList.toggle("hide", v!==name);
-        });
-        current=name;
-        if(typeof window.__afterShow==="function"){ try{ window.__afterShow(name);}catch(_){ } }
+      const el = document.getElementById("viewDogProfile");
+      if (el) {
+        const bg = getComputedStyle(el).backgroundColor;
+        console.log("#viewDogProfile computed background:", bg);
       }
-
-      window.__go=function(name){
-        if(!name) return;
-        if(!document.getElementById("viewHome")) return queue.push({t:"go", name});
-        if(name===current) return;
-        stack.push(current); show(name);
-      };
-      window.__back=function(){
-        if(!document.getElementById("viewHome")) return queue.push({t:"back"});
-        if(!stack.length) return show("Home");
-        show(stack.pop());
-      };
-      window.__home=function(){
-        if(!document.getElementById("viewHome")) return queue.push({t:"home"});
-        stack.length=0; show("Home");
-      };
-
-      document.addEventListener("DOMContentLoaded", ()=>{
-        show("Home");
-        while(queue.length){
-          const a=queue.shift();
-          if(a.t==="go") window.__go(a.name);
-          if(a.t==="back") window.__back();
-          if(a.t==="home") window.__home();
-        }
-      });
-    })();
+    });
   </script>
 </head>
 
