@@ -50,6 +50,18 @@
     #viewDogProfile #dogPhotoBlock > div:first-child,
     #viewDogProfile #dogPhotoBlock > .muted.small,
     #viewDogProfile #dogPhotoBlock .row { display:none !important; }
+ /* Remove divider line between Profile header and first section */
+#viewDogProfile .bp-head,
+#viewDogProfile .bp-head::after,
+#viewDogProfile .bp-head::before {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+#viewDogProfile .bp-section:first-of-type {
+  border-top: none !important;
+  padding-top: 0 !important;
+}
   </style>
 
   <script>
