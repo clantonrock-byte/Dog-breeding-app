@@ -78,10 +78,14 @@
 /* If the line is an actual <hr> inside the rebuild */
 #viewDogProfile hr {
   display: none !important;
-}/* Remove the top border on the first section under Profile (Basics) */
+}/
+   /* Make the Basics section flat (no card box) */
 #viewDogProfile .timeline-item:first-of-type {
-  border-top: none !important;
-}
+  border: none !important;
+  background: transparent !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+} 
   </style>
 
   <script>
