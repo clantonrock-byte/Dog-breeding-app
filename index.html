@@ -151,7 +151,37 @@ function warnMissingView(name) {
         try { window.__afterShow(name); } catch(e){}
       }
     }
+<script>
+  (function () {
+    function removeDuplicateBasicsHeader() {
+      var root = document.getElementById("viewDogProfile");
+      if (!root) return;
 
+      // The tab row uses buttons; the duplicate header is a real heading (h1/h2/h3).
+      var headings = root.querySelectorAll("h1,h2,h3");
+      for (var i = 0; i < headings.length; i++) {
+        var h = headings[i];
+        var txt = (h.textContent || "").trim().toLowerCase();
+        if (txt === "basics") {
+          // Keep the big page title if any, remove the section header.
+          // The section header usually appears below the tabs and above the first form fields.
+          h.style.display = "none";
+          return;
+        }
+      }
+    }
+
+    // Run when you navigate into DogProfile
+    var prev = window.__afterShow;
+    window.__afterShow = function (view) {
+      try { if (typeof prev === "function") prev(view); } catch (e) {}
+      if (view === "DogProfile") {
+        setTimeout(removeDuplicateBasicsHeader, 0);
+        setTimeout(removeDuplicateBasicsHeader, 50);
+      }
+    };
+  })();
+</script>
     window.__go = function(name) {
       if (!name) return;
       if (!document.getElementById("viewHome")) {
