@@ -1578,7 +1578,21 @@ function warnMissingView(name) {
 
 <!-- Dog Profile rebuild MUST be last -->
 <script src="portal/dog_profile_rebuild_v3_7_1.js"></script>
-
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hasGo = typeof window.__go === "function";
+    const dogsEl = document.getElementById("viewDogs");
+    const badge = document.createElement("div");
+    badge.style.cssText =
+      "position:fixed;left:8px;right:8px;bottom:8px;z-index:999999;" +
+      "padding:10px 12px;border-radius:12px;background:#fff;color:#111;" +
+      "border:2px solid #000;font:12px/1.4 system-ui";
+    badge.textContent =
+      "__go=" + (hasGo ? "function" : typeof window.__go) +
+      " | viewDogs=" + (dogsEl ? "yes" : "NO");
+    document.body.appendChild(badge);
+  });
+</script>
 </body>
 </html>
 
